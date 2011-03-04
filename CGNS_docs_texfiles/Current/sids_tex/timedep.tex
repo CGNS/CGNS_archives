@@ -1,0 +1,783 @@
+\section{Time-Dependent Flow}
+\label{s:timedep}
+\thispagestyle{plain}
+
+This section describes structure types intended primarily for time-dependent
+flows.
+Data structures are presented for storing time-dependent or iterative
+data, and for recording rigid and arbitary grid motion.
+The section concludes with several examples.
+
+\subsection{Iterative Data Structure Definitions}
+\label{s:IterativeData}
+
+In order to keep a record of time dependent or iterative data, the data
+structures \fort{BaseIterativeData\_t} and \fort{ZoneIterativeData\_t}
+are used.
+
+\subsubsection{Base Iterative Data Structure Definition: \texttt{BaseIterativeData\_t}}
+\label{s:BaseIterativeData}
+
+The \fort{BaseIterativeData\_t} data structure is located directly under
+the \fort{CGNSBase\_t} node.
+It contains information about the number of time steps or iterations
+being recorded, and the time and/or iteration values at each step.
+In addition, it may include the list of zones and families for each step
+of the simulation, if these vary throughout the simulation.
+
+The \fort{BaseIterativeData\_t} data structure is defined as follows:
+
+\begin{alltt}
+  BaseIterativeData\_t :=
+    \{
+    int NumberOfSteps                                                       (r)
+
+    DataArray\_t<real, 1, NumberOfSteps> TimeValues ;                        (o/r)
+    DataArray\_t<int,  1, NumberOfSteps> IterationValues ;                   (r/o)
+
+    DataArray\_t<int,  1, NumberOfSteps> NumberOfZones ;                     (o)
+    DataArray\_t<int,  1, NumberOfSteps> NumberOfFamilies ;                  (o)
+    DataArray\_t<char, 3, [32, MaxNumberOfZones, NumberOfSteps]>
+       ZonePointers ;                                                       (o)
+    DataArray\_t<char, 3, [32, MaxNumberOfFamilies, NumberOfSteps]>
+       FamilyPointers ;                                                     (o)
+
+    List( DataArray\_t<> DataArray1 ... DataArrayN ) ;                       (o)
+
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \}
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{DataArray\_t}, \fort{Descriptor\_t}, and
+      \fort{UserDefinedData\_t}
+      lists are as shown; users may choose other legitimate names.
+      Legitimate names must be unique within a given instance
+      of \fort{BaseIterativeData\_t} and shall not include the names
+      \fort{DataClass}, \fort{DimensionalUnits}, \fort{FamilyPointers},
+      \fort{IterationValues}, \fort{NumberOfFamilies},
+      \fort{NumberOfZones}, \fort{TimeValues}, or \fort{ZonePointers}.
+\item \fort{NumberOfSteps} is a required element of the
+      \fort{BaseIterativeData\_t} data structure.
+      It holds either the number of time steps or the number of iterations
+      being recorded.
+\item Either \fort{TimeValues} or \fort{IterationValues} must be defined.
+      If both are used, there must be a one-to-one correspondence between
+      them.
+\end{notes}
+
+\fort{TimeValues} and \fort{IterationValues} are data-name identifiers
+corresponding to the time and iteration values stored in the file.
+When \fort{IterationValues} are used, the iterative data stored in the
+database correspond to values at the end of the associated iteration.
+
+The data-name identifiers \fort{NumberOfZones} and \fort{ZonePointers}
+are only used if different zone data structures apply to different steps
+of the simulation.
+(See \hyperref[ex:adaptedunstructuredmesh]{Example~\ref*{ex:adaptedunstructuredmesh}}.)
+
+Similarly, if the geometry varies with time or iteration, then the
+data-name identifiers \fort{NumberOfFamilies} and \fort{FamilyPointers}
+are used to record which \fort{Family\_t} data structure(s)
+correspond(s) to which step.
+
+The \fort{DataArray\_t} nodes for \fort{ZonePointers} and
+\fort{FamilyPointers} are defined as three-dimensional arrays.
+For each recorded step, the names of all zones and families being
+used for the step may be recorded.
+Note that the names are limited to 32 characters, as usual in the SIDS.
+The variables \fort{MaxNumberOfZones} and \fort{MaxNumberOfFamilies}
+represent the maximum number of zones and families that apply to
+one step.
+So if \fort{NumberOfSteps} = 5 and \fort{NumberOfZones} = \{2,2,3,4,3\},
+then \fort{MaxNumberOfZones} equals 4.
+
+When \fort{NumberOfZones} and \fort{NumberOfFamilies} vary for
+different stored time steps, the name \fort{Null} is used in
+\fort{ZonePointers} and \fort{FamilyPointers} as appropriate for
+steps in which the \fort{NumberOfZones} or \fort{NumberOfFamilies}
+is less than the \fort{MaxNumberOfZones} or \fort{MaxNumberOfFamilies}.
+
+Any number of extra \fort{DataArray\_t} nodes are allowed.
+These should be used to record data not covered by this specification.
+
+\subsubsection{Zone Iterative Data Structure Definition: \texttt{ZoneIterativeData\_t}}
+\label{s:ZoneIterativeData}
+
+The \fort{ZoneIterativeData\_t} data structure is located under the
+\fort{Zone\_t} node.
+It may be used to record pointers to zonal data for each recorded step of
+the simulation, and is defined as follows:
+
+\begin{alltt}
+  ZoneIterativeData\_t< int NumberOfSteps > :=
+    \{
+    DataArray\_t<char, 2, [32, NumberOfSteps]> RigidGridMotionPointers ;     (o)
+    DataArray\_t<char, 2, [32, NumberOfSteps]> ArbitraryGridMotionPointers ; (o)
+    DataArray\_t<char, 2, [32, NumberOfSteps]> GridCoordinatesPointers ;     (o)
+    DataArray\_t<char, 2, [32, NumberOfSteps]> FlowSolutionPointers ;        (o)
+
+    List( DataArray\_t<> DataArray1 ... DataArrayN ) ;                       (o)
+
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \}
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{DataArray\_t}, \fort{Descriptor\_t}, and
+      \fort{UserDefinedData\_t}
+      lists are as shown; users may choose other legitimate names.
+      Legitimate names must be unique within a given
+      instance of \fort{ZoneIterativeData\_t} and shall not
+      include the names \fort{ArbitraryGridMotionPointers},
+      \fort{DataClass}, \fort{DimensionalUnits},
+      \fort{FlowSolutionPointers}, \fort{Grid\-Co\-ord\-i\-nates\-Point\-ers}, or
+      \fort{RigidGridMotionPointers}.
+\end{notes}
+
+The data arrays with data-name identifiers \fort{\textit{xxx}Pointers}
+contain lists of associated data structures for each recorded time value
+or iteration.
+These data structures contain data at the associated time value, or at
+the end of the associated iteration.
+There is an implied one-to-one correspondence between each pointer (from
+1, 2, \ldots, \fort{NumberOfSteps}) and the associated \fort{TimeValues}
+and/or \fort{IterationValues} under \fort{BaseIterativeData\_t}.
+They refer by name to data structures within the current zone.
+The name \fort{Null} is used when a particular time or iteration
+does not have a corresponding data structure to point to.
+
+Any number of extra \fort{DataArray\_t} nodes are allowed.
+These should be used to record data not covered by this specification.
+
+The \fort{ZoneIterativeData\_t} data structure may not exist without
+the \fort{BaseIterativeData\_t} under the \fort{CGNSBase\_t} node.
+However \fort{BaseIterativeData\_t} may exist without
+\fort{ZoneIterativeData\_t}.
+
+\subsection{Rigid Grid Motion Structure Definition: \texttt{RigidGridMotion\_t}}
+\label{s:RigidGridMotion}
+
+Adding rigid grid motion information to the CGNS file enables an
+application code to determine the mesh location without the need to
+alter the original mesh definition recorded under \fort{GridCoordinates\_t}.
+A data structure named \fort{RigidGridMotion\_t} is used to record the
+necessary data defining a rigid translation and/or rotation of the grid
+coordinates.
+
+The rigid grid motion is recorded independently for each zone of the
+CGNS base.
+Therefore the \fort{RigidGridMotion\_t} data structure is located under
+the zone data structure (\fort{Zone\_t}).
+There may be zero to several \fort{RigidGridMotion\_t} nodes under a
+\fort{Zone\_t} node.
+The multiple rigid grid motion definitions may be associated with
+different iterations or time steps in the computation.
+This association is recorded under the \fort{ZoneIterativeData\_t} data
+structure, described in \autoref{s:ZoneIterativeData}.
+
+\begin{alltt}
+  RigidGridMotion\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    RigidGridMotionType\_t RigidGridMotionType ;                             (r)
+
+    DataArray\_t<real, 2, [PhysicalDimension, 2]> OriginLocation ;           (r)
+    DataArray\_t<real, 1,  PhysicalDimension>     RigidRotationAngle ;       (o/d)
+    DataArray\_t<real, 1,  PhysicalDimension>     RigidVelocity ;            (o)
+    DataArray\_t<real, 1,  PhysicalDimension>     RigidRotationRate ;        (o)
+
+    List( DataArray\_t DataArray1 ... DataArrayN ) ;                         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+      \fort{UserDefinedData\_t}
+      lists are as shown; users may choose other legitimate names.
+      Legitimate names must be unique within a given instance
+      of \fort{RigidGridMotion\_t} and shall not include the names
+      \fort{DataClass}, \fort{DimensionalUnits}, \fort{OriginLocation},
+      \fort{RigidGridMotionType}, \fort{RigidRotationAngle},
+      \fort{RigidRotationRate}, or \fort{RigidVelocity}.
+\item \fort{RigidGridMotionType} and \fort{OriginLocation} are the
+      only required elements under \fort{RigidGridMotion\_t}.
+      All other elements are optional.
+\end{notes}
+
+\fort{RigidGridMotionType\_t} is an enumeration type that describes
+the type of rigid grid motion.
+
+\begin{alltt}
+  RigidGridMotionType\_t := Enumeration(
+    RigidGridMotionTypeNull,
+    RigidGridMotionTypeUserDefined,
+    ConstantRate,
+    VariableRate ) ;
+\end{alltt}
+
+The characteristics of the grid motion are defined by the
+data-name identifiers in \autoref{t:id_rigidgrid}.
+
+\settowidth{\tmplengtha}{\bold{Data-Name Identifier}}
+\settowidth{\tmplengthb}{\bold{Units}}
+\setlength{\Pwidth}{\linewidth-6\tabcolsep-\tmplengtha-\tmplengthb}
+\begin{table}[htbp]
+\centering
+\caption[Data-Name Identifiers for Rigid Grid Motion]{\textbf{Data-Name Identifiers for Rigid Grid Motion}}
+\label{t:id_rigidgrid}
+\begin{tabular}{>{\ttfamily}l >{\raggedright\arraybackslash}p{\Pwidth} c}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+OriginLocation
+   & Physical coordinates of the origin before and after the rigid grid motion
+   & $\L$ \\
+RigidRotationAngle
+   & Rotation angles about each axis of the translated coordinate system.
+     If not specified, \fort{RigidRotationAngle} is set to zero.
+   & $\A$ \\
+RigidVelocity
+   & Grid velocity vector of the origin translation
+   & $\L/\T$ \\
+RigidRotationRate
+   & Rotation rate vector about the axis of the translated coordinate system
+   & $\A/\T$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+Any number of additional \fort{DataArray\_t} nodes are allowed.
+These may be used to record data not covered by this specification.
+
+``Rigid grid motion'' implies relative motion of grid zones.
+However, no attempt is made in the \fort{RigidGridMotion\_t} data
+structure to require that the \fort{ZoneGridConnectivity\_t} information
+be updated to be consistent with the new grid locations.
+Whether the \fort{ZoneGridConnectivity\_t} information refers to
+the original connectivity (of \fort{GridCoordinates}) or the latest
+connectivity (of the moved or deformed grid) is currently left up to the
+user.
+
+\subsection{Arbitrary Grid Motion Structure Definition: \texttt{ArbitraryGridMotion\_t}}
+\label{s:ArbitraryGridMotion}
+
+When a grid is in motion, it is often necessary to account for the
+position of each grid point as the grid deforms.
+When all grid points move at the same velocity, the grid keeps its
+original shape.
+This particular case of grid motion may be recorded under the
+\fort{RigidGridMotion\_t} data structure described in
+\autoref{s:RigidGridMotion}.
+On the other hand, if the grid points have different velocity, the grid
+is deforming.
+The \fort{ArbitraryGridMotion\_t} data structure allows the CGNS file to
+contain information about arbitrary grid deformations.
+If not present, the grid is assumed to be rigid.
+
+Note that multiple \fort{GridCoordinates\_t} nodes may be stored under a
+\fort{Zone\_t}.
+This allows the storage of the instantaneous grid locations at different
+time steps or iterations.
+
+The arbitrary grid motion is recorded independently for each zone of the
+CGNS base.
+Therefore the \fort{ArbitraryGridMotion\_t} data structure is located
+under the zone data structure (\fort{Zone\_t}).
+There may be zero to several \fort{ArbitraryGridMotion\_t} nodes under a
+single \fort{Zone\_t} node.
+The multiple arbitrary grid motion definitions may be associated with
+different iterations or time steps in the computation.
+This association is recorded under the \fort{ZoneIterativeData\_t} data
+structure, described in \autoref{s:ZoneIterativeData}.
+
+\begin{alltt}
+  ArbitraryGridMotion\_t< int IndexDimension, int VertexSize[IndexDimension], 
+                         int CellSize[IndexDimension] > :=
+    \{
+    ArbitraryGridMotionType\_t ArbitraryGridMotionType ;                     (r)
+
+    List(DataArray\_t<real, IndexDimension, DataSize[]>
+       GridVelocityX GridVelocityY ... ) ;                                  (o)
+
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    GridLocation\_t GridLocation ;                                           (o/d)
+
+    Rind\_t<IndexDimension> Rind ;                                           (o/d)
+
+    DataClass\_t DataClass ;                                                 (o)
+
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \}
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+      \fort{UserDefinedData\_t}
+      lists are as shown; users may choose other legitimate names.
+      Legitimate names must be unique within a given instance
+      of \fort{ArbitraryGridMotion\_t} and shall not include the names
+      \fort{ArbitraryGridMotionType}, \fort{DataClass},
+      \fort{DimensionalUnits}, \fort{GridLocation}, or \fort{Rind}.
+\item The only required element of the \fort{ArbitraryGridMotion\_t}
+      data structure is the \fort{ArbitraryGridMotionType}.
+      Thus, even if a deforming grid application does not require the
+      storage of grid velocity data, the \fort{ArbitraryGridMotion\_t}
+      node must exist (with
+      \fort{ArbitraryGridMotionType} = \fort{DeformingGrid}) to indicate
+      that deformed grid points (\fort{GridCoordinates\_t}) exist for this
+      zone.
+\item \fort{Rind} is an optional field that indicates the number of rind
+      planes (for structured grids) or rind points or elements (for
+      unstructured grids) included in the grid velocity data.
+\item The \fort{GridLocation} specifies the location of the velocity
+      data with respect to the grid; if absent, the data is assumed
+      to coincide with grid vertices (i.e., \fort{GridLocation} =
+      \fort{Vertex}).
+\end{notes}
+
+\fort{ArbitraryGridMotion\_t} requires three structure parameters;
+\fort{IndexDimension} identifies the dimensionality of the grid-size
+arrays, and \fort{VertexSize} and \fort{CellSize} are the number of
+core vertices and cells, respectively, in each index direction.
+For unstructured zones, \fort{IndexDimension} is always 1.
+
+\fort{ArbitraryGridMotionType\_t} is an enumeration type that describes
+the type of arbitrary grid motion.
+
+\begin{alltt}
+  ArbitraryGridMotionType\_t := Enumeration(
+    ArbitraryGridMotionTypeNull,
+    ArbitraryGridMotionTypeUserDefined,
+    NonDeformingGrid,
+    DeformingGrid ) ;
+\end{alltt}
+
+The \fort{DataArray\_t} nodes are used to store the components of the grid
+velocity vector.
+\autoref{t:id_gridvel} lists the data-name identifiers used to record these
+vectors in cartesian, cylindrical, and spherical coordinate systems.
+
+\begin{table}[htbp]
+\centering
+\caption[Data-Name Identifiers for Grid Velocity]{\textbf{Data-Name Identifiers for Grid Velocity}}
+\label{t:id_gridvel}
+\begin{tabular}{>{\ttfamily}l >{\quad}l >{\quad}c}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+GridVelocityX     & $x$-component of grid velocity      &
+   $\L/\T$ \\
+GridVelocityY     & $y$-component of grid velocity      &
+   $\L/\T$ \\
+GridVelocityZ     & $z$-component of grid velocity      &
+   $\L/\T$ \\
+\\
+GridVelocityR     & $r$-component of grid velocity      &
+   $\L/\T$ \\
+GridVelocityTheta & $\theta$-component of grid velocity &
+   $\alpha/\T$ \\
+GridVelocityPhi   & $\phi$-component of grid velocity   &
+   $\alpha/\T$ \\
+\\
+GridVelocityXi    & $\xi$-component of grid velocity    &
+   $\L/\T$ \\
+GridVelocityEta   & $\eta$-component of grid velocity   &
+   $\L/\T$ \\
+GridVelocityZeta  & $\zeta$-component of grid velocity  &
+   $\L/\T$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+The field \fort{GridLocation} specifies the location of the grid
+velocities with respect to the grid; if absent, the grid velocities
+are assumed to coincide with grid vertices (i.e., \fort{GridLocation =
+Vertex}).
+All grid velocities within a given instance of
+\fort{ArbitraryGridMotion\_t} must reside at the same grid location.
+
+\texttt{Rind} is an optional field for structured zones that indicates
+the number of rind planes (for structured grids) or rind points or
+elements (for unstructured grids) included in the data.
+Its purpose and function are identical to those described for the
+\texttt{GridCoordinates\_t} structure in \autoref{s:Grid}.
+Note, however, that the \texttt{Rind} in this structure is independent
+of the \texttt{Rind} contained in \texttt{GridCoordinates\_t} or
+\texttt{FlowSolution\_t}.
+They are not required to contain the same number of rind planes or
+elements.
+Also, the location of any rind points is assumed to be consistent with
+the location of the core data points (e.g., if \texttt{GridLocation =
+CellCenter}, rind points are assumed to be located at fictitious cell
+centers).
+
+\fort{DataClass} defines the default class for data contained in the
+\fort{DataArray\_t} entities.
+For dimensional grid velocities, \fort{DimensionalUnits} may be used to
+describe the system of units employed.
+If present these two entities take precedence over the corresponding
+entities at higher levels of the CGNS hierarchy.
+The rules for determining precedence of entities of this type are
+discussed in \autoref{s:precedence}.
+
+Point-by-point grid velocity implies a deformation (or potentially only
+motion) of the grid points relative to each other.
+Because the original grid coordinates definition remains
+unchanged with the name \fort{GridCoordinates}, any deformed
+coordinates must be written with a different name (e.g.,
+\fort{MovedGrid\#1} or another used-defined name) and are pointed
+to using \fort{GridCoordinatesPointers} in the data structure
+\fort{ZoneIterativeData\_t}, as described in \autoref{s:ZoneIterativeData}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+Point-by-point grid velocity may also lead to relative motion of grid
+zones, or movement of grid along abutting interfaces.
+However, no attempt is made here to require that the
+\fort{ZoneGridConnectivity\_t} information be updated to be consistent
+with the new grid locations.
+Whether the \fort{ZoneGridConnectivity\_t} information refers to
+the original connectivity (of \fort{GridCoordinates}) or the latest
+connectivity (of the moved or deformed grid) is currently left up to the
+user.
+
+\subsubsection*{FUNCTION \texttt{DataSize[]}:}
+
+\noindent return value: one-dimensional |int| array of length
+          |IndexDimension| \\
+\noindent dependencies: |IndexDimension|, |VertexSize[]|, |CellSize[]|,
+          |GridLocation|, |Rind|
+
+The function \fort{DataSize[]} is the size of the \fort{DataArray}s
+containing the grid velocity components.
+It is identical to the function \fort{DataSize[]} defined for
+\fort{FlowSolution\_t} (see \autoref{s:FlowSolution}).
+
+\subsection{Examples for Time-Dependent Flow}
+\label{s:Examplestimedep}
+
+\enlargethispage{\baselineskip}
+\begin{example}{Rigid Grid Motion}
+\label{ex:rigidmotion}
+
+In this example, the whole mesh moves rigidly, so the only
+time-dependant data are the grid coordinates and flow solutions.
+However, since the mesh moves rigidly, the grid coordinates need not be
+recorded at each time step.
+Instead, a \fort{RigidGridMotion\_t} data structure is recorded for
+each step of the computation.
+
+The number of steps and time values for each step are recorded under
+\fort{BaseIterativeData\_t}.
+
+\begin{alltt}
+  CGNSBase\_t \{
+    BaseIterativeData\_t \{
+      NumberOfSteps = N ;
+      TimeValues = time1, time2, ..., timeN ;
+    \} ;
+  \} ;
+\end{alltt}
+
+The multiple rigid grid motion and flow solution data structures are
+recorded under the zone.
+\fort{RigidGridMotionPointers} and \fort{FlowSolutionPointers} keep the
+lists of which \fort{RigidGridMotion\_t} and \fort{FlowSolution\_t} nodes
+correspond to each time step.
+
+\begin{alltt}
+  Zone\_t Zone \{
+
+    \ital{--- Time independent data}
+    GridCoordinates\_t GridCoordinates
+    ZoneBC\_t ZoneBC
+    ZoneGridConnectivity\_t ZoneGridConnectivity
+
+    \ital{--- Time dependant data}
+    RigidGridMotion\_t RigidGridMotion\#1
+    RigidGridMotion\_t RigidGridMotion\#2
+    ...
+    RigidGridMotion\_t RigidGridmotion\#N
+
+    FlowSolution\_t Solution\#0
+    FlowSolution\_t Solution\#1
+    FlowSolution\_t Solution\#2
+    ...
+    FlowSolution\_t Solution\#N
+
+    ZoneIterativeData\_t \{
+      RigidGridMotionPointers = \{"RigidGridMotion\#1", "RigidGridMotion\#2", ...,
+         "RigidGridMotion\#N"\}
+      FlowSolutionPointers = \{"Solution\#1", "Solution\#2, ..., "Solution\#N"\}
+    \}
+  \}
+\end{alltt}
+
+Note that there may be more solutions under a zone than those pointed to
+by \fort{FlowSolutionPointers}.
+In this example, \fort{Solution\#0} could correspond to a restart solution.
+\end{example}
+
+\enlargethispage{\baselineskip}
+\begin{example}{Deforming Grid Motion}
+\label{ex:deformingmotion}
+
+In this example, velocity vectors are node dependant allowing for mesh
+deformation.
+In such a case, it is difficult or even impossible to recompute the mesh
+at each time step.
+Therefore the grid coordinates are recorded for each step.
+
+Multiple \fort{GridCoordinates\_t} and \fort{FlowSolution\_t} data
+structures are recorded under the zone.
+In addition, the data structure \fort{ArbitraryGridMotion\_t} is recorded
+for each step.
+\fort{GridCoordinatesPointers}, \fort{FlowSolutionPointers}, and
+\fort{ArbitraryGridMotionPointers\_t} keep the list of which grid
+coordinates definition, flow solution, and arbitrary grid motion
+definition correspond to each time step.
+
+\begin{alltt}
+  Zone\_t Zone \{
+
+    \ital{--- Time independent data}
+    ZoneBC\_t ZoneBC
+    ZoneGridConnectivity\_t ZoneGridConnectivity
+
+    \ital{--- Time dependent data}
+    List ( GridCoordinates\_t GridCoordinates MovedGrid\#1 MovedGrid\#2 ...
+           MovedGrid\#N )
+    List ( FlowSolution\_t Solution\#0 Solution\#1 Solution\#2 ... Solution\#N )
+    List ( ArbitraryGridMotion\_t ArbitraryGridMotion\#1 
+           ArbitraryGridMotion\#2 ... ArbitraryGridMotion\#N )
+    ZoneIterativeData\_t \{
+      GridCoordinatesPointers = \{"MovedGrid\#1", "MovedGrid\#2", ...,
+         "MovedGrid\#N"\}
+      FlowSolutionPointers = \{"Solution\#1", "Solution\#2, ..., "Solution\#N"\}
+      ArbitraryGridMotionPointers = \{"ArbitraryGridMotion\#1",
+         "ArbitraryGridMotion\#2", ..., "ArbitraryGridMotion\#N"\}
+    \}
+  \}
+\end{alltt}
+\end{example}
+
+\newpage
+\begin{example}{Adapted Unstructured Mesh}
+\label{ex:adaptedunstructuredmesh}
+
+In this example, the mesh size varies at each remeshing, therefore new
+zones must be created.
+\fort{ZonePointers} is used to keep a record of the zone definition
+corresponding to each recorded step.
+Let's assume that the solution is recorded every 50 iterations, and the
+grid is adapted every 100 iterations.
+
+The number of steps, iteration values for each step, number of zones
+for each step, and name of these zones are recorded under
+\fort{BaseIterativeData\_t}.
+
+\begin{alltt}
+  CGNSBase\_t \{
+    BaseIterativeData\_t \{
+      NumberOfSteps = 4
+      IterationValues = \{50, 100, 150, 200\}
+      NumberOfZones = \{1, 1, 1, 1\}
+      ZonePointers = \{"Zone1", "Zone1", "Zone2", "Zone2"\}
+    \}
+  \}
+\end{alltt}
+
+Each zone holds 2 solutions recorded at 50 iterations apart.
+Therefore the \fort{ZoneIterativeData\_t} data structure must be included
+to keep track of the \fort{FlowSolutionPointers}.
+
+\begin{alltt}
+  Zone\_t Zone1 \{
+
+    \ital{--- Constant data}
+    GridCoordinates\_t GridCoordinates
+    Elements\_t Elements
+    ZoneBC\_t ZoneBC
+
+    \ital{--- Variable data}
+    List ( FlowSolution\_t InitialSolution Solution50 Solution100 )
+    ZoneIterativeData\_t \{
+      FlowSolutionPointers = \{"Solution50", "Solution100", "Null", "Null"\}
+    \}
+  \}
+
+  Zone\_t Zone2 \{
+
+    \ital{--- Constant data}
+    GridCoordinates\_t GridCoordinates
+    Elements\_t Elements
+    ZoneBC\_t ZoneBC
+
+    \ital{--- Variable data}
+    List ( FlowSolution\_t RestartSolution Solution150 Solution200 )
+    ZoneIterativeData\_t \{
+      FlowSolutionPointers = \{"Null", "Null", "Solution150", "Solution200"\}
+    \}
+  \}
+\end{alltt}
+\end{example}
+
+\begin{notes}
+\item If the solution was recorded every 100 iterations instead of
+      every 50 iterations, then each zone would have only one
+      \fort{FlowSolution\_t} node and the data structure
+      \fort{ZoneIterativeData\_t} would not be required.
+\item Note that \fort{FlowSolutionPointers} is always an array of size
+      \fort{NumberOfSteps} even if some of the steps are defined in
+      another zone.
+\end{notes}
+
+\begin{example}{Combination of Grid Motion and Time-Accuracy}
+\label{ex:combination}
+
+The following is an example demonstrating the use of the rigid grid motion,
+arbitrary grid motion, and time-accurate data nodes in CGNS.
+The example is a 3-zone case.
+Zone 1 is rigidly rotating about the $x$-axis at a constant rate, with
+no translation.
+Zone 2 is a deforming zone.
+Zone 3 is a fixed zone.
+This is a time-accurate simulation with two solutions saved at times
+15.5 and 31.0, corresponding to iteration numbers 1000 and 2000.
+
+No units are given in this example, but a real case would establish them.
+Also, a real case would include connectivity, boundary conditions, and
+possibly other information as well.
+Each indentation represents a level down (a child) from the parent node.
+
+\begin{alltt}
+  Base (CGNSBase\_t)
+    SimulationType (SimulationType\_t) Data=TimeAccurate
+    BaseIterativeData (BaseIterativeData\_t) Data=NumberOfSteps=2
+      TimeValues (DataArray\_t) Data=(15.5, 31.0)
+      IterationValues (DataArray\_t) Data=(1000, 2000)
+    Zone\#1 (Zone\_t)
+      GridCoordinates (GridCoordinates\_t)
+        CoordinateX (DataArray\_t)
+        CoordinateY (DataArray\_t)
+      RigidGridMotion\#1(RigidGridMotion\_t) Data=RigidGridMotionType=ConstantRate
+        OriginLocation (DataArray\_t) Data=(0,0,0), (0,0,0)
+        RigidRotationAngle (DataArray\_t) Data=(5., 0., 0.)
+      RigidGridMotion\#2(RigidGridMotion\_t) Data=RigidGridMotionType=ConstantRate
+        OriginLocation (DataArray\_t) Data=(0,0,0), (0,0,0)
+        RigidRotationAngle (DataArray\_t) Data=(10., 0., 0.)
+      ZoneIterativeData (ZoneIterativeData\_t)
+        RigidGridMotionPointers (DataArray\_t) Data=(RigidGridMotion\#1,
+                                                    RigidGridMotion\#2)
+        FlowSolutionPointers (DataArray\_t) Data=(Soln\#1, Soln\#2)
+      Soln\#1 (FlowSolution\_t)
+        Density (DataArray\_t)
+        VelocityX (DataArray\_t)
+      Soln\#2 (FlowSolution\_t)
+        Density (DataArray\_t)
+        VelocityX (DataArray\_t)
+    Zone\#2 (Zone\_t)
+      GridCoordinates (GridCoordinates\_t)
+        CoordinateX (DataArray\_t)
+        CoordinateY (DataArray\_t)
+      MovedGrid\#1 (GridCoordinates\_t)
+        CoordinateX (DataArray\_t)
+        CoordinateY (DataArray\_t)
+      MovedGrid\#2 (GridCoordinates\_t)
+        CoordinateX (DataArray\_t)
+        CoordinateY (DataArray\_t)
+      ArbitraryGridMotion\#1 (ArbitraryGridMotion\_t)
+                             Data=ArbitraryGridMotionType=DeformingGrid
+      ArbitraryGridMotion\#2 (ArbitraryGridMotion\_t)
+                             Data=ArbitraryGridMotionType=DeformingGrid
+        GridVelocityX (DataArray\_t)
+        GridVelocityY (DataArray\_t)
+      ZoneIterativeData (ZoneIterativeData\_t)
+        ArbitraryGridMotionPointers (DataArray\_t) Data=("ArbitraryGridMotion\#1",
+                                                        "ArbitraryGridMotion\#2")
+        GridCoordinatesPointers (DataArray\_t) Data=("MovedGrid\#1",
+                                                    "MovedGrid\#2")
+        FlowSolutionPointers (DataArray\_t) Data=("Soln\#1", "Soln\#2")
+      Soln\#1 (FlowSolution\_t)
+        Density (DataArray\_t)
+        VelocityX (DataArray\_t)
+      Soln\#2 (FlowSolution\_t)
+        Density (DataArray\_t)
+        VelocityX (DataArray\_t)
+    Zone\#3 (Zone\_t)
+      GridCoordinates (GridCoordinates\_t)
+        CoordinateX (DataArray\_t)
+        CoordinateY (DataArray\_t)
+      ZoneIterativeData (ZoneIterativeData\_t)
+        FlowSolutionPointers (DataArray\_t) Data=("Soln\#1", "Soln\#2")
+      Soln\#1 (FlowSolution\_t)
+        Density (DataArray\_t)
+        VelocityX (DataArray\_t)
+      Soln\#2 (FlowSolution\_t)
+        Density (DataArray\_t)
+        VelocityX (DataArray\_t)
+\end{alltt}
+
+\newpage
+\begin{notes}
+\item Under \fort{BaseIterativeData\_t}, one can give either
+      \fort{TimeValues}, or \fort{IterationValues}, or both.
+      In the example, both have been given.
+\item The nodes \fort{NumberOfZones} and \fort{ZonePointers} are not
+      required under the \fort{BaseIterativeData\_t} node in this example
+      because all existing zones are used for each time step.
+\item Under \fort{ArbitraryGridMotion}, the \fort{GridVelocity} data
+      is optional.
+      In the example, it was put under one of the nodes but not under
+      the other.
+      Hence, \fort{"ArbitraryGridMotion\#1"} in the example has no
+      children nodes, while \fort{"ArbitraryGridMotion\#2"} does.
+\item The pointers under \fort{ZoneIterativeData\_t} point to names of
+      nodes within the same zone.
+      Thus, for example, \fort{Soln\#1} refers to the flow solution
+      named \fort{Soln\#1} in the same zone, even though there are flow
+      solution nodes in other zones with the same name.
+\item The name \fort{GridCoordinates} always refers to the
+      \emph{original} grid.
+      Thus, when a grid is deforming, the deformed values must be put in
+      \fort{GridCoordinates\_t} nodes of a different name.
+      In the example, the deformed grids (for \fort{Zone\#2}) at the two
+      times of interest were put into \fort{"MovedGrid\#1"} and
+      \fort{"MovedGrid\#2"}.
+\item Because the node \fort{"ArbitraryGridMotion\#1"} doesn't really
+      add any information in the current example (since it was decided
+      not to store \fort{GridVelocity} data under it), one has the option
+      of not including this node in the CGNS file.
+      If it is removed, then under \fort{Zone\#2}'s \fort{ZoneIterativeData},
+      the \fort{ArbitraryGridMotionPointers} data would be replaced by:
+      \begin{alltt}
+   Data = (Null, ArbitraryGridMotion\#2)
+      \end{alltt}
+\end{notes}
+\end{example}

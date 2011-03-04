@@ -1,0 +1,64 @@
+\section{ADF File Version Control Numbering}
+\label{s:versions}
+\thispagestyle{plain}
+
+The ADF file version control number scheme is described below.
+The format for the version number is a field of six digits or characters:
+\begin{indlefttt}
+AXXxxx
+\end{indlefttt}
+where:
+
+\begin{Ventryi}{\fort{xxx}}
+\item [\fort{A}]
+      Major revision number.
+      Major internal structure changes.
+      This number is not expected to change very often, if at all,
+      because the backward compatibility is only available by explicit
+      policy decision.
+
+      One alphabetic character.
+
+      Range of values: \fort{A-Z}, \fort{a-z}
+
+      In the unlikely event of reaching \fort{z}, then use any other
+      unused printable ASCII character, except the blank or symbols
+      used by the ``\textit{what}'' command 
+\begin{indlefttt}
+@()#~>\textbackslash
+\end{indlefttt}
+\item [\fort{XX}]
+      Minor revision number.
+      New features, minor changes, and bug fixes.
+      Backward but not forward compatible.
+
+      Two-digit hexadecimal number (uppercase letters).
+
+      Range of values: \fort{00-FF}
+
+      Reset to \fort{00} with changes in major revision number.
+\item [\fort{xxx}]
+      Incremental number.
+      Incremented with every new version of the library (even if no
+      changes are made to the file format).
+      Files are forward and backward compatible.
+
+      Three-digit hexadecimal number (lowercase letters).
+
+      Range of values: \fort{000-fff}
+
+      Does not reset.
+\end{Ventryi}
+
+\noindent
+The following definitions are used:
+
+\begin{Ventryi}{Backward compatible}
+\item [Forward compatible]
+      Older versions of libraries can read and write to files created
+      by newer versions of libraries.
+\item [Backward compatible]
+      Newer versions of libraries can read and write to files created
+      by older versions of libraries.
+\end{Ventryi}
+

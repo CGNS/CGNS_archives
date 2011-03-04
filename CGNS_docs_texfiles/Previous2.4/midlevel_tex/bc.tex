@@ -1,0 +1,428 @@
+\section{Boundary Conditions}
+\label{s:bc}
+\thispagestyle{plain}
+
+\subsection{Boundary Condition Type and Location}
+\label{s:bctype}
+
+\noindent
+\textit{Node}: \fort{BC\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_boco\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{char *boconame}, & - w m \\
+~~~~~~\textcolor{input}{BCType\_t bocotype}, \textcolor{input}{PointSetType\_t ptset\_type}, \textcolor{input}{int npnts}, & \\
+~~~~~~\textcolor{input}{int *pnts}, \textcolor{output}{\textit{int *BC}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_boco\_normal\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & - w m \\
+~~~~~~\textcolor{input}{int *NormalIndex}, \textcolor{input}{int NormalListFlag}, & \\
+~~~~~~\textcolor{input}{DataType\_t NormalDataType}, \textcolor{input}{void *NormalList}); & \\
+\textcolor{output}{\textit{ier}} = cg\_nbocos(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{int *nbocos}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_boco\_info(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{char *boconame}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{BCType\_t *bocotype}}, \textcolor{output}{\textit{PointSetType\_t *ptset\_type}}, \textcolor{output}{\textit{int *npnts}}, & \\
+~~~~~~\textcolor{output}{\textit{int *NormalIndex}}, \textcolor{output}{\textit{int *NormalListFlag}}, & \\
+~~~~~~\textcolor{output}{\textit{DataType\_t *NormalDataType}}, \textcolor{output}{\textit{int *ndataset}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_boco\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{int *pnts}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{void *NormalList}}); & \\
+\hline
+call cg\_boco\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{boconame}, \textcolor{input}{bocotype}, \textcolor{input}{ptset\_type}, \textcolor{input}{npnts}, & - w m \\
+~~~~~\textcolor{input}{pnts}, \textcolor{output}{\textit{BC}}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_boco\_normal\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{input}{NormalIndex}, \textcolor{input}{NormalListFlag}, & - w m \\
+~~~~~\textcolor{input}{NormalDataType}, \textcolor{input}{NormalList}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_nbocos\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{nbocos}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_boco\_info\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{output}{\textit{boconame}}, \textcolor{output}{\textit{bocotype}}, \textcolor{output}{\textit{ptset\_type}}, & r - m \\
+~~~~~\textcolor{output}{\textit{npnts}}, \textcolor{output}{\textit{NormalIndex}}, \textcolor{output}{\textit{NormalListFlag}}, \textcolor{output}{\textit{NormalDataType}}, \textcolor{output}{\textit{ndataset}}, & \\
+~~~~~\textcolor{output}{\textit{ier}}) & \\
+call cg\_boco\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{output}{\textit{pnts}}, \textcolor{output}{\textit{NormalList}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{NormalListFlag}}\raggedright
+\item [\fort{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\fort{B}]
+      Base index number, where $1 \leq \text{\fort{B}} \leq \text{\fort{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\fort{Z}]
+      Zone index number, where $1 \leq \text{\fort{Z}} \leq \text{\fort{nzones}}$.
+      (\textcolor{input}{Input})
+\item [\fort{BC}]
+      Boundary condition index number, where $1 \leq \text{\fort{BC}} \leq \text{\fort{nbocos}}$.
+      (\textcolor{input}{Input} for \fort{cg\_boco\_normal\_write},
+      \fort{cg\_boco\_info}, \fort{cg\_boco\_read};
+      \textcolor{output}{\textit{output}} for \fort{cg\_boco\_write})
+\item [\fort{nbocos}]
+      Number of boundary conditions in zone \fort{Z}.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{boconame}]
+      Name of the boundary condition.
+      (\textcolor{input}{Input} for \fort{cg\_boco\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_boco\_info})
+\item [\fort{bocotype}]
+      Type of boundary condition defined.
+      See the eligible types for \fort{BCType\_t} in \autoref{s:typedefs}.
+      Note that if \fort{bocotype} is \fort{FamilySpecified}
+      the boundary condition type is being specified for the family
+      to which the boundary belongs.
+      The boundary condition type for the family may be read and written
+      using \fort{cg\_fambc\_read} and \fort{cg\_fambc\_write},
+      as described in \autoref{s:familybc}.
+      (\textcolor{input}{Input} for \fort{cg\_boco\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_boco\_info})
+\item [\fort{ptset\_type}]
+      The extent of the boundary condition may be defined using a range
+      of points or elements, or using a discrete list of all points or
+      elements at which the boundary condition is applied.
+      Depending on the method used, the possible values for
+      \fort{ptset\_type} are:
+
+      \setlength{\tmplength}{\extrarowheight}	% temporarily decrease row heights
+      \setlength{\extrarowheight}{0pt}
+      \begin{tabular}{@{}l >{\ttfamily}l}
+         \uline{\fort{ptset\_type}} & \uline{\textit{Method}} \\
+         \fort{PointRange}   & Range of points or elements \\
+         \fort{PointList}    & List of points or elements \\
+         \fort{ElementRange} & Range of elements \\
+         \fort{ElementRList} & List of elements
+      \end{tabular}
+      \setlength{\extrarowheight}{\tmplength}
+
+      Note that when \fort{ptset\_type} is \fort{ElementRange} or
+      \fort{ElementList}, the \fort{pnts} values (see below) are assumed
+      to be element indices.
+      When \fort{ptset\_type} is \fort{PointRange} or \fort{PointList},
+      the choice of point or element indices is determined by
+      \fort{GridLocation\_t} under the \fort{BC\_t} node.
+      The value of \fort{GridLocation\_t} must be read or
+      written by first using \fort{cg\_goto} to access the
+      \fort{BC\_t} node, then using \fort{cg\_gridlocation\_read} or
+      \fort{cg\_gridlocation\_write}.
+      (\textcolor{input}{Input} for \fort{cg\_boco\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_boco\_info})
+\item [\fort{npnts}]
+      Number of points or elements defining the boundary
+      condition region.
+      For a \fort{ptset\_type} of \fort{PointRange} or \fort{ElementRange},
+      \fort{npnts} is always two.
+      For a \fort{ptset\_type} of \fort{PointList} or \fort{ElementList},
+      \fort{npnts} is the number of points or elements in the list.
+      (\textcolor{input}{Input} for \fort{cg\_boco\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_boco\_info})
+\item [\fort{pnts}]
+      Array of point or element indices defining the boundary condition
+      region.
+      There should be \fort{npnts} values, each of dimension
+      \fort{IndexDimension} (i.e., 1 for unstructured grids,
+      and 2 or 3 for structured grids with 2-D or 3-D elements,
+      respectively).
+      (\textcolor{input}{Input} for \fort{cg\_boco\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_boco\_read})
+\item [\fort{NormalIndex}]
+      Index vector indicating the computational coordinate direction
+      of the boundary condition patch normal.
+      (\textcolor{input}{Input} for \fort{cg\_boco\_normal\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_boco\_info})
+\item [\fort{NormalListFlag}]
+      For \fort{cg\_boco\_normal\_write}, \fort{NormalListFlag} is a
+      flag indicating if the normals are defined in \fort{NormalList};
+      1 if they are defined, 0 if they're not.
+
+      For \fort{cg\_boco\_info}, if the normals are defined in
+      \fort{NormalList}, \fort{NormalListFlag} is the number of points
+      in the patch times \fort{phys\_dim}, the number of coordinates
+      required to define a vector in the field.
+      If the normals are not defined in \fort{NormalList},
+      \fort{NormalListFlag} is 0.
+      (\textcolor{input}{Input} for \fort{cg\_boco\_normal\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_boco\_info})
+\item [\fort{NormalDataType}]
+      Data type used in the definition of the normals.
+      Admissible data types for the normals are \fort{RealSingle} and
+      \fort{RealDouble}.
+      (\textcolor{input}{Input} for \fort{cg\_boco\_normal\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_boco\_info})
+\item [\fort{NormalList}]
+      List of vectors normal to the boundary condition patch pointing
+      into the interior of the zone.
+      (\textcolor{input}{Input} for \fort{cg\_boco\_normal\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_boco\_read})
+\item [\fort{ndataset}]
+      Number of boundary condition datasets for the current boundary
+      condition.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+\subsection{Boundary Condition Datasets}
+\label{s:bcdataset}
+
+\noindent
+\textit{Node}: \fort{BCDataSet\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_dataset\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{input}{char *DatasetName}, & - w m \\
+~~~~~~\textcolor{input}{BCType\_t BCType}, \textcolor{output}{\textit{int *Dset}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_dataset\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{input}{int Dset}, & r - m \\
+~~~~~~\textcolor{output}{\textit{char *DatasetName}}, \textcolor{output}{\textit{BCType\_t *BCType}}, \textcolor{output}{\textit{int *DirichletFlag}}, & \\
+~~~~~~\textcolor{output}{\textit{int *NeumannFlag}}); & \\
+\hline
+call cg\_dataset\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{input}{DatasetName}, \textcolor{input}{BCType}, \textcolor{output}{\textit{Dset}}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_dataset\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{input}{Dset}, \textcolor{output}{\textit{DatasetName}}, \textcolor{output}{\textit{BCType}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{DirichletFlag}}, \textcolor{output}{\textit{NeumannFlag}}, \textcolor{output}{\textit{ier}}) & \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{DirichletFlag}}\raggedright
+\item [\fort{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\fort{B}]
+      Base index number, where $1 \leq \text{\fort{B}} \leq \text{\fort{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\fort{Z}]
+      Zone index number, where $1 \leq \text{\fort{Z}} \leq \text{\fort{nzones}}$.
+      (\textcolor{input}{Input})
+\item [\fort{BC}]
+      Boundary condition index number, where $1 \leq \text{\fort{BC}} \leq \text{\fort{nbocos}}$.
+      (\textcolor{input}{Input})
+\item [\fort{Dset}]
+      Dataset index number, where $1 \leq \text{\fort{Dset}} \leq \text{\fort{ndataset}}$.
+      (\textcolor{input}{Input} for \fort{cg\_dataset\_read};
+      \textcolor{output}{\textit{output}} for \fort{cg\_dataset\_write})
+\item [\fort{DatasetName}]
+      Name of dataset.
+      (\textcolor{input}{Input} for \fort{cg\_dataset\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_dataset\_read})
+\item [\fort{BCType}]
+      Simple boundary condition type for the dataset.
+      The supported types are listed in the table of ``Simple
+      Boundary Condition Types'' in the SIDS manual, but note that
+      \fort{FamilySpecified} does not apply here.
+      (\textcolor{input}{Input} for \fort{cg\_dataset\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_dataset\_read})
+\item [\fort{DirichletFlag}]
+      Flag indicating if the dataset contains Dirichlet data.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{NeumannFlag}]
+      Flag indicating if the dataset contains Neumann data.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+The above functions are applicable to \fort{BCDataSet\_t} nodes
+that are children of \fort{BC\_t} nodes.
+
+For \fort{BCDataSet\_t} nodes that are children of a \fort{BC\_t}
+node, after accessing a particular \fort{BCDataSet\_t} node using
+\fort{cg\_goto}, the Point Set functions described in \autoref{s:ptset}
+may be used to read or write the locations at which the boundary
+conditions are to be applied.
+This is only applicable when the boundary conditions are to be applied
+at locations different from those used with \fort{cg\_boco\_write} to
+define the boundary condition region (e.g., when the region is being
+defined by specification of vertices, but the boundary conditions are to
+be applied at face centers).
+
+When writing point set data to a \fort{BCDataSet\_t} node, in addition
+to the specification of the indices using \fort{cg\_ptset\_write},
+the function \fort{cg\_gridlocation\_write} must also be used to
+specify the location of the data with respect to the grid (e.g.,
+\fort{Vertex} or \fort{FaceCenter}).
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_bcdataset\_write(\textcolor{input}{char *DatasetName}, \textcolor{input}{BCType\_t BCType}, & - w m \\
+~~~~~~\textcolor{input}{BCDataType\_t BCDataType}); & \\
+\textcolor{output}{\textit{ier}} = cg\_bcdataset\_info(\textcolor{output}{\textit{int *ndataset}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_bcdataset\_read(\textcolor{input}{int Dset}, \textcolor{output}{\textit{char *DatasetName}}, \textcolor{output}{\textit{BCType\_t *BCType}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{int *DirichletFlag}}, \textcolor{output}{\textit{int *NeumannFlag}}); & \\
+\hline
+call cg\_bcdataset\_write\_f(\textcolor{input}{DatasetName}, \textcolor{input}{BCType}, \textcolor{input}{BCDataType\_t BCDataType}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_bcdataset\_info\_f(\textcolor{output}{\textit{int *ndataset}}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_bcdataset\_read\_f(\textcolor{input}{Dset}, \textcolor{output}{\textit{DatasetName}}, \textcolor{output}{\textit{BCType}}, \textcolor{output}{\textit{DirichletFlag}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{NeumannFlag}}, \textcolor{output}{\textit{ier}}) & \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{DirichletFlag}}\raggedright
+\item [\fort{Dset}]
+      Dataset index number, where $1 \leq \text{\fort{Dset}} \leq \text{\fort{ndataset}}$.
+      (\textcolor{input}{Input})
+\item [\fort{DatasetName}]
+      Name of dataset.
+      (\textcolor{input}{Input} for \fort{cg\_bcdataset\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_bcdataset\_read})
+\item [\fort{BCType}]
+      Simple boundary condition type for the dataset.
+      The supported types are listed in the table of ``Simple
+      Boundary Condition Types'' in the SIDS manual, but note that
+      \fort{FamilySpecified} does not apply here.
+      (\textcolor{input}{Input} for \fort{cg\_bcdataset\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_bcdataset\_read})
+\item [\fort{BCDataType}]
+      Type of boundary condition in the dataset (i.e., for a
+      \fort{BCData\_t} child node).
+      Admissible types are \fort{Dirichlet} and \fort{Neumann}.
+      (\textcolor{input}{Input})
+\item [\fort{ndataset}]
+      Number of \fort{BCDataSet} nodes under the current
+      \fort{FamilyBC\_t} node.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{DirichletFlag}]
+      Flag indicating if the dataset contains Dirichlet data.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{NeumannFlag}]
+      Flag indicating if the dataset contains Neumann data.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+The above functions are applicable to \fort{BCDataSet\_t} nodes
+that are used to define boundary conditions for a CFD family, and thus
+are children of a \fort{FamilyBC\_t} node.
+The \fort{FamilyBC\_t} node must first be accessed using \fort{cg\_goto}.
+
+The first time \fort{cg\_bcdataset\_write} is called with a particular
+\fort{DatasetName}, \fort{BCType}, and \fort{BCDataType}, a new
+\fort{BCDataSet\_t} node is created, with a child \fort{BCData\_t} node.
+Subsequent calls with the same \fort{DatasetName} and \fort{BCType}
+may be made to add additional \fort{BCData\_t} nodes, of type
+\fort{BCDataType}, to the existing \fort{BCDataSet\_t} node.
+
+\subsection{Boundary Condition Data}
+\label{s:bcdata}
+
+\noindent
+\textit{Node}: \fort{BCData\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_bcdata\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{input}{int Dset}, & - w m \\
+~~~~~~\textcolor{input}{BCDataType\_t BCDataType}); & \\
+\hline
+call cg\_bcdata\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{input}{Dset}, \textcolor{input}{BCDataType}, \textcolor{output}{\textit{ier}}) & - w m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{ptset\_type}}\raggedright
+\item [\fort{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\fort{B}]
+      Base index number, where $1 \leq \text{\fort{B}} \leq \text{\fort{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\fort{Z}]
+      Zone index number, where $1 \leq \text{\fort{Z}} \leq \text{\fort{nzones}}$.
+      (\textcolor{input}{Input})
+\item [\fort{BC}]
+      Boundary condition index number, where $1 \leq \text{\fort{BC}} \leq \text{\fort{nbocos}}$.
+      (\textcolor{input}{Input})
+\item [\fort{Dset}]
+      Dataset index number, where $1 \leq \text{\fort{Dset}} \leq \text{\fort{ndataset}}$.
+      (\textcolor{input}{Input})
+\item [\fort{BCDataType}]
+      Type of boundary condition in the dataset.
+      Admissible boundary condition types are \fort{Dirichlet} and
+      \fort{Neumann}.
+      (\textcolor{input}{Input})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+To write the boundary condition data itself, after creating the
+\texttt{BCData\_t} node using the function \texttt{cg\_bcdata\_write}, use
+\texttt{cg\_goto} to access the node, then \texttt{cg\_array\_write} to
+write the data.
+Note that when using \texttt{cg\_goto} to access a \texttt{BCData\_t}
+node, the node index should be specified as either \texttt{Dirichlet} or
+\texttt{Neumann}, depending on the type of boundary condition.
+See the description of \texttt{cg\_goto} in \autoref{s:navigating} for
+details.
+
+\newpage
+\subsection{Special Boundary Condition Properties}
+\label{s:bcproperty}
+
+\noindent
+\textit{Node}: \fort{BCProperty\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_bc\_wallfunction\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & - w m \\
+~~~~~~\textcolor{input}{WallFunctionType\_t WallFunctionType}); & \\
+\textcolor{output}{\textit{ier}} = cg\_bc\_area\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & - w m \\
+~~~~~~\textcolor{input}{AreaType\_t AreaType}, \textcolor{input}{float SurfaceArea}, \textcolor{input}{\textit{char *RegionName}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_bc\_wallfunction\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & r - m \\
+~~~~~~\textcolor{output}{\textit{WallFunctionType\_t *WallFunctionType}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_bc\_area\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & r - m \\
+~~~~~~\textcolor{output}{\textit{AreaType\_t *AreaType}}, \textcolor{output}{\textit{float *SurfaceArea}}, \textcolor{output}{\textit{char *RegionName}}); & \\
+\hline
+call cg\_bc\_wallfunction\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{input}{WallFunctionType}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_bc\_area\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{input}{AreaType}, \textcolor{input}{SurfaceArea}, & - w m \\
+~~~~~\textcolor{input}{RegionName}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_bc\_wallfunction\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{output}{\textit{WallFunctionType}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_bc\_area\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{output}{\textit{AreaType}}, \textcolor{output}{\textit{SurfaceArea}}, & r - m \\
+~~~~~\textcolor{output}{\textit{RegionName}}, \textcolor{output}{\textit{ier}}) & \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{WallFunctionType}}\raggedright
+\item [\fort{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\fort{B}]
+      Base index number, where $1 \leq \text{\fort{B}} \leq \text{\fort{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\fort{Z}]
+      Zone index number, where $1 \leq \text{\fort{Z}} \leq \text{\fort{nzones}}$.
+      (\textcolor{input}{Input})
+\item [\fort{BC}]
+      Boundary condition index number, where $1 \leq \text{\fort{BC}} \leq \text{\fort{nbocos}}$.
+      (\textcolor{input}{Input})
+\item [\fort{WallFunctionType}]
+      The wall function type.
+      Valid types are \fort{Null}, \fort{UserDefined}, and \fort{Generic}.
+      (\textcolor{input}{Input} for \fort{cg\_bc\_wallfunction\_write};
+      \textcolor{output}{\textit{output}} for
+      \fort{cg\_bc\_wallfunction\_read})
+\item [\fort{AreaType}]
+      The type of area.
+      Valid types are \fort{Null}, \fort{UserDefined}, \fort{BleedArea},
+      and \fort{CaptureArea}.
+      (\textcolor{input}{Input} for \fort{cg\_bc\_area\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_bc\_area\_read})
+\item [\fort{SurfaceArea}]
+      The size of the area.
+      (\textcolor{input}{Input} for \fort{cg\_bc\_area\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_bc\_area\_read})
+\item [\fort{RegionName}]
+      The name of the region, 32 characters max.
+      (\textcolor{input}{Input} for \fort{cg\_bc\_area\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_bc\_area\_read})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+The ``\fort{write}'' functions will create the \fort{BCProperty\_t}
+node if it doesn't already exist, then add the appropriate boundary
+condition property.
+Multiple boundary condition properties may be recorded under the same
+\fort{BCProperty\_t} node.
+
+The ``\fort{read}'' functions will return with $\text{\fort{ier}} = 2 =
+\text{\fort{CG\_NODE\_NOT\_FOUND}}$ if the requested boundary condition
+property, or the \fort{BCProperty\_t} node itself, doesn't exist.

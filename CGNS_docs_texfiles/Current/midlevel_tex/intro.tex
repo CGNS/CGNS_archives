@@ -1,0 +1,26 @@
+\section{Introduction}
+\label{s:intro}
+\thispagestyle{plain}
+
+This document outlines a CGNS library designed to ease implementation of
+CGNS by providing developers with a collection of handy I/O functions.
+Since knowledge of the ADF (or HDF) core routines is not required to use
+this library, it greatly facilitates the task of interfacing with CGNS.
+
+The CGNS Mid-Level Library is based on the mappings described in the
+\href{../filemap/filemap.pdf}{SIDS-to-ADF} and
+\href{../filemap_hdf/filemap.pdf}{SIDS-to-HDF} file mapping manuals.
+It allows reading and writing all of the information described in
+that manual including grid coordinates, block interfaces, flow
+solutions, and boundary conditions.
+Use of the mid-level library functions insures efficient
+communication between the user application and the internal
+representation of the CGNS data.
+
+It is assumed that the reader is familiar with the information in the
+\href{../sids/sids.pdf}{CGNS Standard Interface Data Structures
+(SIDS)}, as well as the file mapping manuals.
+The reader is also strongly encouraged to read the
+\href{../user/user.pdf}{User's Guide to CGNS}, which contains
+coding examples using the Mid-Level Library to write and read simple
+files containing CGNS databases.

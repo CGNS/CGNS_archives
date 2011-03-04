@@ -1,0 +1,679 @@
+\section{Data-Array Structure Definitions}
+\label{s:data}
+\thispagestyle{plain}
+
+This section defines the structure type |DataArray_t| for describing
+data arrays.  This general-purpose structure is used to declare
+data arrays and scalars throughout the CGNS hierarchy.  It is used
+to describe grid coordinates, flow-solution data, governing flow
+parameters, boundary-condition data, and other information.  For most
+of these different types of CFD data, we have also established a
+list of standardized identifiers for entities of type |DataArray_t|.
+For example, |Density| is used for data arrays containing static
+density.  The list of standardized data-name identifiers is provided in
+\hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
+
+We address five classes of data with the |DataArray_t| structure type:
+\begin{enumerate}
+\item[(a)] dimensional data (e.g., velocity in units of m/s);
+\item[(b)] nondimensional data normalized by dimensional reference
+           quantities;
+\item[(c)] nondimensional data with associated nondimensional reference
+           quantities;
+\item[(d)] nondimensional parameters (e.g., Reynolds number, pressure
+           coefficient);
+\item[(e)] pure constants (e.g., $\pi$, $e$).
+\end{enumerate}
+The first two of these classes often occur within the same test case,
+where each piece of data is either dimensional itself or normalized by a
+dimensional quantity.  The third data class is typical of a completely
+nondimensional test case, where all field data and reference quantities
+are nondimensional.  The forth class, nondimensional parameters, are
+universal in CFD, although not always consistently defined.  The
+individual components of nondimensional parameters may be data from any
+of the first three classes.
+
+Each of the five classes of data requires different information to
+describe dimensional units or normalization associated with the data.
+These requirements are reflected in the structure definition for
+|DataArray_t|.
+
+The remainder of this section is as follows: the structure type
+|DataArray_t| is first defined.  Then the class identification and data
+manipulation is discussed in \autoref{s:data_manip} for each of the five data
+classes.  Finally, examples of |DataArray_t| entities are presented in
+\autoref{s:data_example}.
+
+\subsection{Definition: \texttt{DataArray\_t}}
+\label{s:DataArray}
+
+|DataArray_t| describes a multi-dimensional data array of given
+type, dimensionality and size in each dimension.  The data may be dimensional,
+nondimensional or pure constants.  Qualifiers are provided to describe
+dimensional units or normalization information associated with the data.
+\begin{alltt}
+  DataArray\_t< DataType, int Dimension, int[Dimension] DimensionValues > :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+ 
+    Data( DataType, Dimension, DimensionValues ) ;                          (r)
+
+    DataClass\_t DataClass ;                                                 (o)
+    
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    DimensionalExponents\_t DimensionalExponents ;                           (o)
+    
+    DataConversion\_t DataConversion ;                                       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the |Descriptor_t| list are as shown; 
+ users may choose other legitimate names.  Legitimate names must be unique 
+ within a given instance of |DataArray_t| and shall not include 
+ the names |DataClass|, |DimensionalUnits|, |DimensionalExponents|, or
+ |DataConversion|.
+\item
+ |Data()| is the only required field for |DataArray_t|.
+\end{notes}
+
+|DataArray_t| requires three structure parameters: |Dimension| is the 
+dimensionality of the data array; |DimensionValues| is an array of length
+|Dimension| that contains the size of the data arrays in each dimension;
+and |DataType| is the data type of the data stored.  |DataType| will usually
+be |real|, but other data types are permissible. 
+
+The optional entities \texttt{DataClass}, \texttt{DimensionalUnits},
+\texttt{DimensionalExponents} and \texttt{DataConversion} provide
+information on dimensional units and normalization associated with the
+data.  The function of these qualifiers is provided in the next section.
+
+This structure type is formulated to describe an array of scalars.
+Therefore, for vector quantities (e.g., the position vector or the velocity
+vector), separate structure entities are required for each component of the
+vector.  For example, the cartesian coordinates of a 3-D grid are described
+by three separate |DataArray_t| entities: one for $x$, one for $y$ and one
+for $z$ (see \hyperref[ex:grid1]{Example~\ref*{ex:grid1}}).
+
+\subsubsection{Definition: \texttt{DataConversion\_t}}
+\label{s:DataConversion}
+
+|DataConversion_t| contains conversion factors for recovering raw
+dimensional data from given nondimensional data.
+These conversion factors are typically associated with nondimensional
+data that is normalized by dimensional reference quantities.
+\begin{alltt}
+  DataConversion\_t :=
+    \{
+    real ConversionScale ;                                                  (r)
+    
+    real ConversionOffset ;                                                 (r)
+    \} ;
+\end{alltt}
+Given a nondimensional piece of data, |Data(nondimensional)|, the
+conversion to ``raw'' dimensional form is:
+\begin{alltt}
+  Data(raw) = Data(nondimensional)*ConversionScale + ConversionOffset
+\end{alltt}
+These conversion factors are further described in \autoref{s:data_normbydim}. 
+
+\subsection{Data Manipulation}
+\label{s:data_manip}
+
+The optional entities of |DataArray_t| provide information for manipulating
+the data, including changing units or normalization.  This section describes
+the rules under which these optional entities operate and the specific
+manipulations that can be performed on the data.
+
+Within a given instance of |DataArray_t|, the class of data and all
+information required for manipulations may be completely and precisely
+specified by the entities |DataClass|, |DimensionalUnits|,
+|DimensionalExponents| and |DataConversion|.
+|DataClass| identifies the class of data and governs the manipulations
+that can be performed.
+Each of the five data classes is treated separately in the subsequent
+sections.
+
+The entities |DataClass| and |DimensionalUnits| serve special functions in
+the CGNS hierarchy.  If |DataClass| is absent from a given instance of
+|DataArray_t|, then its value is determined from ``global'' data.  This global
+data may be set at any level of the CGNS hierarchy with the data set at the
+lowest level taking precedence.  |DimensionalUnits| may be similarly set by
+global data.  The rules for determining the appropriate set of global data to
+apply is further detailed in \autoref{s:precedence}.
+
+This alternate functionality provides a measure of economy in describing
+dimensional units or normalization within the hierarchy.  Examples that
+make use of global data are presented in \autoref{s:grid_example} and
+\autoref{s:flow_example} for grid and flow solution data.  The complete
+two-zone case of \hyperref[s:twozone]{Appendix~\ref*{s:twozone}} also
+depicts this alternate functionality.
+
+\subsubsection{Dimensional Data}
+\label{s:data_dim}
+
+If |DataClass = Dimensional|, the data is dimensional.
+The optional qualifiers |DimensionalUnits| and |DimensionalExponents|
+describe dimensional units associated with the data.
+These qualifiers are provided to specify the system of dimensional units
+and the dimensional exponents, respectively.
+For example, if the data is the $x$-component of velocity, then
+|DimensionalUnits| will state that the pertinent dimensional units are,
+say, |Meter| and |Second|; |DimensionalExponents| will specify the
+pertinent dimensional exponents are |LengthExponent| |=| |1| and
+|TimeExponent| |=| |-1|.
+Combining the information gives the units m/s.
+Examples showing the use of these two qualifiers are provided in
+\autoref{s:data_example}.
+
+If |DimensionalUnits| is absent, then the appropriate set of dimensional
+units is obtained from ``global'' data.  The rules for determining
+this appropriate set of global dimensional units are presented in
+\autoref{s:precedence}.
+
+If |DimensionalExponents| is absent, then the appropriate dimensional
+exponents can be determined by convention if the specific instance of
+|DataArray_t| corresponds to one of the standardized data-name identifiers
+listed in \hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
+Otherwise, the exponents are unspecified.
+We strongly recommend inclusion of the |DimensionalExponents| qualifier
+whenever the data is dimensional and the instance of |DataArray_t| is not
+among the list of standardized identifiers.
+
+\subsubsection{Nondimensional Data Normalized by Dimensional Quantities}
+\label{s:data_normbydim}
+
+If |DataClass = NormalizedByDimensional|, the data is nondimensional and is
+normalized by dimensional reference quantities.  All optional entities in
+|DataArray_t| are used.  |DataConversion| contains factors to convert the 
+nondimensional data to ``raw'' dimensional data; these factors are
+|ConversionScale| and |ConversionOffset|.  The conversion process is as
+follows:
+\begin{alltt}
+  Data(raw) = Data(nondimensional)*ConversionScale + ConversionOffset
+\end{alltt}
+where |Data(nondimensional)| is the original nondimensional data, and
+|Data(raw)| is the converted raw data.  This converted raw data is
+dimensional, and the optional qualifiers |DimensionalUnits| and
+|DimensionalExponents| describe the appropriate dimensional units and
+exponents.  Note that |DimensionalUnits| and |DimensionalExponents| also
+describe the units for |ConversionScale| and |ConversionOffset|.
+
+If \texttt{DataConversion} is absent, the equivalent defaults are
+\texttt{ConversionScale = 1} and \texttt{ConversionOffset = 0}.
+If either \texttt{DimensionalUnits} or \texttt{DimensionalExponents} is absent,
+follow the rules described in the previous section.
+
+Note that functionally there is little difference between these first two
+data classes (\fort{DataClass = Dimensional} and
+\fort{NormalizedByDimensional}).
+In the first case the data is dimensional, and in the second, the converted
+raw data is dimensional.
+Also, the equivalent defaults for \fort{DataConversion} produce no changes
+in the data; hence, it is almost the same as stating the original data is
+dimensional.
+
+\subsubsection{Nondimensional Data Normalized by Unknown Dimensional Quantities}
+\label{s:data_normbyunkdim}
+
+If |DataClass = NormalizedByUnknownDimensional|, the data is nondimensional
+and is normalized by some unspecified dimensional quantities.  This type of
+data is typical of a completely nondimensional test case, where all field
+data and all reference quantities are nondimensional.  
+
+Only the |DimensionalExponents| qualifier is used in this case,
+although it is expected that this qualifier will be seldom utilized in
+practice.  For entities of |DataArray_t| that are not among the list of
+standardized data-name identifiers, the qualifier could provide useful
+information by defining the exponents of the dimensional form of the
+nondimensional data.
+
+Rather than providing qualifiers to describe the normalization of the data,
+we instead dictate that all data of type |NormalizedByUnknownDimensional|
+in a given database be nondimensionalized consistently.  This is done by
+picking one set of mass, length, time and temperature scales and normalizing
+all appropriate data by these scales.  We describe this process in detail in
+the following.  \hyperref[s:twozone]{Appendix~\ref*{s:twozone}} also shows
+a completely nondimensional database where consistent normalization is used
+throughout.
+
+The practice of nondimensionalization within flow solvers and other
+application codes is quite popular.  The problem with this practice
+is that to manipulate the data from a given code, one must often know
+the particulars of the nondimensionalization used.  This largely
+results from what we call inconsistent normalization---more than
+the minimum required scales are used to normalize data within the
+code.  For example, in the OVERFLOW flow solver, the following
+nondimensionalization is used:
+$$
+\begin{array}{c@{\qquad}c@{\qquad}c}
+ \tilde{x} = x/L, & \tilde{u} = u/c_\infty, & \tilde{\rho} = \rho/\rho_\infty, \\ 
+ \tilde{y} = y/L, & \tilde{v} = v/c_\infty, & \tilde{p} = p/(\rho_\infty c_\infty^2), \\
+ \tilde{z} = z/L, & \tilde{w} = w/c_\infty, & \tilde{\mu} = \mu/\mu_\infty,
+\end{array}
+$$
+where $(x,y,z)$ are the cartesian coordinates, $(u,v,w)$ are the
+cartesian components of velocity, $\rho$ is static density, $p$ is
+static pressure, $c$ is the static speed of sound, and $\mu$ is the
+molecular viscosity.
+In this example, tilde quantities $(\:\tilde{}\:)$ are nondimensional
+and all others are dimensional.
+Four dimensional scales are used for normalization: $L$ (a unit length),
+$\rho_\infty$, $c_\infty$ and $\mu_\infty$.
+However, only three fundamental dimensional units are represented: mass,
+length and time.  The extra normalizing scale leads to inconsistent
+normalization.  The primary consequence of this is additional
+nondimensional parameters, such as Reynolds number, appearing in
+the nondimensionalized governing equations where none are found in
+the original dimensional equations.  Many definitions, including
+skin friction coefficient, also have extra terms appearing in the
+nondimensionalized form.  This adds unnecessary complication to any data
+or equation manipulation associated with the flow solver.
+
+Consistent normalization avoids many of these problems.  Here the
+number of scales used for normalization is the same as the number
+of fundamental dimensional units represented by the data.  Using
+consistent normalization, the resulting nondimensionalized form of
+equations and definitions is identical to their original dimensional
+formulations.  One piece of evidence to support this assertion is that
+it is not possible to form any nondimensional parameters from the set of
+dimensional scales used for normalization.
+
+An important fallout of consistent normalization is that the actual
+scales used for normalization become immaterial for all data
+manipulation processes.  To illustrate this consider the following
+nondimensionalization procedure: let $M$ (mass), $L$ (length) and $T$
+(time) be arbitrary dimensional scales by which all data is normalized
+(neglect temperature data for the present).  The nondimensional data
+follows:
+$$
+\begin{array}{c@{\qquad}c@{\qquad}c}
+ x' = x/L, & u' = u/(L/T), & \rho' = \rho/(M/L^3), \\
+ y' = y/L, & v' = v/(L/T), & p' = p/(M/(L T^2)), \\ 
+ z' = z/L, & w' = w/(L/T), & \mu' = \mu/(M/(L T)), 
+\end{array}
+$$
+where primed quantities are nondimensional and all others are dimensional.
+
+Consider an existing database where all field data and all reference
+data is nondimensional and normalized as shown.  Assume the database has
+a single reference state given by,
+$$
+\begin{array}{c@{\qquad}c@{\qquad}c}
+ x'_\refer = x_\refer/L, & u'_\refer = u_\refer/(L/T), & \rho'_\refer = \rho_\refer/(M/L^3), \\ 
+ y'_\refer = y_\refer/L, & v'_\refer = v_\refer/(L/T), & p'_\refer = p_\refer/(M/(L T^2)) \\
+ z'_\refer = z_\refer/L, & w'_\refer = w_\refer/(L/T), & \mu'_\refer = \mu_\refer/(M/(L T)).
+\end{array}
+$$
+If a user wanted to change the nondimensionalization of grid-point
+pressures, the procedure is straightforward.
+Let the desired new normalization be given by
+$p''_{ijk} = p_{ijk} / (\rho_\refer c_\refer^2)$, where all terms on
+the right-hand-side are \emph{dimensional}, and as such they are unknown
+to the database user.
+However, the desired manipulation is possible using only nondimensional
+data provided in the database,
+$$
+\begin{array}{cl}
+ p''_{ijk} & \ds {}\equiv p_{ijk} / (\rho_\refer c_\refer^2) \\[.02in]
+           & \ds {}= {p_{ijk} \over M/(L T^2)} {M/L^3 \over \rho_\refer}
+	             \left[ L/T \over c_\refer \right]^2 \\
+ \noalign{\smallskip} \\
+           & \ds {}= p'_{ijk} / (\rho'_\refer (c'_\refer)^2)
+\end{array}
+$$
+Thus, the desired renormalization is possible using the database's
+nondimensional data as if it were actually dimensional.  There is,
+in fact, a high degree of equivalence between dimensional data and
+consistently normalized nondimensional data.  The procedure shown in
+this example should extend to any desired renormalization, provided the
+needed reference-state quantities are included in the database.
+
+This example points out two stipulations that we now dictate for 
+data in the class \texttt{NormalizedByUnknownDimensional},
+\begin{enumerate}
+\item[(a)]
+All nondimensional data within a given database that has 
+\texttt{DataClass = NormalizedByUnknownDimensional}
+shall be consistently normalized.
+\item[(b)]
+Any nondimensional reference state appearing in a database should
+be sufficiently populated with reference quantities to allow for
+renormalization procedures.
+\end{enumerate}
+The second of these stipulations is somewhat ambiguous, but good
+practice would suggest that a flow solver, for example, should output
+to the database enough static and/or stagnation reference quantities to
+sufficiently define the state.
+
+\hyperref[s:twozone]{Appendix~\ref*{s:twozone}} shows an example of a
+well-populated reference state.
+
+With these two stipulations, we contend the following:
+\begin{itemize}
+\item
+The dimensional scales used to nondimensionalize all data are
+immaterial, and there is no need to identify these quantities in a CGNS
+database.
+\item
+The dimensional scales need not be reference-state quantities provided
+in the database.  For example, a given database could contain freestream
+reference state conditions, but all the data is normalized by sonic
+conditions (which are not provided in the database).
+\item
+All renormalization procedures can be carried out treating the data as if
+it were dimensional with a consistent set of units.
+\item
+Any application code that internally uses consistent normalization
+can use the data provided in a CGNS database without modification or
+transformation to the code's internal normalization.
+\end{itemize}
+
+Before ending this section, we note that the OVERFLOW flow solver
+mentioned above (or any other application code that internally uses
+inconsistent normalization) could easily read and write data to a
+nondimensional CGNS database that conforms to the above stipulations.
+On output, the code could renormalize data so it is consistently
+normalized.
+Probably, the easiest method would be to remove the molecular viscosity
+scale ($\mu_\infty$), and only use $L$, $\rho_\infty$ and $c_\infty$ for
+all normalizations (recall these are dimensional scales).
+The only change from the above example would be the nondimensionalization
+of viscosity, which would become,
+$\tilde{\tilde{\mu}} = \mu / (\rho_\infty c_\infty L).$
+%$$
+% \tilde{\tilde{\mu}} = \mu / (\rho_\infty c_\infty L).
+%$$
+The code could then output all field data as,
+$$
+\begin{array}{c@{\qquad}c@{\qquad}c}
+ \tilde{x}_{ijk} = x_{ijk}/L, & \tilde{u}_{ijk} = u_{ijk}/c_\infty, & \tilde{\rho}_{ijk} = \rho_{ijk}/\rho_\infty, \\
+ \tilde{y}_{ijk} = y_{ijk}/L, & \tilde{v}_{ijk} = v_{ijk}/c_\infty, & \tilde{p}_{ijk} = p_{ijk}/(\rho_\infty c_\infty^2), \\[.02in]
+ \tilde{z}_{ijk} = z_{ijk}/L, & \tilde{w}_{ijk} = w_{ijk}/c_\infty, & \tilde{\tilde{\mu}}_{ijk} = \mu_{ijk} / (\rho_\infty c_\infty L),
+\end{array}
+$$
+and output the freestream reference quantities,
+$$
+\begin{array}{c@{\qquad}c@{\qquad}c}
+ \tilde{u}_\infty = u_\infty/c_\infty,     & \tilde{\rho}_\infty = \rho_\infty/\rho_\infty = 1, \\
+ \tilde{v}_\infty = v_\infty/c_\infty,     & \tilde{p}_\infty = p_\infty/(\rho_\infty c_\infty^2) = 1/\gamma, \\[.02in]
+ \tilde{w}_\infty = w_\infty/c_\infty,     & \tilde{\tilde{\mu}}_\infty = \mu_\infty / (\rho_\infty c_\infty L) \sim O(1/Re), \\
+ \tilde{c}_\infty = c_\infty/c_\infty = 1, & \tilde{L} = L/L = 1,
+\end{array}
+$$
+where $\gamma$ is the specific heat ratio (assumes a perfect gas) and
+$Re$ is the Reynolds number.
+
+On input, the flow solver should be able to recover its internal
+normalizations from the data in a nondimensional CGNS database by
+treating the data as if it were dimensional.
+
+\subsubsection{Nondimensional Parameters}
+
+If |DataClass = NondimensionalParameter|, the data is a nondimensional
+parameter (or array of nondimensional parameters).  Examples include Mach
+number, Reynolds number and pressure coefficient.  These parameters are
+prevalent in CFD, although their definitions tend to vary between different
+application codes.  A list of standardized data-name identifiers for
+nondimensional parameters is provided in
+\hyperref[s:dataname_nondim]{Appendix~\ref*{s:dataname_nondim}}.
+
+We distinguish nondimensional parameters from other data classes by
+the fact that they are \emph{always} dimensionless.  In a completely
+nondimensional database, they are distinct in that their normalization
+is not necessarily consistent with other data.
+
+Typically, the |DimensionalUnits|, |DimensionalExponents| and
+|DataConversion| qualifiers are not used for nondimensional parameters;
+although, there are a few situations where they may be used (these are
+discussed below).
+Rather than rely on optional qualifiers to describe the normalization,
+we establish the convention that \emph{any nondimensional parameters
+should be accompanied by their defining scales}; this is further
+discussed in \hyperref[s:dataname_nondim]{Appendix~\ref*{s:dataname_nondim}}.
+An example is Reynolds number defined as $Re = V L_R / \nu$, where $V$,
+$L_R$ and $\nu$ are velocity, length, and viscosity scales, respectively.
+Note that these defining scales may be dimensional or nondimensional data.
+We establish the data-name identifiers \texttt{Reynolds},
+\texttt{Reynolds\_Velocity}, \texttt{Reynolds\_Length} and
+\texttt{Reynolds\_ViscosityKinematic} for the Reynolds number and its
+defining scales.
+Anywhere an instance of |DataArray_t| is found with the identifier
+|Reynolds|, there should also be entities for the defining scales.
+An example of this use for Reynolds number is given in
+\autoref{s:data_example}.
+
+In certain situations, it may be more convenient to use the optional
+qualifiers of |DataArray_t| to describe the normalization used
+in nondimensional parameters.  These situations must satisfy two
+requirements:  First, the defining scales are dimensional; and second,
+the nondimensional parameter is a normalization of a single ``raw'' data
+quantity and it is clear what this raw data is.  Examples that satisfy
+this second constraint are pressure coefficient, where the raw data is
+static pressure, and lift coefficient, where the raw data is the lift
+force.  Conversely, Reynolds number is a parameter that violates the
+second requirement---there are three pieces of raw data rather than one
+that make up $Re$.  For nondimensional parameters that satisfy these two
+requirements, the qualifiers |DimensionalUnits|, |DimensionalExponents|
+and |DataConversion| may be used as in \autoref{s:data_normbydim} to
+recover the raw dimensional data.
+
+\subsubsection{Dimensionless Constants}
+
+If |DataClass = DimensionlessConstant|, the data is a constant (or array
+of constants) with no associated dimensional units.  The |DimensionalUnits|,
+|DimensionalExponents| and |DataConversion| qualifiers are not used.
+
+\subsection{Data-Array Examples}
+\label{s:data_example}
+
+This section presents five examples of data-array entities and
+illustrates the use of optional information for describing dimensional
+and nondimensional data.
+
+\begin{example}{One-Dimensional Data Array, Constants}
+\label{ex:data1}
+
+A one-dimensional array of integers; the array is the integers from 1 to 10.
+The data is pure constants.
+\begin{alltt}
+  !  DataType = int
+  !  Dimension = 1
+  !  DimensionValues = 10
+  DataArray\_t<int, 1, 10> Data1 =
+    \{\{
+    Data(int, 1, 10) = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] ;
+    
+    DataClass\_t DataClass = DimensionlessConstant ;
+    \}\} ;
+\end{alltt}
+The structure parameters for |DataArray_t| state the data is an
+one-dimensional integer array of length ten.  The value of |DataClass|
+indicates the data is unitless constants.
+\end{example}
+
+\begin{example}{Two-Dimensional Data Array, Pressures}
+\label{ex:data2}
+
+A two-dimensional array of pressures with size $11\times 9$ given by the
+array |P(i,j)|.
+The data is dimensional with units of N/m\tsup{2} (i.e., kg/(m-s\tsup{2})).
+Note that |Pressure| is the data-name identifier for static pressure.
+\begin{alltt}
+  !  DataType = real
+  !  Dimension = 2
+  !  DimensionValues = [11,9]
+  DataArray\_t<real, 2, [11,9]> Pressure =
+    \{\{
+    Data(real, 2, [11,9]) = ((P(i,j), i=1,11), j=1,9) ;
+    
+    DataClass\_t DataClass = Dimensional ;
+
+    DimensionalUnits\_t DimensionalUnits =
+      \{\{
+      MassUnits        = Kilogram ;
+      LengthUnits      = Meter ;
+      TimeUnits        = Second ;
+      TemperatureUnits = Null ;
+      AngleUnits       = Null ;
+      \}\} ;
+	
+    DimensionalExponents\_t DimensionalExponents =
+      \{\{
+      MassExponent        = +1 ;
+      LengthExponent      = -1 ;
+      TimeExponent        = -2 ;
+      TemperatureExponent =  0 ;
+      AngleExponent       =  0 ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+From the data-name identifier conventions presented in
+\hyperref[s:dataname]{Appendix~\ref*{s:dataname}}, |Pressure| has a
+floating-point data type; hence, the appropriate structure parameter
+for |DataArray_t| is |real|.  
+
+The value of |DataClass| indicates that the data is dimensional, and
+both the dimensional units and dimensional exponents are provided.
+\texttt{DimensionalUnits} specifies that the units are kilograms,
+meters, and seconds, and \texttt{DimensionalExponents} specifies the
+appropriate exponents for pressure.
+Combining the information gives pressure as kg/(m-s\tsup{2}).
+\texttt{DimensionalExponents} could have been defaulted, since the
+dimensional exponents are given in
+\hyperref[s:dataname]{Appendix~\ref*{s:dataname}} for the data-name
+identifier |Pressure|.
+
+Note that FORTRAN multidimensional array indexing is used to store the data;
+this is reflected in the FORTRAN-like implied do-loops for |P(i,j)|.
+\end{example}
+
+\begin{example}{Three-Dimensional Data Array, Nondimensional Static Enthalpy}
+\label{ex:data3}
+
+A 3-D array of size $33\times 9\times 17$ containing nondimensional static 
+enthalpy.  The data is normalized by freestream velocity as follows:
+$$
+ \bar{h}_{i,j,k} = {h_{i,j,k} \over q^2_{\rm ref}},
+$$
+where $\bar{h}_{i,j,k}$ is nondimensional static enthalpy.  The freestream
+velocity is dimensional with a value of 10 m/s.  
+\begin{alltt}
+  !  DataType = real
+  !  Dimension = 3
+  !  DimensionValues = [33,9,17]
+  DataArray\_t<real, 3, [33,9,17]> Enthalpy =
+    \{\{
+    Data(real, 3, [33,9,17]) = (((H(i,j,k), i=1,33), j=1,9), k=1,17) ;
+    
+    DataClass\_t DataClass = NormalizedByDimensional ;
+    
+    DataConversion\_t DataConversion =
+      \{\{
+      real ConversionScale  = 100 ;
+      real ConversionOffset = 0 ;
+      \}\} ;
+      
+    DimensionalUnits\_t DimensionalUnits =
+      \{\{
+      MassUnits        = Null ;
+      LengthUnits      = Meter ;
+      TimeUnits        = Second ;
+      TemperatureUnits = Null ;
+      AngleUnits       = Null ;
+      \}\} ;
+	
+    DimensionalExponents\_t DimensionalExponents =
+      \{\{
+      MassExponent        =  0 ;
+      LengthExponent      = +2 ;
+      TimeExponent        = -2 ;
+      TemperatureExponent =  0 ;
+      AngleExponent       =  0 ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+From \hyperref[s:dataname]{Appendix~\ref*{s:dataname}}, the identifier for
+static enthalpy is |Enthalpy| and its data type is |real|.
+
+The value of |DataClass| indicates that the data is nondimensional and
+normalized by a dimensional reference quantity.  |DataConversion| provides
+the conversion factors for recovering the raw static enthalpy, which has
+units of m\tsup{2}/s\tsup{2} as indicated by |DimensionalUnits| and
+|DimensionalExponents|.  Note that |DimensionalExponents| could have been
+defaulted using the conventions for the data-name identifier |Enthalpy|.
+\end{example}
+
+\begin{example}{Three-Dimensional Data Array, Nondimensional Database}
+\label{ex:data4}
+
+The previous example for nondimensional enthalpy is repeated for a
+completely nondimensional database.
+\begin{alltt}
+  !  DataType = real
+  !  Dimension = 3
+  !  DimensionValues = [33,9,17]
+  DataArray\_t<real, 3, [33,9,17]> Enthalpy =
+    \{\{
+    Data(real, 3, [33,9,17]) = (((H(i,j,k), i=1,33), j=1,9), k=1,17) ;
+    
+    DataClass\_t DataClass = NormalizedByUnknownDimensional ;
+    \}\} ;
+\end{alltt}
+The value of |DataClass| indicates the appropriate class.  
+\end{example}
+
+\begin{example}{Data Arrays for Reynolds Number}
+\label{ex:data5}
+
+Reynolds number of $1.554 \!\times\! 10^{6}$ based on a velocity scale of
+10 m/s, a length scale of 2.3 m and a kinematic viscosity scale of
+$1.48 \!\times\! 10^{-5}$ m\tsup{2}/s.
+Assume the database has globally set the dimensional units to kilograms,
+meters, and seconds, and the global default data class to dimensional
+(|DataClass = Dimensional|).
+\begin{alltt}
+  !  DataType = real
+  !  Dimension = 1
+  !  DimensionValues = 1
+  DataArray\_t<real, 1, 1> Reynolds =
+    \{\{
+    Data(real, 1, 1) = 1.554e+06 ;
+    
+    DataClass\_t DataClass = NondimensionalParameter ;
+    \}\} ;
+
+  DataArray\_t<real, 1, 1> Reynolds\_Velocity =
+    \{\{
+    Data(real, 1, 1) = 10. ;
+    \}\} ;
+
+  DataArray\_t<real, 1, 1> Reynolds\_Length =
+    \{\{
+    Data(real, 1, 1) = 2.3 ;
+    \}\} ;
+
+  DataArray\_t<real, 1, 1> Reynolds\_ViscosityKinematic =
+    \{\{
+    Data(real, 1, 1) = 1.48e-05 ;
+    \}\} ;
+\end{alltt}
+|Reynolds| contains the value of the Reynolds number, and the value of its
+|DataClass| qualifier designates it as a nondimensional parameter.
+By conventions described in
+\hyperref[s:dataname_nondim]{Appendix~\ref*{s:dataname_nondim}},
+the defining scales are contained in the associated entities
+|Reynolds_Velocity|, |Reynolds_Length|, and |Reynolds_ViscosityKinematic|.
+Since each of these entities contain no qualifiers, global information
+is used to decipher that they are all dimensional with mass, length, and
+time units of kilograms, meters, and seconds.
+The structure parameters for each |DataArray_t| entity state that they
+contain a real scalar.
+
+If a user wanted to convey the dimensional units of the defining scales
+using optional qualifiers of |DataArray_t|, then the last three entities in
+this example would have a form similar to that in
+\hyperref[ex:data2]{Example~\ref*{ex:data2}}.
+\end{example}

@@ -1,0 +1,32 @@
+\section{ADF File System Architectures}
+\label{s:arch}
+\thispagestyle{plain}
+
+The following platform architectures have been tested and used both for
+functionality testing of the ADF core software libraries and for testing
+and running the prototype.
+
+\begin{longtable}{l >{\quad}l >{\quad}l >{\quad}l}
+\caption[Platform Architectures]{\textbf{Platform Architectures}}
+\label{t:arch}
+\\ \hline\hline \\*[-2ex]
+\bold{Release} & \bold{Machine} & \bold{OS Version} & \bold{Native Format}
+\\*[1ex] \hline\hline \\*[-2ex]
+A01 & Cray          & Unicos 8.0  & Unicos 8.0 \\
+A01 & SGI/IRIS      & 4.0.5       & IEEE Big Endian\footnote{
+   In the table, ``Endian'' refers to the ordering of bytes in a
+   multi-byte number.
+   Big endian is a computer architecture in which, within a given
+   multi-byte numeric representation, the most significant byte has the
+   lowest address (the word is stored ``big-end-first'').
+   Little endian is a computer architecture in which, within a given 16-
+   or 32-bit word, bytes at lower addresses have lower significance (the
+   word is stored ``little-end-first'').} \\
+B01 & HP            & 9.05        & IEEE Big Endian \\
+B01 & SGI/IRIS      & 5.03        & IEEE Little Endian \\
+C00 & Intel Paragon & ---         & IEEE Little Endian \\
+C00 & Dec Alpha     & ---         & IEEE Little Endian \\
+C00 & SGI/IRIS      & 6.2         & IEEE Big Endian \\
+C00 & Cray T90      & Unicos 9.02 & Cray Format
+\\*[1ex] \hline\hline
+\end{longtable}

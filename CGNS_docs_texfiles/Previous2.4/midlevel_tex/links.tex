@@ -1,0 +1,63 @@
+\section{Links}
+\label{s:links}
+\thispagestyle{plain}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_link\_write(\textcolor{input}{char *nodename}, \textcolor{input}{char *filename}, & - w m \\
+~~~~~~\textcolor{input}{char *name\_in\_file}); & \\
+\textcolor{output}{\textit{ier}} = cg\_is\_link(\textcolor{output}{\textit{int *path\_length}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_link\_read(\textcolor{output}{\textit{char **filename}}, \textcolor{output}{\textit{char **link\_path}}); & r - m \\
+\hline
+call cg\_link\_write\_f(\textcolor{input}{nodename}, \textcolor{input}{filename}, \textcolor{input}{name\_in\_file}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_is\_link\_f(\textcolor{output}{\textit{path\_length}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_link\_read\_f(\textcolor{output}{\textit{filename}}, \textcolor{output}{\textit{link\_path}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{name\_in\_file}}\raggedright
+\item [\fort{nodename}]
+      Name of the link node to create, e.g., \fort{GridCoordinates}.
+      (\textcolor{input}{Input})
+\item [\fort{filename}]
+      Name of the linked file, or empty string if the link is within the
+      same file.
+      (\textcolor{input}{Input} for \fort{cg\_link\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_link\_read})
+\item [\fort{name\_in\_file}]
+      Path name of the node which the link points to.
+      This can be a simple or a compound name, e.g.,
+      \fort{Base/Zone 1/GridCoordinates}.
+      (\textcolor{input}{Input})
+\item [\fort{path\_length}]
+      Length of the path name of the linked node.
+      The value 0 is returned if the node is not a link.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{link\_path}]
+      Path name of the node which the link points to.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+Use \fort{cg\_goto(\_f)}, described in \autoref{s:navigating}, to
+position to a location in the file prior to calling these routines.
+
+When using \fort{cg\_link\_write}, the node being linked to does not have 
+to exist when the link is created.
+However, when the link is used, an error will occur if the linked-to
+node does not exist.
+
+Only nodes that support child nodes will support links.
+
+It is assumed that the CGNS version for the file containing the link,
+as determined by the \fort{CGNSLibraryVersion\_t} node, is also
+applicable to \fort{filename}, the file containing the linked node.
+
+Memory is allocated by the library for the return values of the C
+function \fort{cg\_link\_read}.
+This memory should be freed by the user when no longer needed by calling
+\texttt{cg\_free(filename)} and \texttt{cg\_free(link\_path)}, described
+in \autoref{s:free}.

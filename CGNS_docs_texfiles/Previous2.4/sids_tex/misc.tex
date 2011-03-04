@@ -1,0 +1,730 @@
+\section{Miscellaneous Data Structures}
+\label{s:misc}
+\thispagestyle{plain}
+
+This section contains miscellaneous structure types for describing
+reference states, convergence history, discrete field data, integral or
+global data, families, and user-defined data.
+
+\subsection{Reference State Structure Definition: \texttt{ReferenceState\_t}}
+\label{s:ReferenceState}
+
+|ReferenceState_t| describes a reference state, which is a list of
+geometric or flow-state quantities defined at a common location or
+condition.
+Examples of typical reference states associated with CFD calculations
+are freestream, plenum, stagnation, inlet and exit.
+Note that providing a \fort{ReferenceState} description is particularly
+important if items elsewhere in the CGNS database are
+\fort{NormalizedByUnknownDimensional}.
+
+\begin{alltt}
+  ReferenceState\_t :=
+    \{
+    Descriptor\_t ReferenceStateDescription ;                                (o)
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{ReferenceState\_t} and shall not include the names \fort{DataClass},
+ \fort{DimensionalUnits}, or \fort{ReferenceStateDescription}.
+\end{notes}
+
+Data-name identifiers associated with \fort{ReferenceState} are shown in
+\autoref{t:id_reference}.
+
+\begin{table}[htbp]
+\centering
+\caption[Data-name Identifiers for Reference State]{\textbf{Data-name Identifiers for Reference State}}
+\label{t:id_reference}
+\begin{tabular}{>{\ttfamily}l >{\quad}l >{\quad\bfseries}l}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+Mach			     & Mach number, $M = q/c$		   & - \\
+Mach\_Velocity  	     & Velocity scale, $q$		   & L/T \\
+Mach\_VelocitySound	     & Speed of sound scale, $c$	   & L/T \\
+Reynolds		     & Reynolds number, $Re = V L_R / \nu$ & - \\
+Reynolds\_Velocity	     & Velocity scale, $V$		   & L/T \\
+Reynolds\_Length	     & Length scale, $L_R$		   & L \\
+Reynolds\_ViscosityKinematic & Kinematic viscosity scale, $\nu$    & L\tsup{2}/T \\
+LengthReference 	     & Reference length, $L$		   & L
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+In addition, any flowfield quantities (such as \fort{Density},
+\fort{Pressure}, etc.) can be included in the \fort{ReferenceState}.
+
+The reference length $L$ (\fort{LengthReference}) may be necessary for
+\fort{NormalizedByUnknownDimensional} databases, to define the length
+scale used for nondimensionalizations.
+It may be the same or different from the \fort{Reynolds\_Length} used to
+define the Reynolds number.
+
+Because of different definitions for angle of attack and angle of yaw,
+these quantities are not explicitly defined in the SIDS.
+Instead, the user can unambigouosly denote the freestream velocity      
+vector direction by giving \fort{VelocityX}, \fort{VelocityY}, and      
+\fort{VelocityZ} in \fort{ReferenceState}, (with the reference state    
+denoting the freestream).
+
+Care should be taken when defining the reference state quantities to
+ensure consistency.
+(See the discussion in \autoref{s:data_normbyunkdim}.)
+For example, if velocity, length, and time are all defined, then the
+velocity stored should be length/time.
+If consistency is not followed, different applications could interpret
+the resulting data in different ways.
+
+|DataClass| defines the default for the class of data contained in the
+reference state.
+If any reference state quantities are dimensional, |DimensionalUnits|
+may be used to describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+We recommend using the |ReferenceStateDescription| entity to document
+the flow conditions.  The format of the documentation is currently
+unregulated.
+
+\subsection{Reference State Example}
+
+An example is presented in this section of a reference state entity that
+contains dimensional data.
+An additional example of a nondimensional reference state is provided in
+\hyperref[s:twozone]{Appendix~\ref*{s:twozone}}.
+
+\begin{example}{Reference State with Dimensional Data}
+
+A freestream reference state where all data quantities are dimensional.
+Standard atmospheric conditions at sea level are assumed for static
+quantities, and all stagnation variables are obtained using the
+isentropic relations.
+The flow velocity is 200 m/s aligned with the $x$-axis.
+Dimensional units of kilograms, meters, and seconds are used.
+The data class and system of units are specified at the
+|ReferenceState_t| level rather than attaching this information directly
+to the |DataArray_t| entities for each reference quantity.
+Data-name identifiers are provided in
+\hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
+\begin{alltt}
+  ReferenceState\_t ReferenceState = 
+    \{\{
+    Descriptor\_t ReferenceStateDescription = 
+      \{\{
+      Data(char, 1, 45) = "Freestream at standard atmospheric conditions" ;
+      \}\} ;
+    
+    DataClass\_t DataClass = Dimensional ;
+
+    DimensionalUnits\_t DimensionalUnits = 
+      \{\{
+      MassUnits        = Kilogram ;
+      LengthUnits      = Meter ;
+      TimeUnits        = Second ;
+      TemperatureUnits = Kelvin ;
+      AngleUnits       = Radian ;
+      \}\} ;
+
+    DataArray\_t<real, 1, 1> VelocityX = 
+      \{\{
+      Data(real, 1, 1) = 200. ;
+      \}\} ;
+    DataArray\_t<real, 1, 1> VelocityY               = \{\{ 0. \}\} ;
+    DataArray\_t<real, 1, 1> VelocityZ               = \{\{ 0. \}\} ;
+
+    DataArray\_t<real, 1, 1> Pressure                = \{\{ 1.0132E+05 \}\} ;
+    DataArray\_t<real, 1, 1> Density                 = \{\{ 1.226 \}\} ;
+    DataArray\_t<real, 1, 1> Temperature             = \{\{ 288.15 \}\} ;
+    DataArray\_t<real, 1, 1> VelocitySound           = \{\{ 340. \}\} ;
+    DataArray\_t<real, 1, 1> ViscosityMolecular      = \{\{ 1.780E-05 \}\} ;
+
+    DataArray\_t<real, 1, 1> PressureStagnation      = \{\{ 1.2806E+05 \}\} ;
+    DataArray\_t<real, 1, 1> DensityStagnation       = \{\{ 1.449 \}\} ;
+    DataArray\_t<real, 1, 1> TemperatureStagnation   = \{\{ 308.09 \}\} ;
+    DataArray\_t<real, 1, 1> VelocitySoundStagnation = \{\{ 351.6 \}\} ;
+
+    DataArray\_t<real, 1, 1> PressureDynamic         = \{\{ 0.2542E+05 \}\} ;
+    \}\} ;                        
+\end{alltt}
+Note that all |DataArray_t| entities except |VelocityX| have been
+abbreviated.
+\end{example}
+
+\subsection{Convergence History Structure Definition: \texttt{ConvergenceHistory\_t}}
+\label{s:ConvergenceHistory}
+
+Flow solver convergence history information is described by the 
+|ConvergenceHistory_t| structure.
+This structure contains the number of iterations and a list of data
+arrays containing convergence information at each iteration.
+
+\begin{alltt}
+  ConvergenceHistory\_t :=
+    \{
+    Descriptor\_t NormDefinitions ;                                          (o)
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    int Iterations ;                                                        (r)
+
+    List( DataArray\_t<DataType, 1, Iterations> 
+      DataArray1 ... DataArrayN ) ;                                         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{ConvergenceHistory\_t} and shall not include the names
+ \fort{DataClass}, \fort{DimensionalUnits}, or \fort{NormDefinitions}. 
+\item
+ |Iterations| is the only required field for |ConvergenceHistory_t|.
+\end{notes}
+
+|Iterations| identifies the number of iterations for which convergence
+information is recorded.  This value is also passed into each of the
+|DataArray_t| entities, defining the length of the data arrays.
+
+|DataClass| defines the default for the class of data contained in the
+convergence history.
+If any convergence-history data is dimensional, |DimensionalUnits| may
+be used to describe the system of dimensional units employed.
+If present, these two entities take precedence over all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+Measures used to record convergence vary greatly among current
+flow-solver implementations.
+Convergence information typically includes global forces, norms of
+equation residuals, and norms of solution changes.
+Attempts to systematically define a set of convergence measures within
+the CGNS project have been futile.
+For global parameters, such as forces and moments,
+\hyperref[s:dataname]{Appendix~\ref*{s:dataname}} lists a set of
+standardized data-array identifiers.
+For equations residuals and solution changes, no such standard list
+exists.
+It is suggested that data-array identifiers for norms of equations
+residuals begin with |RSD|, and those for solution changes begin with
+|CHG|.
+For example, |RSDMassRMS| could be used for the $L_2$-norm (RMS) of mass
+conservation residuals.
+It is also strongly recommended that |NormDefinitions| be utilized to
+describe the convergence information recorded in the data arrays.
+The format used to describe the convergence norms in |NormDefinitions|
+is currently unregulated.
+
+\subsection{Discrete Data Structure Definition: \texttt{DiscreteData\_t}} 
+\label{s:DiscreteData}
+
+|DiscreteData_t| provides a description of generic discrete data (i.e.,
+data defined on a computational grid); it is identical to
+|FlowSolution_t| except for its type name.
+This structure can be used to store field data, such as fluxes or
+equation residuals, that is not typically considered part of the flow
+solution.
+|DiscreteData_t| contains a list for data arrays, identification of
+grid location, and a mechanism for identifying rind-point data included
+in the data arrays.
+All data contained within this structure must be defined at the same
+grid location and have the same amount of rind-point data.
+\begin{alltt}
+  DiscreteData\_t< int IndexDimension, int VertexSize[IndexDimension], 
+                  int CellSize[IndexDimension] > :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    GridLocation\_t GridLocation ;                                           (o/d)
+
+    Rind\_t<IndexDimension> Rind ;                                           (o/d)
+
+    List( DataArray\_t<DataType, IndexDimension, DataSize[]> 
+          DataArray1 ... DataArrayN ) ;                                     (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+    
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \texttt{Descriptor\_t},
+      \texttt{DataArray\_t}, and \texttt{UserDefinedData\_t} lists are
+      as shown; users may choose other legitimate names.
+      Legitimate names must be unique within a given instance
+      of \texttt{DiscreteData\_t} and shall not include the
+      names \texttt{DataClass}, \texttt{DimensionalUnits},
+      \texttt{GridLocation}, or \texttt{Rind}.
+\item There are no required fields for \texttt{DiscreteData\_t}.
+      \texttt{GridLocation} has a default of \texttt{Vertex} if absent.
+      \texttt{Rind} also has a default if absent; the the default
+      is equivalent to having an instance of \texttt{Rind}
+      whose \texttt{RindPlanes} array contains all zeros (see
+      \autoref{s:Rind}).
+\item The structure parameter \texttt{DataType} must be consistent
+      with the data stored in the \texttt{DataArray\_t} entities (see
+      \autoref{s:DataArray}).
+\item For unstructured zones \texttt{GridLocation} options are limited
+      to \texttt{Vertex} or \texttt{CellCenter}, meaning that solution
+      data may only be expressed at these locations.
+      The data arrays must follow the node ordering
+      if \texttt{GridLocation = Vertex}, and the element ordering if
+      \texttt{GridLocation = CellCenter}.
+\end{notes}
+
+|DiscreteData_t| requires three structure parameters; |IndexDimension|
+identifies the dimensionality of the grid size arrays, and |VertexSize|
+and |CellSize| are the number of core vertices and cells, respectively,
+in each index direction.
+
+The arrays of discrete data are stored in the list of |DataArray_t|
+entities.
+The field |GridLocation| specifies the location of the data with respect
+to the grid; if absent, the data is assumed to coincide with grid
+vertices (i.e., |GridLocation = Vertex|).
+All data within a given instance of |DiscreteData_t| must reside at the
+same grid location.
+
+\texttt{Rind} is an optional field that indicates
+the number of rind planes (for structured grids) or rind points or
+elements (for unstructured grids) included in the data.
+Its purpose and function are identical to those described in
+\autoref{s:Grid}.
+Note, however, that the \texttt{Rind} in this structure is independent
+of the \texttt{Rind} contained in \texttt{GridCoordinates\_t}.
+They are not required to contain the same number of rind planes or
+elements.
+Also, the location of any flow-solution rind points is assumed to be
+consistent with the location of the core flow solution points (e.g.,
+if \texttt{GridLocation = CellCenter}, rind points are assumed to be
+located at fictitious cell centers).
+
+|DataClass| defines the default class for data contained in the
+|DataArray_t| entities.
+For dimensional data, |DimensionalUnits| may be used to describe the
+system of units employed.
+If present these two entities take precedence over the corresponding
+entities at higher levels of the CGNS hierarchy.
+The rules for determining precedence of entities of this type are
+discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+%\noindent {\bf FUNCTION} |DataSize[]|:
+\subsubsection*{FUNCTION \texttt{DataSize[]}:}
+
+\noindent return value: one-dimensional |int| array of length
+          |IndexDimension| \\
+\noindent dependencies: |IndexDimension|, |VertexSize[]|, |CellSize[]|,
+          |GridLocation|, |Rind|
+
+The function \fort{DataSize[]} is the size of discrete-data arrays.
+It is identical to the function \fort{DataSize[]} defined for
+\fort{FlowSolution\_t} (see \autoref{s:FlowSolution}).
+
+\subsection{Integral Data Structure Definition: \texttt{IntegralData\_t}} 
+\label{s:IntegralData}
+
+|IntegralData_t| provides a description of generic global or integral data
+that may be associated with a particular zone or an entire database.
+In contrast to |DiscreteData_t|, integral data is not associated with
+any specific field location.
+\begin{alltt}
+  IntegralData\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+    
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{DiscreteData\_t} and shall not include the names \fort{DataClass}
+ or \fort{DimensionalUnits}.
+\item
+ There are no required fields for |IntegralData_t|.  
+\item
+ The structure parameter \fort{DataType} must be consistent with the
+ data stored in the \fort{DataArray\_t} entities (see \autoref{s:DataArray}).
+\end{notes}
+
+|DataClass| defines the default class for data contained in the
+|DataArray_t| entities.
+For dimensional data, |DimensionalUnits| may be used to describe the
+system of units employed.
+If present these two entities take precedence over the corresponding
+entities at higher levels of the CGNS hierarchy.
+The rules for determining precedence of entities of this type are
+discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Family Data Structure Definition: \texttt{Family\_t}}
+\label{s:Family}
+
+Geometric associations need to be set through one layer of indirection.
+That is, rather than setting the geometry data for each mesh entity
+(nodes, edges, and faces), they are associated to intermediate objects.
+The intermediate objects are in turn linked to nodal regions of the
+computational mesh.
+We define a CFD \emph{family} as this intermediate object.
+This layer of indirection is necessary since there is rarely a 1-to-1
+connection between mesh regions and geometric entities.
+
+The \fort{Family\_t} data structure holds the CFD family data.
+Each mesh surface is linked to the geometric entities of the CAD databases
+by a name attribute.
+This attribute corresponds to a family of CAD geometric entities on which
+the mesh face is projected.
+Each one of these geometric entities is described in a CAD file and is not
+redefined within the CGNS file.
+A \fort{Family\_t} data structure may be included in the \fort{CGNSBase\_t}
+structure for each CFD family of the model.
+
+The \fort{Family\_t} structure contains all information pertinent to a
+CFD family.
+This information includes the name attribute or family name, the
+boundary conditions applicable to these mesh regions, and the referencing
+to the CAD databases.
+
+\begin{alltt}
+  Family\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    FamilyBC\_t FamilyBC ;                                                   (o)
+
+    List( GeometryReference\_t GeometryReference1 ... GeometryReferenceN ) ; (o)
+
+    RotatingCoordinates\_t RotatingCoordinates ;                             (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+
+    int Ordinal ;                                                           (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item All data structures contained in \fort{Family\_t} are optional.
+\item Default names for the \fort{Descriptor\_t},
+      \fort{GeometryReference\_t}, and \fort{UserDefinedData\_t} lists
+      are as shown; users may choose other legitimate names.
+      Legitimate names must be unique at this level and must
+      not include the names \fort{FamilyBC}, \fort{Ordinal}, or
+      \fort{RotatingCoordinates}.
+\item The CAD referencing data are written in the
+      \fort{GeometryReference\_t} data structures.
+      They identify the CAD systems and databases where the geometric
+      definition of the family is stored.
+\item The boundary condition type pertaining to a family is contained in
+      the data structure \fort{FamilyBC\_t}.
+      If this boundary condition type is to be used, the \fort{BCType}
+      specified under \fort{BC\_t} must be \fort{FamilySpecified}.
+\item For the purpose of defining zone properties, families are extended
+      to a volume of cells.
+      In such case, the \fort{GeometryReference\_t} structures are not
+      used.
+\item The mesh is linked to the family by attributing a family name
+      to a BC patch or a zone in the data structure \fort{BC\_t} or
+      \fort{Zone\_t}, respectively.
+\item \fort{Ordinal} is defined in the SIDS as a user-defined integer
+      with no restrictions on the values that it can contain.
+      It may be used here to attribute a number to the family.
+\end{notes}
+
+Rotation of the CFD family may be defined using the
+\fort{RotatingCoordinates\_t} data structure.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Geometry Reference Structure Definition: \texttt{GeometryReference\_t}}
+\label{s:GeometryReference}
+
+The standard interface data structure identifies the CAD systems used
+to generate the geometry, the CAD files where the geometry is stored,
+and the geometric entities corresponding to the family.
+The \fort{GeometryReference\_t} structures contain all the information
+necessary to associate a CFD family to the CAD databases.
+For each \fort{GeometryReference\_t} structure, the CAD format
+is recorded in \fort{GeometryFormat}, and the CAD file in
+\fort{GeometryFile}.
+The geometry entity or entities within this CAD file that correspond to
+the family are recorded under the \fort{GeometryEntity\_t} nodes.
+
+\begin{alltt}
+  GeometryReference\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    GeometryFormat\_t GeometryFormat ;                                       (r)
+
+    GeometryFile\_t GeometryFile ;                                           (r)
+
+    List (GeometryEntity\_t GeometryEntity1 ... GeometryEntityN) ;           (o/d)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+The \fort{GeometryFormat} is an enumeration type that identifies the CAD
+system used to generate the geometry.
+
+\begin{alltt}
+  GeometryFormat_t := Enumeration(
+    Null,
+    NASA-IGES,
+    SDRC,
+    Unigraphics,
+    ProEngineer,
+    ICEM-CFD,
+    UserDefined ) ;
+\end{alltt}
+
+\begin{notes}
+\item
+Default names for the \fort{Descriptor\_t}, \fort{GeometryEntity\_t}, and
+\fort{UserDefinedData\_t}
+lists are as shown; users may choose other legitimate names.
+Legitimate names must be unique at this level and must not include the
+names \fort{GeometryFile} or \fort{GeometryFormat}.
+\item
+By default, there is only one \fort{GeometryEntity} and its name is
+the family name.
+\item
+There is no limit to the number of CAD files or CAD systems referenced
+in a CGNS file.
+Different parts of the same model may be described with different CAD
+files of different CAD systems.
+\item
+Other CAD geometry formats may be added to this list as needed.
+\end{notes}
+
+\subsection{Family Boundary Condition Structure Definition: \texttt{FamilyBC\_t}}
+\label{s:FamilyBC}
+
+One of the main advantages of the concept of a layer of indirection
+(called a family here) is that the mesh density and the geometric
+entities may be modified without altering the association between
+nodes and intermediate objects, or between intermediate objects and
+geometric entities.
+This is very beneficial when handling boundary conditions and properties.
+Instead of setting boundary conditions directly on mesh entities,
+or on CAD entities, they may be associated to the intermediate objects.
+Since these intermediate objects are stable in the sense that they are
+not subject to mesh or geometric variations, the boundary conditions
+do not need to be redefined each time the model is modified.
+Using the concept of indirection, the boundary conditions and property
+settings are made independent of operations such as geometric changes,
+modification of mesh topology (i.e., splitting into zones), mesh
+refinement and coarsening, etc.
+
+The \fort{FamilyBC\_t} data structure contains the boundary condition type.
+It is envisioned that it will be extended to hold both material and
+volume properties as well.
+
+\begin{alltt}
+  FamilyBC\_t :=
+    \{
+    BCType\_t BCType;                                                        (r)
+
+    List( BCDataSet\_t<ListLength>; BCDataSet1 ... BCDataSetN ) ;            (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{BCDataSet\_t} list are as shown; users
+      may choose other legitimate names.
+      Legitimate names must be unique within a given instance of
+      \fort{FamilyBC\_t} and shall not include the name \fort{BCType}.
+\item When \fort{BCDataSet\_t} structures are used to define boundary
+      conditions for a CFD family, the use of \fort{GridLocation},
+      \fort{PointRange}, and \fort{PointList} in the \fort{BCDataSet\_t}
+      structures is not allowed.
+\end{notes}
+
+\fort{BCType} specifies the boundary-condition type, which gives general
+information on the boundary-condition equations to be enforced.
+Boundary conditions are to be applied at the locations specified by the
+\fort{BC\_t} structure(s) associated with the CFD family.
+
+The \fort{FamilyBC\_t} structure provides for a list of
+boundary-condition data sets.
+In general, the proper \fort{BCDataSet\_t} instance to impose on
+the CFD family is determined by the \fort{BCType} association table
+(\autoref{t:BCType_assoc} on p.~\pageref*{t:BCType_assoc}).
+The mechanics of determining the proper data set to impose is described
+in \autoref{s:BCType_assoc}.
+
+For a few boundary conditions, such as a symmetry plane or polar
+singularity, the value of \fort{BCType} completely describes the
+equations to impose, and no instances of \fort{BCDataSet\_t} are needed.
+For ``simple'' boundary conditions, where a single set of Dirichlet
+and/or Neumann data is applied, a single \fort{BCDataSet\_t} will likely
+appear (although this is not a requirement).
+For ``compound'' boundary conditions, where the equations to impose
+are dependent on local flow conditions, several instances of
+\fort{BCDataSet\_t} will likely appear; the procedure for choosing the
+proper data set is more complex as described in \autoref{s:BCType_assoc}.
+
+\subsection{User-Defined Data Structure Definition: \texttt{UserDefinedData\_t}}
+\label{s:UserDefinedData}
+
+Since the needs of all CGNS users cannot be anticipated,
+\fort{UserDefinedData\_t} provides a means of storing arbitrary
+user-defined data in \fort{Descriptor\_t} and \fort{DataArray\_t}
+children without the restrictions or implicit meanings imposed on these
+node types at other node locations.
+
+\begin{alltt}
+  UserDefinedData\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    GridLocation\_t GridLocation ;                                           (o/d)
+
+    IndexRange\_t<IndexDimension> PointRange ;                               (o)
+    IndexArray\_t<IndexDimension, ListLength, int> PointList ;               (o)
+
+    List( DataArray\_t<> DataArray1 ... DataArrayN ) ;                       (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    FamilyName\_t FamilyName ;                                               (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+
+    int Ordinal ;                                                           (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t},
+      and \fort{UserDefinedData\_t} lists are as shown; users may choose
+      other legitimate names.
+      Legitimate names must be unique within a given instance of
+      \fort{UserDefinedData\_t} and shall not include the names
+      \fort{DataClass}, \fort{DimensionalUnits}, \fort{FamilyName},
+      \fort{GridLocation}, \fort{Ordinal}, \fort{PointList}, or
+      \fort{PointRange}.
+\item \fort{GridLocation} may be set to \fort{Vertex},
+      \fort{IFaceCenter}, \fort{JFaceCenter}, \fort{KFaceCenter},
+      \fort{FaceCenter}, \fort{CellCenter}, or \fort{EdgeCenter}.
+      If \fort{GridLocation} is absent, then its default value is
+      \fort{Vertex}.
+      When \fort{GridLocation} is set to \fort{Vertex}, then
+      \fort{PointList} or \fort{PointRange} refer to node indices, for
+      both structured and unstructured grids.
+      When \fort{GridLocation} is set to \fort{FaceCenter}, then
+      \fort{PointList} or \fort{PointRange} refer to face elements.
+\item \fort{GridLocation}, \fort{PointRange}, and \fort{PointList}
+      may only be used when \fort{UserDefinedData\_t} is located below a
+      \fort{Zone\_t} structure in the database hierarchy.
+\item Only one of \fort{PointRange} and \fort{PointList} may be
+      specified.
+\end{notes}
+
+\subsection{Gravity Data Structure Definition: \texttt{Gravity\_t}}
+\label{s:Gravity}
+
+The \fort{Gravity\_t} data structure may be used to define the
+gravitational vector.
+
+\begin{alltt}
+  Gravity\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    DataArray\_t<real, 1, PhysicalDimension> GravityVector ;                 (r)
+
+    DataClass\_t DataClass ;                                                 (o)
+
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+Default names for the \fort{Descriptor\_t} and \fort{UserDefinedData\_t}
+lists are as shown; users may choose other legitimate names.
+Legitimate names must be unique within a given instance of
+\fort{Gravity\_t} and shall not include the names \fort{DataClass},
+\fort{DimensionalUnits}, or \fort{GravityVector}.
+\end{notes}
+
+The only required field under the \fort{Gravity\_t} data structure is
+\fort{GravityVector}, which contains the components of the gravity
+vector in the coordinate system being used.
+
+\fort{DataClass} defines the default class for data contained in the
+\fort{DataArray\_t} entity.
+For dimensional data, \fort{DimensionalUnits} may be used to describe
+the system of units employed.
+If present, these two entities take precedence over the corresponding
+entities at higher levels of the CGNS hierarchy, following the standard
+precedence rules.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.

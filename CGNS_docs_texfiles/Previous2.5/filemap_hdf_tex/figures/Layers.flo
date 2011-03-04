@@ -1,0 +1,40 @@
+Skip 2.5 0 1 1 
+SetTrack arrow
+Right
+Oval 12 1
+ \textbf{SIDS}
+Box 15 2
+ \textit{End User Application}
+Down
+SetTrack none
+Skip 0 2 1 1 
+Box 15 2
+ \textbf{MLL} (Trees)
+Box 15 2
+ \textbf{SLL} (Nodes)
+Box 15 2
+ \textit{Storage layer} (HDF5 or ADF)
+SetTrack none
+Up 5 
+Left 10
+SetTrack line
+Oval 12 1
+ \textit{SLL node interface}
+Right 10
+Down 1 *
+SetTrack none
+Down 3 
+Left 10
+SetTrack line
+Oval 12 1
+ \textit{SLL mapping to HDF5}
+Right 10
+Up 1 *
+SetTrack none
+Up 7 
+Left 10
+SetTrack line
+Oval 12 1
+ \textit{MLL tree interface}
+Right 10
+Down 1 *

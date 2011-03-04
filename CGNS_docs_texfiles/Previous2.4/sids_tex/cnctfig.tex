@@ -1,0 +1,63 @@
+\begin{figure}[ht]
+   \setlength{\unitlength}{1.0in}
+   \begin{picture}(6.5,2.375)(0,-0.5)
+      % Zone 1 drawing
+      \drawline(0.0,0.0)(2.0,0.0)(2.0,1.25)(0.0,1.25)(0.0,0.0)
+      \drawline(0.0,1.25)(1.0,1.75)(3.0,1.75)(2.0,1.25)
+      \drawline(2.0,0.0)(3.0,0.5)(3.0,1.75)
+      \dashline{0.05}(0.0,0.0)(1.0,0.5)(3.0,0.5)
+      \dashline{0.05}(1.0,0.5)(1.0,1.75)
+      \dashline[25]{0.025}(2.375,0.1875)(2.375,1.0)(3.0,1.3125)
+      \put(2.375,0.1875){\circle*{0.05}}
+      \put(2.375,1.0   ){\circle*{0.05}}
+      \put(3.0,  1.3125){\circle*{0.05}}
+      \put(3.0,  0.5   ){\circle*{0.05}}
+      \thicklines
+      \put(0.0,0.0){\vector(1,0){0.5}}
+      \put(0.0,0.0){\vector(2,1){0.45}}
+      \put(0.0,0.0){\vector(0,1){0.5}}
+      \thinlines
+
+      % Zone 1 labels
+      \put(0.5,-0.1){\makebox(0,0)[t]{$i$}}
+      \put(0.45,0.45){\makebox(0,0)[tl]{$j$}}
+      \put(-0.1,0.5){\makebox(0,0)[r]{$k$}}
+
+      \put(2.375,0.0875){\makebox(0,0)[lt]{\small $(17,3,1)$}}
+      \put(3.1,1.3125){\makebox(0,0)[l]{\small $(17,9,5)$}}
+
+      \put(1.0,-0.2){\makebox(0,0)[t]{\shortstack{
+                     Zone 1\rule[-0.5ex]{0pt}{1ex} \\
+                     $17\cross 9\cross 7$\rule[-0.5ex]{0pt}{1ex}}}}
+
+      % Zone 2 drawing
+      \drawline(3.75,0.1875)(5.875,0.1875)(5.875,1.0)(3.75,1.0)(3.75,0.1875)
+      \drawline(3.75,1.0)(4.375,1.3125)(6.5,1.3125)(5.875,1.0)
+      \drawline(5.875,0.1875)(6.5,0.5)(6.5,1.3125)
+      \dashline{0.05}(3.75,0.1875)(4.375,0.5)(6.5,0.5)
+      \dashline{0.05}(4.375,0.5)(4.375,1.3125)
+      \put(3.75,  0.1875){\circle*{0.05}}
+      \put(3.75,  1.0   ){\circle*{0.05}}
+      \put(4.375, 1.3125){\circle*{0.05}}
+      \put(4.375, 0.5   ){\circle*{0.05}}
+      \thicklines
+      \put(6.5,1.3125){\vector(-2,-1){0.45}}
+      \put(6.5,1.3125){\vector(-1, 0){0.5}}
+      \put(6.5,1.3125){\vector( 0,-1){0.5}}
+      \thinlines
+
+      % Zone 2 labels
+      \put(6.1,1.05  ){\makebox(0,0)[t]{$i$}}
+      \put(6.0,1.4125){\makebox(0,0)[b]{$j$}}
+      \put(6.6,0.8125){\makebox(0,0)[l]{$k$}}
+
+      \put(3.75,0.0895){\makebox(0,0)[t]{\small $(7,9,5)$}}
+      \put(4.375,1.4125){\makebox(0,0)[b]{\small $(1,9,1)$}}
+
+      \put(4.8125,-0.0125){\makebox(0,0)[t]{\shortstack{
+                           Zone 2\rule[-0.5ex]{0pt}{1ex} \\
+                           $7\cross 9\cross 5$\rule[-0.5ex]{0pt}{1ex}}}}
+   \end{picture}
+   \caption{Example Interface for 1-to-1 Connectivity}
+   \label{f:1to1b}
+\end{figure}

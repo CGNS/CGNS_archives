@@ -1,0 +1,62 @@
+Box 22 5
+   \textbf{\Large DataArray Node}
+   (See Figures \ref*{f:GridCoordinates}, \ref*{f:Elements}, \ref*{f:Axisymmetry}, \ref*{f:RotatingCoordinates}, \ref*{f:FlowSolution}, \ref*{f:GridConnectivity}, \ref*{f:Periodic}, \ref*{f:BCData}, \ref*{f:Area}, \ref*{f:GasModel}, \ref*{f:ViscosityModel}, \ref*{f:ThermalConductivityModel}, \ref*{f:TurbulenceClosure}, \ref*{f:TurbulenceModel},
+   \ref*{f:ThermalRelaxationModel}, \ref*{f:ChemicalKineticsModel}, \ref*{f:EMElectricFieldModel}, \ref*{f:EMMagneticFieldModel}, \ref*{f:EMConductivityModel}, \ref*{f:ConvergenceHistory}, \ref*{f:IntegralData}, \ref*{f:ReferenceState}, \ref*{f:BaseIterativeData}, \ref*{f:ZoneIterativeData}, \ref*{f:RigidGridMotion}, \ref*{f:ArbitraryGridMotion}, \ref*{f:UserDefinedData}, \ref*{f:Gravity})
+SetTrack none
+Down 0
+Left 4
+SetTrack line
+Down 7.5
+Right 3
+TxtPos [l] [l] ~
+Box 20 11
+   \textbf{Name:} \fort{DimensionalExponents}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{DimensionalExponents\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{R4} or \fort{R8}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} 5\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:}    \fort{MassExponent}, \fort{LengthExponent},\rule[-0.5ex]{0pt}{1ex}
+   \hspace*{\indData}\fort{TimeExponent}, \fort{TemperatureExponent},\rule[-0.5ex]{0pt}{1ex}
+   \hspace*{\indData}\fort{AngleExponent}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} Figure \ref*{f:DimensionalExponents}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 4
+SetTrack line
+Down 10.5
+Right 3
+Box 20 8
+   \textbf{Name:} \fort{DataConversion}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{DataConversion\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{R4} or \fort{R8}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} 2\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{ConversionScale}, \fort{ConversionOffset}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 4
+SetTrack line
+Down 7
+Right 3
+Box 20 4
+   \textbf{Name:} \fort{DataClass}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{DataClass\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 4
+SetTrack line
+Down 5
+Right 3
+Box 20 4
+   \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{Descriptor\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 4
+SetTrack line
+Down 5
+Right 3
+Box 20 4
+   \textbf{Name:} \fort{DimensionalUnits}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{DimensionalUnits\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}

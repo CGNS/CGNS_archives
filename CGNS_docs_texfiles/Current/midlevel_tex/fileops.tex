@@ -1,0 +1,217 @@
+\section{File Operations}
+\label{s:fileops}
+\thispagestyle{plain}
+
+\subsection{Opening and Closing a CGNS File}
+\label{s:openclose}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_open(\textcolor{input}{char *filename}, \textcolor{input}{int mode}, \textcolor{output}{\textit{int *fn}}); & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_version(\textcolor{input}{int fn}, \textcolor{output}{\textit{float *version}});         & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_close(\textcolor{input}{int fn});                           & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_is\_cgns(\textcolor{input}{const char *filename}, \textcolor{output}{\textit{int *file\_type}});                           & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_save\_as(\textcolor{input}{int fn}, \textcolor{input}{const char *filename}, \textcolor{input}{int file\_type}, \textcolor{input}{int follow\_links});                           & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_set\_file\_type(\textcolor{input}{int file\_type});                           & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_get\_file\_type(\textcolor{input}{int fn}, \textcolor{output}{\textit{int *file\_type}});                           & r w m \\
+\hline
+\hline
+call cg\_open\_f(\textcolor{input}{filename}, \textcolor{input}{mode}, \textcolor{output}{\textit{fn}}, \textcolor{output}{\textit{ier}})          & r w m \\
+call cg\_version\_f(\textcolor{input}{fn}, \textcolor{output}{\textit{version}}, \textcolor{output}{\textit{ier}})              & r w m \\
+call cg\_close\_f(\textcolor{input}{fn}, \textcolor{output}{\textit{ier}})                         & r w m \\
+call cg\_is\_cgns\_f(\textcolor{input}{filename}, \textcolor{output}{\textit{file\_type}}, \textcolor{output}{\textit{ier}})                         & r w m \\
+call cg\_save\_as\_f(\textcolor{input}{fn}, \textcolor{input}{filename}, \textcolor{input}{file\_type}, \textcolor{input}{follow\_links}, \textcolor{output}{\textit{ier}})                         & r w m \\
+call cg\_set\_file\_type\_f(\textcolor{input}{file\_type}, \textcolor{output}{\textit{ier}})                         & r w m \\
+call cg\_get\_file\_type\_f(\textcolor{input}{fn}, \textcolor{output}{\textit{file\_type}}, \textcolor{output}{\textit{ier}})                         & r w m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{filename}}\raggedright
+\item [\texttt{filename}]
+      Name of the CGNS file, including path name if necessary.
+      There is no limit on the length of this character variable.
+      (\textcolor{input}{Input})
+\item [\texttt{mode}]
+      Mode used for opening the file.
+      The modes currently supported are \texttt{CG\_MODE\_READ},
+      \texttt{CG\_MODE\_WRITE}, and \texttt{CG\_MODE\_MODIFY}.
+      (\textcolor{input}{Input})
+\item [\texttt{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input} for \texttt{cg\_version} and
+      \texttt{cg\_close}; \textcolor{output}{\textit{output}} for
+      \texttt{cg\_open})
+\item [\texttt{version}]
+      CGNS version number.
+      (\textcolor{output}{\textit{Output}})
+\item [\texttt{file\_type}]
+      Type of CGNS file.  This will typically be either \texttt{CG\_FILE\_ADF} or
+      \texttt{CG\_FILE\_HDF5} depending on the underlying file format.
+      (\textcolor{input}{Input} for \texttt{cg\_save\_as} and
+      \texttt{cg\_set\_file\_type}; \textcolor{output}{\textit{output}} for
+      \texttt{cg\_get\_file\_type})  \\
+      However, note that when built in 32-bit, there is also an option
+      to create a Version 2.5 CGNS file by setting the file type to
+      \texttt{CG\_FILE\_ADF2}.
+\item [\texttt{follow\_links}]
+      This flag determines whether links are left intact when saving a CGNS 
+      file. If non-zero, then the links will be removed and the data associated 
+      with the linked files copied to the new file.
+      (\textcolor{input}{Input})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+The function \texttt{cg\_open} must always be the first one called.
+It opens a CGNS file for reading and/or writing and returns an index
+number \texttt{fn}.
+The index number serves to identify the CGNS file in subsequent
+function calls.
+Several CGNS files can be opened simultaneously.
+The current limit on the number of files opened at once depends on the
+platform.
+On an SGI workstation, this limit is set at 100 (parameter
+\texttt{FOPEN\_MAX} in \textit{stdio.h}).
+
+The file can be opened in one of the following modes:
+
+\begin{Ventryic}{\texttt{CG\_MODE\_MODIFY}}
+\item [\texttt{CG\_MODE\_READ}]
+      Read only mode.
+\item [\texttt{CG\_MODE\_WRITE}]
+      Write only mode.
+\item [\texttt{CG\_MODE\_MODIFY}]
+      Reading and/or writing is allowed.
+\end{Ventryic}
+
+When the file is opened, if no \texttt{CGNSLibraryVersion\_t} node is
+found, a default value of 1.05 is assumed for the CGNS version number.
+Note that this corresponds to an old version of the CGNS standard, that
+doesn't include many data structures supported by the current standard.
+
+The function \texttt{cg\_close} must always be the last one called.
+It closes the CGNS file designated by the index number \texttt{fn} and
+frees the memory where the CGNS data was kept.
+When a file is opened for writing, \texttt{cg\_close} writes all the
+CGNS data in memory onto disk prior to closing the file.
+Consequently, if is omitted, the CGNS file is not written properly.
+
+In order to reduce memory usage and improve execution speed,
+large arrays such as grid coordinates or flow solutions are not actually
+stored in memory.
+Instead, only their ADF (or HDF) ID numbers are kept in memory for future
+reference.
+An attempt is also made to do the same with unstructured mesh element data.
+
+The function \texttt{cg\_is\_cgns} may be used to determine if a file is a 
+CGNS file or not, and the type of file (\texttt{CG\_FILE\_ADF} or \texttt{CG\_FILE\_HDF5}). 
+If the file is a CGNS file, \texttt{cg\_is\_cgns} returns \texttt{CG\_OK}, 
+otherwise \texttt{CG\_ERROR} is returned and \texttt{file\_type} is set to 
+\texttt{CG\_FILE\_NONE}. 
+
+The CGNS file identified by \texttt{fn} may be saved to a different filename 
+and type using \texttt{cg\_save\_as}. In order to save as an HDF5 file, the 
+library must have been built with HDF5 support. ADF support is always built.
+The function 
+\texttt{cg\_set\_file\_type} changes this default. The function 
+\texttt{cg\_get\_file\_type} returns the file type for the CGNS file identified by 
+\texttt{fn}. 
+
+\subsection{Configuring CGNS Internals}
+\label{s:configure}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_configure(\textcolor{input}{int option}, \textcolor{input}{void *value}); & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_error\_handler(\textcolor{input}{void (*)(int, char *)}); & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_set\_compress(\textcolor{input}{int compress}); & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_get\_compress(\textcolor{output}{\textit{int *compress}}); & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_set\_path(\textcolor{input}{const char *path}); & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_add\_path(\textcolor{input}{const char *path}); & r w m \\
+\hline
+\hline
+call cg\_set\_compress\_f(\textcolor{input}{compress}, \textcolor{output}{\textit{ier}})          & r w m \\
+call cg\_get\_compress\_f(\textcolor{output}{\textit{compress}}, \textcolor{output}{\textit{ier}})          & r w m \\
+call cg\_set\_path\_f(\textcolor{input}{path}, \textcolor{output}{\textit{ier}})          & r w m \\
+call cg\_add\_path\_f(\textcolor{input}{path}, \textcolor{output}{\textit{ier}})          & r w m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{option}}\raggedright
+\item [\texttt{option}]
+      The option to configure, currently one of
+      \texttt{CG\_CONFIG\_ERROR}, \texttt{CG\_CONFIG\_COMPRESS},
+      \texttt{CG\_CONFIG\_SET\_PATH}, \texttt{CG\_CONFIG\_ADD\_PATH},
+      or \texttt{CG\_CONFIG\_HDF5\_COMPRESS}
+      as defined in \textit{cgnslib.h}.
+      (\textcolor{input}{Input})
+\item [\texttt{value}]
+      The value to set, type cast as \texttt{void *}.
+      (\textcolor{input}{Input})
+\item [\texttt{compress}]
+      CGNS compress (rewrite) setting).
+      (\textcolor{input}{Input} for \texttt{cg\_set\_compress}; \textcolor{output}{\textit{output}} for
+      \texttt{cg\_get\_compress})
+\item [\texttt{path}]
+      Pathname to search for linked to files when opening a file with external links.
+      (\textcolor{input}{Input})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+The function \texttt{cg\_configure} allows certain CGNS library internal
+options to be configured.
+The currently supported options and expected values are:
+
+\begin{Ventryi}{\texttt{CG\_CONFIG\_SET\_PATH}}
+\item [\texttt{CG\_CONFIG\_ERROR}]
+      This allows an error call-back function to be defined by the
+      user.
+      The value should be a pointer to a function to receive the error.
+      The function is defined as \texttt{void err\_callback(int is\_error,
+      char *errmsg)}, and will be called for errors and warnings.
+      The first argument, \texttt{is\_error}, will be 0 for warning
+      messages, 1 for error messages, and $-1$ if the program is
+      going to terminate (i.e., a call to \texttt{cg\_error\_exit()}).
+      The second argument is the error or warning message.
+      If this is defined, warning and error messages will go to the
+      function, rather than the terminal.
+      A \texttt{value} of \texttt{NULL} will remove the call-back
+      function.
+\item [\texttt{CG\_CONFIG\_COMPRESS}]
+      When a CGNS file is closed after being opened in modify mode, the
+      normal operation of the CGNS library is to rewrite the file if
+      there is unused space.
+      This happens when nodes have been rewritten or deleted.
+      Setting \texttt{value} to 0 will prevent the library from
+      rewriting the file, and setting it to 1 will force the rewrite.
+      The default value is $-1$.
+\item [\texttt{CG\_CONFIG\_SET\_PATH}]
+      Sets the search path for locating linked-to files.
+      The argument \texttt{value} should be a character string
+      containing one or more directories, formatted the same as for the
+      \texttt{PATH} environment variable.
+      This will replace any current settings.
+      Setting \texttt{value} to \texttt{NULL} will remove all paths.
+\item [\texttt{CG\_CONFIG\_ADD\_PATH}]
+      Adds a directory, or list of directories, to the linked-to file
+      search path.
+      This is the same as \texttt{CG\_CONFIG\_SET\_PATH}, but adds to
+      the path instead of replacing it.
+\item [\texttt{CG\_CONFIG\_HDF5\_COMPRESS}]
+      Sets the compression level for data written from HDF5. The default 
+      is no compression. Setting \texttt{value} to $-1$, will use the default 
+      compression level of $6$. The acceptable values are $0$ to $9$, 
+      corresponding to gzip compression levels.
+\end{Ventryi}
+
+The routines \texttt{cg\_error\_handler}, \texttt{cg\_set\_compress}, 
+\texttt{cg\_set\_path}, and \texttt{cg\_add\_path} are convenience functions 
+built on top of \texttt{cg\_configure}.
+
+There is no Fortran counterpart to function \texttt{cg\_configure} or 
+\texttt{cg\_error\_handler}. 

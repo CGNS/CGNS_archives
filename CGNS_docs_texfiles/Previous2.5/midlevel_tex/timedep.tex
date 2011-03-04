@@ -1,0 +1,192 @@
+\section{Time-Dependent Data}
+\label{s:timedep}
+\thispagestyle{plain}
+
+\subsection{Base Iterative Data}
+\label{s:biter}
+
+\noindent
+\textit{Node}: \texttt{BaseIterativeData\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_biter\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{char *BaseIterName}, \textcolor{input}{int Nsteps}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_biter\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{output}{\textit{char *BaseIterName}}, \textcolor{output}{\textit{int *Nsteps}}); & r - m \\
+\hline
+call cg\_biter\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{BaseIterName}, \textcolor{input}{Nsteps}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_biter\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{output}{\textit{BaseIterName}}, \textcolor{output}{\textit{Nsteps}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{BaseIterName}}\raggedright
+\item [\texttt{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\texttt{B}]
+      Base index number, where $1 \leq \text{\texttt{B}} \leq \text{\texttt{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{BaseIterName}]
+      Name of the \texttt{BaseIterativeData\_t} node.
+      (\textcolor{input}{Input} for \texttt{cg\_biter\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_biter\_read})
+\item [\texttt{Nsteps}]
+      Number of time steps or iterations.
+      (\textcolor{input}{Input} for \texttt{cg\_biter\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_biter\_read})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+\subsection{Zone Iterative Data}
+\label{s:ziter}
+
+\noindent
+\textit{Node}: \texttt{ZoneIterativeData\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_ziter\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{char *ZoneIterName}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_ziter\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{char *ZoneIterName}}); & r - m \\
+\hline
+call cg\_ziter\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{ZoneIterName}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_ziter\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{ZoneIterName}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{ZoneIterName}}\raggedright
+\item [\texttt{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\texttt{B}]
+      Base index number, where $1 \leq \text{\texttt{B}} \leq \text{\texttt{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{Z}]
+      Family index number, where $1 \leq \text{\texttt{Z}} \leq \text{\texttt{nzones}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{ZoneIterName}]
+      Name of the \texttt{ZoneIterativeData\_t} node.
+      (\textcolor{input}{Input} for \texttt{cg\_ziter\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_ziter\_read})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+\subsection{Rigid Grid Motion}
+\label{s:rigid}
+
+\noindent
+\textit{Node}: \texttt{RigidGridMotion\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_rigid\_motion\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, & - w m \\
+~~~~~~\textcolor{input}{char *RigidGridMotionName}, & \\
+~~~~~~\textcolor{input}{RigidGridMotionType\_t RigidGridMotionType}, \textcolor{output}{\textit{int *R}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_n\_rigid\_motions(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{int *n\_rigid\_motions}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_rigid\_motion\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int R}, & r - m \\
+~~~~~~\textcolor{output}{\textit{char *RigidGridMotionName}}, & \\
+~~~~~~\textcolor{output}{\textit{RigidGridMotionType\_t RigidGridMotionType}}); & \\
+\hline
+call cg\_rigid\_motion\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{RigidGridMotionName}, & - w m \\
+~~~~~\textcolor{input}{RigidGridMotionType}, \textcolor{output}{\textit{R}}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_n\_rigid\_motions\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{n\_rigid\_motions}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_rigid\_motion\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{R}, \textcolor{output}{\textit{RigidGridMotionName}}, & r - m \\
+~~~~~\textcolor{output}{\textit{RigidGridMotionType}}, \textcolor{output}{\textit{ier}}) & \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{RigidGridMotionName}}\raggedright
+\item [\texttt{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\texttt{B}]
+      Base index number, where $1 \leq \text{\texttt{B}} \leq \text{\texttt{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{Z}]
+      Family index number, where $1 \leq \text{\texttt{Z}} \leq \text{\texttt{nzones}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{RigidGridMotionName}]
+      Name of the \texttt{RigidGridMotion\_t} node.
+      (\textcolor{input}{Input} for \texttt{cg\_rigid\_motion\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_rigid\_motion\_read})
+\item [\texttt{RigidGridMotionType}]
+      Type of rigid grid motion.
+      The admissible types are \texttt{Null}, \texttt{UserDefined},
+      \texttt{ConstantRate}, and \texttt{VariableRate}.
+      (\textcolor{input}{Input} for \texttt{cg\_rigid\_motion\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_rigid\_motion\_read})
+\item [\texttt{n\_rigid\_motions}]
+      Number of \texttt{RigidGridMotion\_t} nodes under zone \texttt{Z}.
+      (\textcolor{output}{\textit{Output}})
+\item [\texttt{R}]
+      Rigid rotation index number, where $1 \leq \text{\texttt{R}} \leq \text{\texttt{n\_rigid\_motions}}$.
+      (\textcolor{input}{Input} for \texttt{cg\_rigid\_motion\_read};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_rigid\_motion\_write})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+\newpage
+\subsection{Arbitrary Grid Motion}
+\label{s:arbitrary}
+
+\noindent
+\textit{Node}: \texttt{ArbitraryGridMotion\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_arbitrary\_motion\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, & - w m \\
+~~~~~~\textcolor{input}{char *ArbitraryGridMotionName}, & \\
+~~~~~~\textcolor{input}{ArbitraryGridMotionType\_t ArbitraryGridMotionType}, \textcolor{output}{\textit{int *A}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_n\_arbitrary\_motions(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, & r - m \\
+~~~~~~\textcolor{output}{\textit{int *n\_arbitrary\_motions}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_arbitrary\_motion\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int A}, & r - m \\
+~~~~~~\textcolor{output}{\textit{char *ArbitraryGridMotionName}}, & \\
+~~~~~~\textcolor{output}{\textit{ArbitraryGridMotionType\_t ArbitraryGridMotionType}}); & \\
+\hline
+call cg\_arbitrary\_motion\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{ArbitraryGridMotionName}, & - w m \\
+~~~~~\textcolor{input}{ArbitraryGridMotionType}, \textcolor{output}{\textit{A}}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_n\_arbitrary\_motions\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{n\_arbitrary\_motions}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_arbitrary\_motion\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{A}, \textcolor{output}{\textit{ArbitraryGridMotionName}}, & r - m \\
+~~~~~\textcolor{output}{\textit{ArbitraryGridMotionType}}, \textcolor{output}{\textit{ier}}) & \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{ArbitraryGridMotionName}}\raggedright
+\item [\texttt{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\texttt{B}]
+      Base index number, where $1 \leq \text{\texttt{B}} \leq \text{\texttt{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{Z}]
+      Family index number, where $1 \leq \text{\texttt{Z}} \leq \text{\texttt{nzones}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{ArbitraryGridMotionName}]
+      Name of the \texttt{ArbitraryGridMotion\_t} node.
+      (\textcolor{input}{Input} for \texttt{cg\_arbitrary\_motion\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_arbitrary\_motion\_read})
+\item [\texttt{ArbitraryGridMotionType}]
+      Type of arbitrary grid motion.
+      The admissible types are \texttt{Null}, \texttt{UserDefined},
+      \texttt{NonDeformingGrid}, and \texttt{DeformingGrid}.
+      (\textcolor{input}{Input} for \texttt{cg\_arbitrary\_motion\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_arbitrary\_motion\_read})
+\item [\texttt{n\_arbitrary\_motions}]
+      Number of \texttt{ArbitraryGridMotion\_t} nodes under zone \texttt{Z}.
+      (\textcolor{output}{\textit{Output}})
+\item [\texttt{A}]
+      Arbitrary grid motion index number, where $1 \leq \text{\texttt{A}} \leq \text{\texttt{n\_arbitrary\_motions}}$.
+      (\textcolor{input}{Input} for \texttt{cg\_arbitrary\_motion\_read};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_arbitrary\_motion\_write})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
