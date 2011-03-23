@@ -15,7 +15,8 @@
 \textcolor{output}{\textit{ier}} = cg\_boco\_normal\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & - w m \\
 ~~~~~~\textcolor{input}{int *NormalIndex}, \textcolor{input}{int NormalListFlag}, & \\
 ~~~~~~\textcolor{input}{DataType\_t NormalDataType}, \textcolor{input}{void *NormalList}); & \\
-\textcolor{output}{\textit{ier}} = cg\_boco\_gridlocation\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{input}{\textit{GridLocation_t location}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_boco\_gridlocation\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & r - m \\
+~~~~~~\textcolor{input}{\textit{GridLocation\_t location}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_nbocos(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{int *nbocos}}); & r - m \\
 \textcolor{output}{\textit{ier}} = cg\_boco\_info(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{char *boconame}}, & r - m \\
 ~~~~~~\textcolor{output}{\textit{BCType\_t *bocotype}}, \textcolor{output}{\textit{PointSetType\_t *ptset\_type}}, \textcolor{output}{\textit{cgsize\_t *npnts}}, & \\
@@ -23,7 +24,8 @@
 ~~~~~~\textcolor{output}{\textit{DataType\_t *NormalDataType}}, \textcolor{output}{\textit{int *ndataset}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_boco\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{cgsize\_t *pnts}}, & r - m \\
 ~~~~~~\textcolor{output}{\textit{void *NormalList}}); & \\
-\textcolor{output}{\textit{ier}} = cg\_boco\_gridlocation\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{GridLocation_t *location}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_boco\_gridlocation\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & r - m \\
+~~~~~~\textcolor{output}{\textit{GridLocation\_t *location}}); \\
 \hline
 call cg\_boco\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{boconame}, \textcolor{input}{bocotype}, \textcolor{input}{ptset\_type}, \textcolor{input}{npnts}, & - w m \\
 ~~~~~\textcolor{input}{pnts}, \textcolor{output}{\textit{BC}}, \textcolor{output}{\textit{ier}}) & \\
