@@ -15,6 +15,7 @@
 \textcolor{output}{\textit{ier}} = cg\_boco\_normal\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & - w m \\
 ~~~~~~\textcolor{input}{int *NormalIndex}, \textcolor{input}{int NormalListFlag}, & \\
 ~~~~~~\textcolor{input}{DataType\_t NormalDataType}, \textcolor{input}{void *NormalList}); & \\
+\textcolor{output}{\textit{ier}} = cg\_boco\_gridlocation\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{input}{\textit{GridLocation_t location}}); & r - m \\
 \textcolor{output}{\textit{ier}} = cg\_nbocos(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{int *nbocos}}); & r - m \\
 \textcolor{output}{\textit{ier}} = cg\_boco\_info(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{char *boconame}}, & r - m \\
 ~~~~~~\textcolor{output}{\textit{BCType\_t *bocotype}}, \textcolor{output}{\textit{PointSetType\_t *ptset\_type}}, \textcolor{output}{\textit{cgsize\_t *npnts}}, & \\
@@ -22,16 +23,19 @@
 ~~~~~~\textcolor{output}{\textit{DataType\_t *NormalDataType}}, \textcolor{output}{\textit{int *ndataset}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_boco\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{cgsize\_t *pnts}}, & r - m \\
 ~~~~~~\textcolor{output}{\textit{void *NormalList}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_boco\_gridlocation\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{GridLocation_t *location}}); & r - m \\
 \hline
 call cg\_boco\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{boconame}, \textcolor{input}{bocotype}, \textcolor{input}{ptset\_type}, \textcolor{input}{npnts}, & - w m \\
 ~~~~~\textcolor{input}{pnts}, \textcolor{output}{\textit{BC}}, \textcolor{output}{\textit{ier}}) & \\
 call cg\_boco\_normal\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{input}{NormalIndex}, \textcolor{input}{NormalListFlag}, & - w m \\
 ~~~~~\textcolor{input}{NormalDataType}, \textcolor{input}{NormalList}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_boco\_gridlocation\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{input}{location}, \textcolor{output}{\textit{ier}}); & - w m \\
 call cg\_nbocos\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{nbocos}}, \textcolor{output}{\textit{ier}}) & r - m \\
 call cg\_boco\_info\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{output}{\textit{boconame}}, \textcolor{output}{\textit{bocotype}}, \textcolor{output}{\textit{ptset\_type}}, & r - m \\
 ~~~~~\textcolor{output}{\textit{npnts}}, \textcolor{output}{\textit{NormalIndex}}, \textcolor{output}{\textit{NormalListFlag}}, \textcolor{output}{\textit{NormalDataType}}, \textcolor{output}{\textit{ndataset}}, & \\
 ~~~~~\textcolor{output}{\textit{ier}}) & \\
 call cg\_boco\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{output}{\textit{pnts}}, \textcolor{output}{\textit{NormalList}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_boco\_gridlocation\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{output}{\textit{location}}, \textcolor{output}{\textit{ier}}); & r - m \\
 \end{fctbox}
 
 \noindent
@@ -151,6 +155,14 @@ call cg\_boco\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{i
       Number of boundary condition datasets for the current boundary
       condition.
       (\textcolor{output}{\textit{Output}})
+\item [\texttt{location}]
+      Grid location used in the definition of the point set.
+      The currently admissible locations are \texttt{Vertex},
+      \texttt{FaceCenter}, \texttt{IFaceCenter},
+      \texttt{JFaceCenter}, and \texttt{KFaceCenter}.
+      (\textcolor{input}{Input} for \texttt{cg\_boco\_gridlocation\_write};
+      \textcolor{output}{\textit{output}} for
+      \texttt{cg\_boco\_gridlocation\_read})
 \item [\texttt{ier}]
       Error status.
       (\textcolor{output}{\textit{Output}})
