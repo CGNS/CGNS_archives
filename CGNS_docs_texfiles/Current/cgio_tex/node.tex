@@ -1,0 +1,146 @@
+\section{Node Management Routines}
+\label{s:node}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cgio\_get\_node\_id(\textcolor{input}{int cgio\_num}, \textcolor{input}{double pid}, \textcolor{input}{const char *pathname}, & r w m \\
+~~~~~~~\textcolor{output}{\textit{double *id}}); & \\
+\textcolor{output}{\textit{ier}} = cgio\_get\_name(\textcolor{input}{int cgio\_num}, \textcolor{input}{double id}, \textcolor{output}{\textit{char *name}}); & r w m \\
+\textcolor{output}{\textit{ier}} = cgio\_set\_name(\textcolor{input}{int cgio\_num}, \textcolor{input}{double pid}, \textcolor{input}{double id}, & - w m \\
+~~~~~~~\textcolor{input}{const char *name}); & \\
+\textcolor{output}{\textit{ier}} = cgio\_get\_label(\textcolor{input}{int cgio\_num}, \textcolor{input}{double id}, \textcolor{output}{\textit{char *label}}); & r w m \\
+\textcolor{output}{\textit{ier}} = cgio\_set\_label(\textcolor{input}{int cgio\_num}, \textcolor{input}{double id}, \textcolor{input}{const char *label}); & - w m \\
+\textcolor{output}{\textit{ier}} = cgio\_get\_data\_type(\textcolor{input}{int cgio\_num}, \textcolor{input}{double id}, \textcolor{output}{\textit{char *data\_type}}); & r w m \\
+\textcolor{output}{\textit{ier}} = cgio\_get\_dimensions(\textcolor{input}{int cgio\_num}, \textcolor{input}{double id}, \textcolor{output}{\textit{int *ndims}}, & r w m \\
+~~~~~~~\textcolor{output}{\textit{cgsize\_t *dims}}); & \\
+\textcolor{output}{\textit{ier}} = cgio\_set\_dimensions(\textcolor{input}{int cgio\_num}, \textcolor{input}{double id}, & - w m \\
+~~~~~~~\textcolor{input}{const char *data\_type}, \textcolor{input}{int ndims}, \textcolor{input}{const cgsize\_t *dims}); & \\
+\hline
+call cgio\_get\_node\_id\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{pid}, \textcolor{input}{name}, \textcolor{output}{\textit{id}}, \textcolor{output}{\textit{ier}}) & r w m \\
+call cgio\_get\_name\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{id}, \textcolor{output}{\textit{name}}, \textcolor{output}{\textit{ier}}) & r w m \\
+call cgio\_set\_name\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{pid}, \textcolor{input}{id}, \textcolor{input}{name}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cgio\_get\_label\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{id}, \textcolor{output}{\textit{label}}, \textcolor{output}{\textit{ier}}) & r w m \\
+call cgio\_set\_label\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{id}, \textcolor{input}{label}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cgio\_get\_data\_type\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{id}, \textcolor{output}{\textit{data\_type}}, \textcolor{output}{\textit{ier}}) & r w m \\
+call cgio\_get\_dimensions\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{id}, \textcolor{output}{\textit{ndims}}, \textcolor{output}{\textit{dims}}, \textcolor{output}{\textit{ier}}) & r w m \\
+call cgio\_set\_dimensions\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{id}, \textcolor{input}{data\_type}, \textcolor{input}{ndims}, \textcolor{input}{dims}, \textcolor{output}{\textit{ier}}) & - w m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{data\_type}}\raggedright
+\item [\texttt{cgio\_num}]
+      Database identifier.
+\item [\texttt{pid}]
+      Parent node identifier.
+\item [\texttt{id}]
+      Node identifier.
+\item [\texttt{pathname}]
+      Absolute or relative path name for a node.
+\item [\texttt{name}]
+      Node name (max length 32).
+\item [\texttt{label}]
+      Node label (max length 32).
+\item [\texttt{data\_type}]
+      Type of data contained in the node. One of ``MT'', ``I4'', ``I8'',
+      ``U4'', ``U8'', ``R4'', ``C1'', or ``B1''.
+\item [\texttt{ndims}]
+      Number of dimensions for the data (max 12).
+\item [\texttt{dims}]
+      Data dimension values (\texttt{ndims} values).
+\item [\texttt{ier}]
+      Error status.
+\end{Ventryi}
+
+\subsection{Function Descriptions}
+
+\subsubsection{\texttt{cgio\_get\_node\_id}} \label{get_node_id}
+    \noindent
+    Gets the node identifier for the node specified by \texttt{pathname}
+    in the database given by \texttt{cgio\_num}. if \texttt{pathname} starts
+    with ``\texttt{/}'', then it is taken as an absolute path and is located based
+    on the root id of the database, otherwise it is taken to be a relative
+    path from the parent node identifed by \texttt{pid}. The function returns
+    0 and the node identifier in \texttt{id} on success, else an error code.
+
+\subsubsection{\texttt{cgio\_get\_name}} \label{get_name}
+    \noindent
+    Gets the name of the node identified by \texttt{id} in the database given
+    by \texttt{cgio\_num}. The name is returned in \texttt{name}, and has a
+    maximum length of \texttt{CGIO\_MAX\_NAME\_LENGTH} (32). In C, \texttt{name}
+    should be dimensioned at least 33 to allow for the terminating '0'.
+    The function returns 0 for success, else an error code.
+
+\subsubsection{\texttt{cgio\_set\_name}} \label{set_name}
+    \noindent
+    Sets (renames) the node identied by \texttt{id} in the database given by
+    \texttt{cgio\_num} to \texttt{name}. The parent node identifier is given
+    by \texttt{pid}. There must not already exist a child node of \texttt{pid}
+    with that name. The function return 0 on success, else an error code.
+
+\subsubsection{\texttt{cgio\_get\_label}} \label{get_label}
+    \noindent
+    Gets the label of the node identified by \texttt{id} in the database given
+    by \texttt{cgio\_num}. The label is returned in \texttt{label}, and has a
+    maximum length of \texttt{CGIO\_MAX\_LABEL\_LENGTH} (32). In C, \texttt{label}
+    should be dimensioned at least 33 to allow for the terminating '0'.
+    The function returns 0 for success, else an error code.
+
+\subsubsection{\texttt{cgio\_set\_label}} \label{set_label}
+    \noindent
+    Sets the label of the node identied by \texttt{id} in the database given by
+    \texttt{cgio\_num} to \texttt{label}. The function return 0 on success,
+    else an error code.
+
+\subsubsection{\texttt{cgio\_get\_data\_type}} \label{get_data_type}
+    \noindent
+    Gets the data type of the data associated with the node identified by
+    \texttt{id} in the database given by \texttt{cgio\_num}.
+    The data type is returned in \texttt{data\_type}, and has a
+    maximum length of \texttt{CGIO\_MAX\_DATATYPE\_LENGTH} (2).
+    In C, \texttt{data\_type} should be dimensioned at least 3 to allow for
+    the terminating '0'.
+    The function returns 0 for success, else an error code.
+
+\subsubsection{\texttt{cgio\_get\_dimensions}} \label{get_dimensions}
+    \noindent
+    Gets the dimensions of the data associated with the node identified by
+    \texttt{id} in the database given by \texttt{cgio\_num}. The number of
+    dimensions is returned in \texttt{ndims} and the dimension values
+    in \texttt{dims}. Since the maximum number of dimensions is
+    \texttt{CGIO\_MAX\_DIMENSIONS} (12), \texttt{dims} should be dimensioned
+    12, unless the actual number of dimensions is already known.
+    The function returns 0 for success, else an error code.
+
+\subsubsection{\texttt{cgio\_set\_dimensions}} \label{set_dimensions}
+    \noindent
+    Sets the data type and dimensions for data associated with the node
+    identified by \texttt{id} in the database given by \texttt{cgio\_num}.
+    The data type (\texttt{data\_type}) as one of:
+    \begin{Ventryi}{``\texttt{MT}''}
+    \item [``\texttt{MT}'']
+          An empty node containing no data
+    \item [``\texttt{I4}'']
+          32-bit integer (int or integer*4)
+    \item [``\texttt{I8}'']
+          64-bit integer (cglong\_t or integer*8)
+    \item [``\texttt{U4}'']
+          32-bit unsigned integer (unsigned int or integer*4)
+    \item [``\texttt{U8}'']
+          64-bit unsigned integer (cgulong\_t or integer*8)
+    \item [``\texttt{R4}'']
+          32-bit real (float or real*4)
+    \item [``\texttt{R8}'']
+          64-bit real (double or real*8)
+    \item [``\texttt{C1}'']
+          character (char or character)
+    \item [``\texttt{B1}'']
+          unsigned bytes (unsigned char or character*1)
+    \end{Ventryi}
+    \noindent
+    The number of dimensions is given by \texttt{ndims} (maximum is 12), and
+    the dimension values by \texttt{dims}. Note that any existing data for the
+    node will be destroyed. To add the data to the node, use one of the
+    \hyperlink{s:dataio}{data writing routines}. The function returns 0 for
+    success, else an error code.
+

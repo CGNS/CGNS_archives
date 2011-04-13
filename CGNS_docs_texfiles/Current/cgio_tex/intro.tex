@@ -1,0 +1,25 @@
+\section{Introduction}
+\label{s:intro}
+\thispagestyle{plain}
+
+The CGIO interface provides low-level access to the database manager which
+underlies CGNS. The original database manager for CGNS was
+\href{../adf/adf.pdf}{ADF} (Advanced Data Format), and as such
+much of the CGIO interface routines are patterned after this. Starting
+with CGNS library version 2.xx, a new database manager
+\href{../hdf5/hdf5.pdf}{HDF5} (Hierarchical Data Format) was
+introduced. At that time only one of these database managers could be used
+at a time, and this was selected at build time.
+
+In CGNS library version 3.xx, the CGIO interface was developed to support
+both database managers simultaneously, and in a fashion transparent to
+the application code. This is now the preferred way to acces the database
+manager.
+
+This document defines the general structure of a database file, but not
+the specific implementation details. See the
+\href{../adf/adf.pdf}{ADF} and \href{../hdf5/hdf5.pdf}{HDF5}
+Implementations for the details.
+The CGIO core routines used to store and retrieve data from the
+database manager are also described.
+
