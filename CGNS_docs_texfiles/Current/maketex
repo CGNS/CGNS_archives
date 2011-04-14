@@ -1,0 +1,64 @@
+#! /bin/sh
+#
+# makehtml - create compressed tar file containing HTML documentation
+#            for a specified document
+#
+# Author: Charlie Towne (towne@lerc.nasa.gov)
+
+#set -vx
+
+version='1.0, 8 June 2001'
+
+usage='USAGE: maketex dirlist'
+
+# get the directories to process
+
+dirs=""
+while [ $# -gt 0 ]; do
+  [ -d $1 ] && dirs="$dirs $1"
+  shift
+done
+
+if [ -z "$dirs" ]; then
+   echo 'Error: No directories specified' >& 2
+   echo $usage >& 2
+   exit 1
+fi
+
+# process the directories
+
+for d in $dirs ; do
+
+# Set directory name
+  directory=$d
+
+# Create the tar file
+# explicitly name the files so don't get .svn
+  case $d in
+    adf_tex)      tar cvf $d.tar $d/*.tex $d/*.pdf $d/*.eps $d/*.sty;;
+    cgio_tex)     tar cvf $d.tar $d/*.tex $d/*.pdf $d/*.sty;;
+    charter_tex)  tar cvf $d.tar $d/*.tex $d/*.sty;;
+    filemap_tex)  tar cvf $d.tar $d/*.tex $d/*.sty \
+                      $d/figures/f $d/figures/*.flo $d/figures/*.pic;;
+    hdf5_tex)     tar cvf $d.tar $d/*.tex $d/*.sty;;
+    midlevel_tex) tar cvf $d.tar $d/*.tex $d/*.sty;;
+    overview_tex) tar cvf $d.tar $d/*.tex $d/*.sty;;
+    python_tex)   tar cvf $d.tar $d/*.tex $d/*.sty $d/*.ist $d/*.cls;;
+    sids_tex)     tar cvf $d.tar $d/*.tex $d/*.sty \
+                      $d/*.figs/*.flo $d/*.figs/*.pic \
+                      $d/*.figs/*.pdf $d/*.figs/*.eps;;
+    user_tex)     tar cvf $d.tar $d/*.tex $d/*.sty \
+                      $d/figures/*.pdf $d/figures/*.eps;;
+    *)            directory=""
+                  echo "skipping directory $d" ;;
+  esac
+
+  if [ -n "$directory" ]; then
+# Compress it, show the sizes, and move it into the directory
+    gzip $directory.tar
+    gzip -l $directory.tar.gz
+#    mv $directory.tar.gz $directory
+    echo "$directory.tar.gz - done"
+  fi
+
+done
