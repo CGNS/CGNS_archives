@@ -14,10 +14,12 @@
 \textcolor{output}{\textit{ier}} = cg\_nbases(\textcolor{input}{int fn}, \textcolor{output}{\textit{int *nbases}}); & r - m \\
 \textcolor{output}{\textit{ier}} = cg\_base\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{output}{\textit{char *basename}}, \textcolor{output}{\textit{int *cell\_dim}}, & r - m \\
 ~~~~~~\textcolor{output}{\textit{int *phys\_dim}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_cell\_dim(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{output}{\textit{int *cell\_dim}}); & r - m \\
 \hline
 call cg\_base\_write\_f(\textcolor{input}{fn}, \textcolor{input}{basename}, \textcolor{input}{cell\_dim}, \textcolor{input}{phys\_dim}, \textcolor{output}{\textit{B}}, \textcolor{output}{\textit{ier}}) & - w m \\
 call cg\_nbases\_f(\textcolor{input}{fn}, \textcolor{output}{\textit{nbases}}, \textcolor{output}{\textit{ier}}) & r - m \\
 call cg\_base\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{output}{\textit{basename}}, \textcolor{output}{\textit{cell\_dim}}, \textcolor{output}{\textit{phys\_dim}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_cell\_dim\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{output}{\textit{cell\_dim}}, \textcolor{output}{\textit{ier}}) & r - m \\
 \end{fctbox}
 
 \noindent
@@ -39,9 +41,11 @@ call cg\_base\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{o
       (\textcolor{input}{Input} for \texttt{cg\_base\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_base\_read})
 \item [\texttt{cell\_dim}]
-      Dimension of the cells; 3 for volume cells, 2 for surface cells.
+      Dimension of the cells; 3 for volume cells, 2 for surface cells
+      and 1 for line cells.
       (\textcolor{input}{Input} for \texttt{cg\_base\_write};
-      \textcolor{output}{\textit{output}} for \texttt{cg\_base\_read})
+      \textcolor{output}{\textit{output}} for \texttt{cg\_base\_read}
+      and \texttt{cg\_cell\_dim})
 \item [\texttt{phys\_dim}]
       Number of coordinates required to define a vector in the field.
       (\textcolor{input}{Input} for \texttt{cg\_base\_write};
@@ -51,6 +55,7 @@ call cg\_base\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{o
       (\textcolor{output}{\textit{Output}})
 \end{Ventryi}
 
+\newpage
 \subsection{Zone Information}
 \label{s:zone}
 
@@ -64,17 +69,19 @@ call cg\_base\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{o
 \textcolor{output}{\textit{ier}} = cg\_zone\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{char *zonename}}, & r - m \\
 ~~~~~~\textcolor{output}{\textit{cgsize\_t *size}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_zone\_type(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{ZoneType\_t *zonetype}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_index\_dim(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{int *index\_dim}}); & r - m \\
 \hline
 call cg\_zone\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{zonename}, \textcolor{input}{size}, \textcolor{input}{zonetype}, \textcolor{output}{\textit{Z}}, \textcolor{output}{\textit{ier}}) & - w m \\
 call cg\_nzones\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{output}{\textit{nzones}}, \textcolor{output}{\textit{ier}}) & r - m \\
 call cg\_zone\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{zonename}}, \textcolor{output}{\textit{size}}, \textcolor{output}{\textit{ier}}) & r - m \\
 call cg\_zone\_type\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{zonetype}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_index\_dim\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{index\_dim}}, \textcolor{output}{\textit{ier}}) & r - m \\
 \end{fctbox}
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
-\begin{Ventryi}{\texttt{zonename}}\raggedright
+\begin{Ventryi}{\texttt{index\_dim}}\raggedright
 \item [\texttt{fn}]
       CGNS file index number.
       (\textcolor{input}{Input})
@@ -137,6 +144,11 @@ call cg\_zone\_type\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{i
       The admissible types are \texttt{Structured} and \texttt{Unstructured}.
       (\textcolor{input}{Input} for \texttt{cg\_zone\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_zone\_type})
+\item [\texttt{index\_dim}]
+      Index dimension for the zone. For Structured zones,
+      this will be the base cell dimension and for Unstructured zones
+      it will be 1.
+      (\textcolor{output}{\textit{output}})
 \item [\texttt{ier}]
       Error status.
       (\textcolor{output}{\textit{Output}})

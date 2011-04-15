@@ -10,7 +10,8 @@
 \textcolor{output}{\textit{ier}} = cg\_version(\textcolor{input}{int fn}, \textcolor{output}{\textit{float *version}});         & r w m \\
 \textcolor{output}{\textit{ier}} = cg\_close(\textcolor{input}{int fn});                           & r w m \\
 \textcolor{output}{\textit{ier}} = cg\_is\_cgns(\textcolor{input}{const char *filename}, \textcolor{output}{\textit{int *file\_type}});                           & r w m \\
-\textcolor{output}{\textit{ier}} = cg\_save\_as(\textcolor{input}{int fn}, \textcolor{input}{const char *filename}, \textcolor{input}{int file\_type}, \textcolor{input}{int follow\_links});                           & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_save\_as(\textcolor{input}{int fn}, \textcolor{input}{const char *filename}, \textcolor{input}{int file\_type}, & r w m \\
+~~~~~~\textcolor{input}{int follow\_links}); & \\
 \textcolor{output}{\textit{ier}} = cg\_set\_file\_type(\textcolor{input}{int file\_type});                           & r w m \\
 \textcolor{output}{\textit{ier}} = cg\_get\_file\_type(\textcolor{input}{int fn}, \textcolor{output}{\textit{int *file\_type}});                           & r w m \\
 \hline
@@ -27,7 +28,7 @@ call cg\_get\_file\_type\_f(\textcolor{input}{fn}, \textcolor{output}{\textit{fi
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
-\begin{Ventryi}{\texttt{filename}}\raggedright
+\begin{Ventryi}{\texttt{follow\_links}}\raggedright
 \item [\texttt{filename}]
       Name of the CGNS file, including path name if necessary.
       There is no limit on the length of this character variable.
@@ -101,9 +102,10 @@ Consequently, if is omitted, the CGNS file is not written properly.
 In order to reduce memory usage and improve execution speed,
 large arrays such as grid coordinates or flow solutions are not actually
 stored in memory.
-Instead, only their ADF (or HDF) ID numbers are kept in memory for future
-reference.
-An attempt is also made to do the same with unstructured mesh element data.
+Instead, only basic information about the node is kept,
+while reads and writes of the data is directly to and from the
+application's memory. An attempt is also made to do the same with
+unstructured mesh element data.
 
 The function \texttt{cg\_is\_cgns} may be used to determine if a file is a 
 CGNS file or not, and the type of file (\texttt{CG\_FILE\_ADF} or \texttt{CG\_FILE\_HDF5}). 
@@ -115,10 +117,14 @@ The CGNS file identified by \texttt{fn} may be saved to a different filename
 and type using \texttt{cg\_save\_as}. In order to save as an HDF5 file, the 
 library must have been built with HDF5 support. ADF support is always built.
 The function 
-\texttt{cg\_set\_file\_type} changes this default. The function 
+\texttt{cg\_set\_file\_type} sets the default file type for
+newly created CGNS files. The function 
 \texttt{cg\_get\_file\_type} returns the file type for the CGNS file identified by 
-\texttt{fn}. 
+\texttt{fn}. If the CGNS library is built as 32-bit, the additional
+file type, \texttt{CG\_FILE\_ADF2}, is available. This allows creation
+of a 2.5 compatible CGNS file.
 
+\newpage
 \subsection{Configuring CGNS Internals}
 \label{s:configure}
 
@@ -215,3 +221,9 @@ built on top of \texttt{cg\_configure}.
 
 There is no Fortran counterpart to function \texttt{cg\_configure} or 
 \texttt{cg\_error\_handler}. 
+
+\textit{Note}: The HDF5 implementation does not support search paths
+for linked files. The links need to be either absolute or relative
+pathnames. As a result, it is recommended that the search path options
+not be used as they may be removed in future versions.
+

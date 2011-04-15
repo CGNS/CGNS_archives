@@ -8,7 +8,7 @@ The CGNS Mid-Level Library may be downloaded from SourceForge, at
 {\itshape\url{http://sourceforge.net/projects/cgns}}.
 This manual, as well as the other CGNS documentation, is available in
 both HTML and PDF format from the CGNS documentation web site, at
-{\itshape\url{http://www.grc.nasa.gov/www/cgns/}}.
+{\itshape\url{http://www.grc.nasa.gov/www/cgns/CGNS_docs_current/}}.
 
 \subsection{Organization of This Manual}
 
@@ -21,9 +21,8 @@ opening and closing a CGNS file, and some configuration options)
 The remaining sections describe the functions used to read, write, and
 modify nodes and data in a CGNS database.
 These sections basically follow the organization used in
-the ``Detailed CGNS Node Descriptions'' section of both the
-\href{../filemap/filemap.pdf}{SIDS-to-ADF} and
-\href{../filemap_hdf/filemap.pdf}{SIDS-to-HDF} file mapping manuals.
+the ``Detailed CGNS Node Descriptions'' section of the
+\href{../filemap/filemap.pdf}{SIDS File Mapping} manual.
 
 At the start of each sub-section is a \textit{Node} line, listing the
 the applicable CGNS node label.
@@ -126,9 +125,9 @@ types (typedefs) are:
          \texttt{ZoneTypeNull, ZoneTypeUserDefined, Structured, Unstructured}
    \item [\texttt{ElementType\_t}]
          \texttt{ElementTypeNull, ElementTypeUserDefined, NODE, BAR\_2, BAR\_3, TRI\_3, TRI\_6, QUAD\_4,
-         QUAD\_8, QUAD\_9, TETRA\_4, TETRA\_10, PYRA\_5, PYRA\_13,
+         QUAD\_8, QUAD\_9, TETRA\_4, TETRA\_10, PYRA\_5,
          PYRA\_14, PENTA\_6, PENTA\_15, PENTA\_18, HEXA\_8,
-         HEXA\_20, HEXA\_27, MIXED, NGON\_n, NFACE\_n}
+         HEXA\_20, HEXA\_27, MIXED, PYRA\_13, NGON\_n, NFACE\_n}
    \item [\texttt{DataType\_t}]
          \texttt{DataTypeNull, DataTypeUserDefined, Integer, RealSingle, RealDouble, Character}
    \item [\texttt{DataClass\_t}]

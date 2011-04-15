@@ -190,3 +190,76 @@ call cg\_arbitrary\_motion\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B},
       Error status.
       (\textcolor{output}{\textit{Output}})
 \end{Ventryi}
+
+\newpage
+\subsection{Zone Grid Connectivity}
+\label{s:zconn}
+
+\noindent
+\textit{Node}: \texttt{ZoneGridConnectivity\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_nzconns(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{int *nzconns}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_zconn\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int ZC}, \textcolor{output}{\textit{char *zcname}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_zconn\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{const char *zcname}, & - w m \\
+~~~~~~\textcolor{output}{\textit{int *ZC}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_zconn\_set(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int ZC}); & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_zconn\_get(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{int *ZC}}); & r w m \\
+\hline
+call cg\_nzconns\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{nzconns}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_zconn\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{ZC}, \textcolor{output}{\textit{zcname}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_zconn\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{zcname}, \textcolor{output}{\textit{ZC}}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_zconn\_set\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{ZC}, \textcolor{output}{\textit{ier}}) & r w m \\
+call cg\_zconn\_get\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{ZC}}, \textcolor{output}{\textit{ier}}) & r w m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{nzconns}}\raggedright
+\item [\texttt{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\texttt{B}]
+      Base index number, where $1 \leq \text{\texttt{B}} \leq \text{\texttt{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{Z}]
+      Family index number, where $1 \leq \text{\texttt{Z}} \leq \text{\texttt{nzones}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{ZC}]
+      Zone grid connectivity index number, where $1 \leq \text{\texttt{ZC}} \leq \text{\texttt{nzconns}}$.
+      (\textcolor{input}{Input} for \texttt{cg\_zconn\_read} and
+      \texttt{cg\_zconn\_set};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_zconn\_write}
+      and \texttt{cg\_zconn\_get})
+\item [\texttt{nzconns}]
+      Number of \texttt{ZoneGridConnectivity\_t} nodes under Zone \texttt{Z}.
+      (\textcolor{output}{Output})
+\item [\texttt{zcname}]
+      Name of the \texttt{ZoneGridConnectivity\_t} node.
+      (\textcolor{input}{Input} for \texttt{cg\_zconn\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_zconn\_read})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+This allows for the specification of multiple \texttt{ZoneGridConnectivity\_t}
+nodes. If these functions are not used, or \texttt{cg\_zconn\_write}
+is called once with a \texttt{zcname} of \texttt{ZoneGridConnectivity},
+then there will be no differences from previous versions of the
+CGNS library. However, with multiple \texttt{ZoneGridConnectivity\_t}
+nodes, there is an implicit \textit{current} \texttt{ZoneGridConnectivity\_t}
+node on which subsequent grid connectivity functions will operate,
+i.e. \texttt{cg\_conn\_read/write} (\autoref{s:generalized}) or
+\texttt{cg\_1to1\_read/write} (\autoref{s:1to1}).
+
+The functions \texttt{cg\_zconn\_read} and \texttt{cg\_zconn\_write}
+will implicity set the \textit{current} \texttt{ZoneGridConnectivity\_t}
+node, while \texttt{cg\_zconn\_set} explicitly sets it. The functions
+\texttt{cg\_nzconns} and \texttt{cg\_zconn\_get} do not change it.
+
+The time-dependent changes to the connectivities may then be recorded
+in the \texttt{ZoneInterativeData\_t} (\autoref{s:ziter}) node as an
+array of \texttt{ZoneGridConnectivityPointers}.
+

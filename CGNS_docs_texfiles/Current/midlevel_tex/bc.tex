@@ -15,7 +15,7 @@
 \textcolor{output}{\textit{ier}} = cg\_boco\_normal\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & - w m \\
 ~~~~~~\textcolor{input}{int *NormalIndex}, \textcolor{input}{int NormalListFlag}, & \\
 ~~~~~~\textcolor{input}{DataType\_t NormalDataType}, \textcolor{input}{void *NormalList}); & \\
-\textcolor{output}{\textit{ier}} = cg\_boco\_gridlocation\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_boco\_gridlocation\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & - w m \\
 ~~~~~~\textcolor{input}{\textit{GridLocation\_t location}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_nbocos(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{int *nbocos}}); & r - m \\
 \textcolor{output}{\textit{ier}} = cg\_boco\_info(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{char *boconame}}, & r - m \\
@@ -25,7 +25,7 @@
 \textcolor{output}{\textit{ier}} = cg\_boco\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{cgsize\_t *pnts}}, & r - m \\
 ~~~~~~\textcolor{output}{\textit{void *NormalList}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_boco\_gridlocation\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, & r - m \\
-~~~~~~\textcolor{output}{\textit{GridLocation\_t *location}}); \\
+~~~~~~\textcolor{output}{\textit{GridLocation\_t *location}}); & \\
 \hline
 call cg\_boco\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{boconame}, \textcolor{input}{bocotype}, \textcolor{input}{ptset\_type}, \textcolor{input}{npnts}, & - w m \\
 ~~~~~\textcolor{input}{pnts}, \textcolor{output}{\textit{BC}}, \textcolor{output}{\textit{ier}}) & \\
@@ -78,40 +78,29 @@ call cg\_boco\_gridlocation\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}
       \textcolor{output}{\textit{output}} for \texttt{cg\_boco\_info})
 \item [\texttt{ptset\_type}]
       The extent of the boundary condition may be defined using a range
-      of points or elements, or using a discrete list of all points or
-      elements at which the boundary condition is applied.
-      Depending on the method used, the possible values for
-      \texttt{ptset\_type} are:
+      of points or elements using \texttt{PointRange}, or using a
+      discrete list of all points or elements at which the boundary
+      condition is applied using \texttt{PointList}.
 
-      \setlength{\tmplength}{\extrarowheight}	% temporarily decrease row heights
-      \setlength{\extrarowheight}{0pt}
-      \begin{tabular}{@{}l >{\ttfamily}l}
-         \uline{\texttt{ptset\_type}} & \uline{\textit{Method}} \\
-         \texttt{PointRange}   & Range of points or elements \\
-         \texttt{PointList}    & List of points or elements \\
-         \texttt{ElementRange} & Range of elements \\
-         \texttt{ElementRList} & List of elements
-      \end{tabular}
-      \setlength{\extrarowheight}{\tmplength}
-
-      Note that when \texttt{ptset\_type} is \texttt{ElementRange} or
-      \texttt{ElementList}, the \texttt{pnts} values (see below) are assumed
-      to be element indices.
-      When \texttt{ptset\_type} is \texttt{PointRange} or \texttt{PointList},
-      the choice of point or element indices is determined by
-      \texttt{GridLocation\_t} under the \texttt{BC\_t} node.
-      The value of \texttt{GridLocation\_t} must be read or
-      written by first using \texttt{cg\_goto} to access the
-      \texttt{BC\_t} node, then using \texttt{cg\_gridlocation\_read} or
-      \texttt{cg\_gridlocation\_write}.
+      When the boundary condition is to be applied anywhere other than points,
+      then \texttt{GridLocation\_t} under the \texttt{BC\_t} node must
+      be used to indicate this.
+      The value of \texttt{GridLocation\_t} may be read or written by
+      \texttt{cg\_boco\_gridlocation\_read} and
+      \texttt{cg\_boco\_gridlocation\_write}.
+      As in previous versions of the library, this may also be done by
+      first using \texttt{cg\_goto} (\autoref{s:navigating})
+      to access the \texttt{BC\_t} node, then using
+      \texttt{cg\_gridlocation\_read} or
+      \texttt{cg\_gridlocation\_write} (\autoref{s:gridlocation}).
       (\textcolor{input}{Input} for \texttt{cg\_boco\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_boco\_info})
 \item [\texttt{npnts}]
       Number of points or elements defining the boundary
       condition region.
-      For a \texttt{ptset\_type} of \texttt{PointRange} or \texttt{ElementRange},
+      For a \texttt{ptset\_type} of \texttt{PointRange},
       \texttt{npnts} is always two.
-      For a \texttt{ptset\_type} of \texttt{PointList} or \texttt{ElementList},
+      For a \texttt{ptset\_type} of \texttt{PointList},
       \texttt{npnts} is the number of points or elements in the list.
       (\textcolor{input}{Input} for \texttt{cg\_boco\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_boco\_info})
@@ -159,9 +148,11 @@ call cg\_boco\_gridlocation\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}
       (\textcolor{output}{\textit{Output}})
 \item [\texttt{location}]
       Grid location used in the definition of the point set.
-      The currently admissible locations are \texttt{Vertex},
-      \texttt{FaceCenter}, \texttt{IFaceCenter},
-      \texttt{JFaceCenter}, and \texttt{KFaceCenter}.
+      The currently admissible locations are \texttt{Vertex} (the default
+      if not given). For 2-D grids, \texttt{EdgeCenter} is also allowed,
+      and for 3-D grids, the additional values of \texttt{FaceCenter},
+      \texttt{IFaceCenter}, \texttt{JFaceCenter}, and
+      \texttt{KFaceCenter} may be used.
       (\textcolor{input}{Input} for \texttt{cg\_boco\_gridlocation\_write};
       \textcolor{output}{\textit{output}} for
       \texttt{cg\_boco\_gridlocation\_read})
@@ -169,6 +160,19 @@ call cg\_boco\_gridlocation\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}
       Error status.
       (\textcolor{output}{\textit{Output}})
 \end{Ventryi}
+
+\noindent
+\textit{Notes}: (see CPEX 0031)
+\begin{itemize}
+\item The use of \texttt{ElementList} and \texttt{ElementRange} for
+      \texttt{ptset\_type} is deprecated and should not be used
+      in new code. These are still currently accepted, but will be internally
+      replaced with the appropriate values of \texttt{PointList/PointRange}
+      and \texttt{GridLocation\_t}.
+\item \texttt{CellCenter} for \texttt{GridLocation\_t} is also deprecated.
+      If used, the value will be replaced by \texttt{EdgeCenter} for
+      2-D grids or \texttt{FaceCenter} for 3-D grids.
+\end{itemize}
 
 \subsection{Boundary Condition Datasets}
 \label{s:bcdataset}
