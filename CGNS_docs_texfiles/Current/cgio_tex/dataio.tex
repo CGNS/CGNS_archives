@@ -96,7 +96,7 @@ call cgio\_write\_block\_data\_f(\textcolor{input}{cgio\_num}, \textcolor{input}
 
     \noindent
     Be careful when writing data using
-    \hyperlink{write_all_data}{\texttt{cgio\_write\_all\_data}} and then using
+    \texttt{cgio\_write\_all\_data} and then using
     \texttt{cgio\_read\_data} to randomly access the data.
     \texttt{cgio\_write\_all\_data} takes a starting address in memory and
     writes \textit{N} words to disk, making no assumption as to the order of
@@ -113,7 +113,7 @@ call cgio\_write\_block\_data\_f(\textcolor{input}{cgio\_num}, \textcolor{input}
     \noindent
     There can be a significant performance penalty for using
     \texttt{cgio\_read\_data} when compared with
-    \hyperlink{read_all_data}{\texttt{cgio\_read\_all\_data}}.
+    \texttt{cgio\_read\_all\_data}.
     If performance is a major consideration, it is best to organize
     data to take advantage of the speed of \texttt{cgio\_read\_all\_data}.
 
@@ -139,19 +139,16 @@ call cgio\_write\_block\_data\_f(\textcolor{input}{cgio\_num}, \textcolor{input}
 
 \subsubsection{\texttt{cgio\_write\_data}} \label{write_data}
     \noindent
-    This function is similar to
-    \hyperlink{read_data}{\texttt{cgio\_read\_data}},
+    This function is similar to \texttt{cgio\_read\_data},
     but writes the data from memory to the node.
 
 \subsubsection{\texttt{cgio\_write\_all\_data}} \label{write_all_data}
     \noindent
-    This function is similar to
-    \hyperlink{read_all_data}{\texttt{cgio\_read\_all\_data}},
+    This function is similar to \texttt{cgio\_read\_all\_data},
     but writes the data from memory to the node.
 
 \subsubsection{\texttt{cgio\_write\_block\_data}} \label{write_block_data}
     \noindent
-    This function is similar to
-    \hyperlink{read_block_data}{\texttt{cgio\_read\_block\_data}},
+    This function is similar to \texttt{cgio\_read\_block\_data},
     but writes the data from memory to the node.
 

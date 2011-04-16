@@ -32,6 +32,10 @@ for d in $dirs ; do
 # Set directory name
   directory=$d
 
+# we don't want to add the pdf file if it exists
+  pdffile=`echo $directory | sed s/_tex//`.pdf
+  [ -f $directory/$pdffile ] && mv $directory/$pdffile .
+
 # Create the tar file
 # explicitly name the files so don't get .svn
   case $d in
@@ -52,6 +56,8 @@ for d in $dirs ; do
     *)            directory=""
                   echo "skipping directory $d" ;;
   esac
+
+  [ -f $pdffile ] && mv $pdffile $directory
 
   if [ -n "$directory" ]; then
 # Compress it, show the sizes, and move it into the directory

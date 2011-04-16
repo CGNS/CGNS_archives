@@ -83,9 +83,9 @@ call cgio\_children\_ids\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{id},
     as a child of the node identified by \texttt{pid}. The name of the new
     node is given by \texttt{name}, and must not already exist as a child
     of the parent node. The node will contain no label, dimensions,
-    or data. Use the \hyperlink{s:node}{Node Management Routines} to
+    or data. Use the Node Management Routines (\autoref{s:node}) to
     change the properties of the node, and the
-    \hyperlink{s:dataio}{Data I/O Routines} to add data. Returns 0 and the
+    Data I/O Routines (\autoref{s:dataio}) to add data. Returns 0 and the
     identifier of the new node in \texttt{id} on success, else an error code.
 
 \subsubsection{\texttt{cgio\_new\_node}} \label{new_node}
@@ -97,10 +97,8 @@ call cgio\_children\_ids\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{id},
     the type of data by \texttt{data\_type}, the dimensions of the data by
     \texttt{ndims} and \texttt{dims}, and the data to write to the node
     by \texttt{data}. This is equivalent to calling the routines:
-    \hyperlink{create_node}{\texttt{cgio\_create\_node}},
-    \hyperlink{set_label}{\texttt{cgio\_set\_label}}.
-    \hyperlink{set_dimensions}{\texttt{cgio\_set\_dimensions}}, and
-    \hyperlink{write_all_data}{\texttt{cgio\_write\_all\_data}}
+    \texttt{cgio\_create\_node}, \texttt{cgio\_set\_label}.
+    \texttt{cgio\_set\_dimensions}, and \texttt{cgio\_write\_all\_data}.
     Returns 0 and the identifier of the new node in \texttt{id} on success,
     else an error code.
 

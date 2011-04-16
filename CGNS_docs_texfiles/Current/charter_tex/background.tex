@@ -94,14 +94,27 @@ The implementing software, in turn, was developed in two layers:
 
 \begin{itemize}
 \item Low-level routines to perform elementary operations on the
-      database, known as the \textit{ADF (Advanced Data Format) Library}.
-      This low-level ADF library performs basic direct I/O operations on
-      the file.
-      It does not have any built-in knowledge of the data structure or
-      the content of the data.
-      The user must provide this knowledge; thus, a user who writes
-      ADF calls must have a complete understanding of the CGNS data
-      structures and content.
+     database, known as the \textit{ADF (Advanced Data Format) Library}.
+     This low-level ADF library performs basic direct I/O operations on
+     the file.
+     It does not have any built-in knowledge of the data structure or
+     the content of the data.
+     The user must provide this knowledge; thus, a user who writes
+     ADF calls must have a complete understanding of the CGNS data
+     structures and content.
+
+      When CGNS Version 2.4 was released, support for
+      \textit{HDF5 (Hierarchical Data Format)}
+      as the underlying database was added.
+      The ADF routines were ``mapped'' to equivalent HDF5
+      routines, and the Mid-Level Library could be built using
+      either ADF or HDF5.
+
+      With the release of CGNS Version 3.1, new low-level routines
+      were created (\textit{the CGIO interface})
+      as a replacement for the direct ADF calls. This interface supports
+      both ADF and HDF5 simultaneously
+      and transfarently to the application code.
 \item Higher-level routines to perform common operations required by a
       CFD code, known as the \textit{CGNS Mid-Level Library}.
       The CGNS Mid-Level Library is an Application Programming Interface
@@ -111,22 +124,20 @@ The implementing software, in turn, was developed in two layers:
       to have a general understanding of the standard data structure and
       content.
       The purpose of the mid-level library is to shield the user from
-      the complexity of the basic ADF calls, and to ensure that the data
+      the complexity of the basic database manager calls,
+      and to ensure that the data
       are written in the proper structure to create a CGNS-compliant
       file.
-      With the release of CGNS Version 2.4, the Mid-Level Library may be
-      built using either ADF or HDF5 as the underlying database.
 \end{itemize}
 
 The data standards are controlled by two documents, which are available
 at the CGNS Documentation Home Page, at
-\url{http://www.grc.nasa.gov/WWW/cgns/}.
+\url{http://www.grc.nasa.gov/WWW/cgns/CGNS_docs_current/}.
 These key control documents are:
 
 \begin{itemize*}
 \item \textit{Standard Interface Data Structures (SIDS)}
-\item \textit{SIDS-to-ADF File Mapping Manual}, or
-      \textit{SIDS-to-HDF File Mapping Manual}
+\item \textit{SIDS File Mapping Manual}
 \end{itemize*}
 
 The ADF library was developed during 1995, and the first large-scale

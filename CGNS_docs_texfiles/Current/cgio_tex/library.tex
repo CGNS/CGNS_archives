@@ -212,7 +212,7 @@ only when information is requested about the linked node or it's children.
 \item [Link-Node]
       A special type of node.
       Links are created using the
-      \hyperlink{create_link}{\key{cgio\_create\_link}}
+      \texttt{cgio\_create\_link} (\autoref{create_link})
       subroutine.
       The data type of this node is \key{LK}, and its data is a
       one-dimensional array containing the name of the file (if other
@@ -325,16 +325,16 @@ CHARACTER*(CGIO\_MAX\_NAME\_LENGTH) NAME
       dimension varying the slowest.
  
       The index starting at one is used in
-      \hyperlink{read_data}{\key{cgio\_read\_data}},
-      \hyperlink{write_data}{\key{cgio\_write\_data}},
-      \hyperlink{children_names}{\key{cgio\_children\_names}}, and
-      \hyperlink{children_ids}{\key{cgio\_children\_ids}}.
+      \texttt{cgio\_read\_data} (\autoref{read_data}),
+      \texttt{cgio\_write\_data} (\autoref{write_data}),
+      \texttt{cgio\_children\_names} (\autoref{children_names}), and
+      \texttt{cgio\_children\_ids} (\autoref{children_ids}).
  
       The user should be aware of the differences in array indexing
       between Fortran and C.
       The subroutines
-      \hyperlink{read_all_data}{\key{cgio\_read\_all\_data}} and
-      \hyperlink{write_all_data}{\key{cgio\_write\_all\_data}}
+      \texttt{cgio\_read\_all\_data} (\autoref{read_all_data}) and
+      \texttt{cgio\_write\_all\_data} (\autoref{write_all_data})
       merely take a pointer to the beginning of the data, compute how
       much data is to be read/written, and process as many bytes as
       have been requested.
@@ -342,8 +342,8 @@ CHARACTER*(CGIO\_MAX\_NAME\_LENGTH) NAME
       or vice versa.
       Given this convention, it is possible for a C program to
       use standard C conventions for array indexing and use
-      \key{cgio\_write\_all\_data} to store the array on disk.
-      Then a Fortran program might use \key{cgio\_read\_all\_data} to
+      \texttt{cgio\_write\_all\_data} to store the array on disk.
+      Then a Fortran program might use \texttt{cgio\_read\_all\_data} to
       read the data set.
       Unless the user is aware of the structure of the data, it is
       possible for the array to be transposed relative to what is
@@ -365,9 +365,8 @@ CHARACTER*(CGIO\_MAX\_NAME\_LENGTH) NAME
       were successfull or not. On success, 0 (\key{CGIO\_ERR\_NONE}) is
       returned. A non-zero return indicates an error. Return codes < 0
       indicate an error at the CGIO level; codes > 0 indicate an
-      error in the database manager. See
-      \hyperlink{s:messages}{Error Messages} for a list of
-       error codes and mesages.
+      error in the database manager. See \autoref{s:messages}
+      for a list of error codes and mesages.
 \end{Ventryi}
 
 \subsection{Limits and Sizes}

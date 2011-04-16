@@ -66,9 +66,9 @@ call cgio\_error\_abort\_f(\textcolor{input}{abort\_flag}) & - - - \\
     \texttt{abort\_flag} is non-zero, then an error in the CGIO routines
     or database managers will cause \texttt{cgio\_error\_exit} to be called.
     The exceptions are
-    \hyperlink{is_supported}{\texttt{cgio\_is\_supported}},
-    \hyperlink{check_file}{\texttt{cgio\_check\_file}}, and
-    \hyperlink{is_link}{\texttt{cgio\_is\_link}}. These routines
+    \texttt{cgio\_is\_supported} (\autoref{is_supported}),
+    \texttt{cgio\_check\_file} (\autoref{check_file}), and
+    \texttt{cgio\_is\_link} (\autoref{is_link}). These routines
     will not cause an abort on an error.
 
 \subsection{Error Messages} \label{s:messages}
