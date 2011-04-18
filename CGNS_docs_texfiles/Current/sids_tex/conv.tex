@@ -451,7 +451,7 @@ number of nodes.
 2-D & Triangle    & \fort{TRI\_3}   & \fort{TRI\_6} \\
     & Quadrangle  & \fort{QUAD\_4}  & \fort{QUAD\_8, QUAD\_9} \\
 3-D & Tetrahedron & \fort{TETRA\_4} & \fort{TETRA\_10} \\
-    & Pyramid     & \fort{PYRA\_5}  & \fort{\begin{changes}PYRA\_13\end{changes}, PYRA\_14}\\
+    & Pyramid     & \fort{PYRA\_5}  & \fort{PYRA\_13, PYRA\_14}\\
     & Pentahedron & \fort{PENTA\_6} & \fort{PENTA\_15, PENTA\_18} \\
     & Hexahedron  & \fort{HEXA\_8}  & \fort{HEXA\_20, HEXA\_27}
 \\*[1ex] \hline\hline
@@ -459,7 +459,7 @@ number of nodes.
 \end{table}
 
 Any element type not supported by CGNS can be recorded using the CGNS
-generic element type\begin{changes}s\end{changes} \fort{NGON\_n} \begin{changes}and \fort{NFACE\_n}\end{changes}.
+generic element types \fort{NGON\_n} and \fort{NFACE\_n}.
 See \autoref{s:Elements} for more detail.
 
 The ordering of the nodes within an element is important.
@@ -879,16 +879,13 @@ of each of the six edges.
 \end{Ventryi}
 
 \paragraph{Pyramid Elements}
-CGNS supports \begin{changes}three\end{changes} types of pyramid elements, \fort{PYRA\_5},
-\begin{changes}\texttt{PYRA\_13}\end{changes}, and \texttt{PYRA\_14}.
+CGNS supports three types of pyramid elements, \fort{PYRA\_5},
+\texttt{PYRA\_13}, and \texttt{PYRA\_14}.
 \fort{PYRA\_5} elements are composed of five nodes located at the
 five geometric corners of the pyramid.
-\sout{\texttt{PYRA\_14} elements have nine additional nodes, eight located at
-the middle of each of the eight edges, and one at the center of the
-quadrilateral face.}
-\begin{changes}In addition, \texttt{PYRA\_13} and \texttt{PYRA\_14} elements have a node
+In addition, \texttt{PYRA\_13} and \texttt{PYRA\_14} elements have a node
 at the middle of each of the eight edges; \texttt{PYRA\_14} adds a node
-at the middle of the quadrilateral face.\end{changes}
+at the middle of the quadrilateral face.
 
 \begin{minipage}[t]{0.5\linewidth}
    \vspace{0pt}
@@ -913,7 +910,7 @@ at the middle of the quadrilateral face.\end{changes}
 \begin{minipage}[t]{0.5\linewidth}
    \vspace{0pt}
    \centering
-   \hspace*{\tmplength}\begin{changes}\fort{PYRA\_13}\end{changes}\hfill\mbox{} \\[\baselineskip]
+   \hspace*{\tmplength}\fort{PYRA\_13}\hfill\mbox{} \\[\baselineskip]
    \begin{picture}(2.0,2.125)
       \drawline(1.375,2.125)(0.0,0.875)(0.5,0.0)(2.0,0.125)(1.375,2.125)(0.5,0.0)
       \dashline{0.05}(0.0,0.875)(1.375,1.0)(2.0,0.125)

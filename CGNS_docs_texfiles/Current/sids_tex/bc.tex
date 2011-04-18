@@ -162,11 +162,12 @@ boundary-condition data.
 All boundary-condition information pertaining to a given
 zone is contained in the |ZoneBC_t| structure.
 \begin{alltt}
-  ZoneBC\_t< int IndexDimension, int PhysicalDimension > :=
+  ZoneBC\_t< int CellDimension, int IndexDimension, int PhysicalDimension > :=
     \{
     List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
 
-    List( BC\_t<IndexDimension, int PhysicalDimension> BC1 ... BCN ) ;       (o)
+    List( BC\_t<CellDimension, IndexDimension, int PhysicalDimension> 
+          BC1 ... BCN ) ;                                                   (o)
 
     ReferenceState\_t ReferenceState ;                                       (o)
 
@@ -190,7 +191,7 @@ zone is contained in the |ZoneBC_t| structure.
  All lists within a \fort{ZoneBC\_t} structure entity may be empty.
 \end{notes}
 
-\fort{ZoneBC\_t} requires two structure parameters,
+\fort{ZoneBC\_t} requires three structure parameters, \fort{CellDimension},
 \fort{IndexDimension} and \fort{PhysicalDimension}, which are passed
 onto all \fort{BC\_t} substructures.
 
@@ -249,7 +250,7 @@ structure also contains information describing the normal vector to the
 BC surface patch.
 
 \begin{alltt}
-  BC\_t< int IndexDimension, int PhysicalDimension > :=
+  BC\_t< int CellDimension, int IndexDimension, int PhysicalDimension > :=
     \{
     List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
 
@@ -257,16 +258,15 @@ BC surface patch.
 
     GridLocation\_t GridLocation ;                                           (o/d)
 
-    IndexRange\_t<IndexDimension> PointRange ;                               (r:o:o:o)
-    IndexArray\_t<IndexDimension, ListLength, int> PointList ;               (o:r:o:o)
-    IndexRange\_t<IndexDimension> ElementRange ;                             (o:o:r:o)
-    IndexArray\_t<IndexDimension, ListLength, int> ElementList ;             (o:o:o:r)
+    IndexRange\_t<IndexDimension> PointRange ;                               (r:o)
+    IndexArray\_t<IndexDimension, ListLength[], int> PointList ;             (o:r)
 
     int[IndexDimension] InwardNormalIndex ;                                 (o)
 
-    IndexArray\_t<PhysicalDimension, ListLength, real> InwardNormalList ;    (o)
+    IndexArray\_t<PhysicalDimension, ListLength[], real> InwardNormalList ;  (o)
 
-    List( BCDataSet\_t<ListLength> BCDataSet1 ... BCDataSetN ) ;             (o)
+    List( BCDataSet\_t<CellDimension, IndexDimension, ListLength[],
+          GridLocation> BCDataSet1 ... BCDataSetN ) ;                       (o)
 
     BCProperty\_t BCProperty ;                                               (o)
 
@@ -291,52 +291,18 @@ BC surface patch.
       Legitimate names must be unique within a given instance
       of \fort{BC\_t} and shall not include the names
       \fort{BCProperty}, \fort{BCType}, \fort{DataClass},
-      \fort{DimensionalUnits}, \fort{ElementList}, \fort{ElementRange},
+      \fort{DimensionalUnits}, 
       \fort{FamilyName}, \fort{GridLocation}, \fort{InwardNormalIndex},
       \fort{InwardNormalList}, \fort{Ordinal}, \fort{PointList},
       \fort{PointRange} or \fort{ReferenceState}.
-\item The patch on which the boundary condition is to be applied
-      is specified by one of \fort{PointRange}, \fort{PointList},
-      \fort{ElementRange}, or \fort{ElementList}.
-      Only one of these may be specified.
-\item \fort{PointRange} and \fort{PointList} refer to either vertices
-      or cell faces, depending on the value of \fort{GridLocation}.
-      \fort{GridLocation} may be set to \fort{Vertex}, \fort{IFaceCenter},
-      \fort{JFaceCenter}, \fort{KFaceCenter}, or \fort{FaceCenter}.
-      If \fort{GridLocation} is absent, then its default value is
-      \fort{Vertex}.
-      
-      \vspace{0.5\baselineskip}
-      When \fort{GridLocation} is set to \fort{Vertex}, then
-      \fort{PointList} or \fort{PointRange} refer to node indices, for
-      both structured and unstructured grids.
-      These node indices define the BC patch.
-      In particular, it should be noted that these points can be
-      interpreted in one of two ways --- the finite-difference sense and
-      the finite-volume sense.
-      In the finite-difference sense, the points are defined as specific
-      point locations at which the BC patch is enforced.
-      In the finite-volume sense, the points define the boundary
-      surrounding the BC patch region; thus, the indices are used
-      to define the logical region in index-space within which the
-      particular BC patch is defined.
-      This latter case means that the edges of the BC patches may be
-      multiply defined, but the areas which are enclosed are unique.
-      There is no mechanism currently included in this standard to
-      differentiate between these two interpretations.
-      Both are allowed.
-
-      \vspace{0.5\baselineskip}
-      When \fort{GridLocation} is set to \fort{FaceCenter}, then
-      \fort{PointList} or \fort{PointRange} refer to face elements.
-      Face elements are indexed using different methods depending if the zone
-      is structured or unstructured.
-      For a structured zone, face elements are indexed using the minimum of
-      the connecting vertex indices, as described in \autoref{s:structgrid}.
-      For an unstructured zone, face elements are indexed using their element
-      numbering, as defined in the \fort{Elements\_t} data structures.
-\item \fort{ElementRange} and \fort{ElementList} always refer to
-      cell faces, and \fort{GridLocation} is ignored.
+\item \fort{GridLocation} is optional; if absent its default value is \fort{Vertex}.
+     For 2-D grids (\fort{CellDimension} = 2), \fort{GridLocation} may take
+     the additional value of \fort{EdgeCenter}.
+     For 3-D grids (\fort{CellDimension} = 3), \fort{GridLocation} may take
+     the additional values of \fort{EdgeCenter}, \fort{FaceCenter},
+     \fort{IFaceCenter}, \fort{JFaceCenter}, or \fort{KFaceCenter}.
+\item One of \fort{PointRange} or \fort{PointList} must be specified but not
+     both. They must define a face subrange of the zone.
 \item \fort{InwardNormalIndex} is only an option for structured grids.
       For unstructured grid boundaries, it should not be used.
       \fort{InwardNormalIndex} may have only one nonzero element, whose sign
@@ -344,18 +310,13 @@ BC surface patch.
       this normal points into the interior of the zone.
 \item \fort{InwardNormalList} contains a list of vectors normal to the BC patch
       pointing into the interior of the zone.
-      It is a function of \fort{PhysicalDimension} and \fort{ListLength}.
+      It is a function of \fort{PhysicalDimension} and \fort{ListLength[]}.
       The vectors are located at the vertices of the BC patch when
-      \fort{PointRange} or \fort{PointList} is used with
-      \fort{GridLocation} set to \fort{Vertex}.
-      They are located at cell-face midpoints when \fort{PointRange}
-      or \fort{PointList} is used with \fort{GridLocation} set to
-      \fort{FaceCenter} (or \fort{IFaceCenter}, etc.), or when
-      \fort{ElementRange} or \fort{ElementList} is used.
+      \fort{GridLocation} is set to \fort{Vertex}. Otherwise, they are
+      located at edge/face midpoints.
       The vectors are not required to have unit magnitude.
-\item If a range (|PointRange| or |ElementRange|) and |InwardNormalList|
-      are specified, an ordering convention is needed for indices on the
-      BC patch.
+\item If \fort{PointRange} and \fort{InwardNormalList} are specified,
+      an ordering convention is needed for indices on the BC patch.
       An ordering convention is also needed if a range is specified and
       local data is present in the |BCDataSet_t| substructures.
       FORTRAN multidimensional array ordering is used.
@@ -369,7 +330,47 @@ all the |BCType| values.
 The BC patch may be specified by \fort{PointRange} or
 \fort{ElementRange} if it constitutes a logically rectangular region.
 In all other cases, \fort{PointList} or \fort{ElementList} should be
-used to list the vertices or cell faces making up the BC patch.
+used to list the vertices or cell faces making up the BC patch.  When
+\fort{GridLocation} is set to \fort{Vertex}, then \fort{PointList} or
+\fort{PointRange} refer to vertex indices, for both structured and unstructured
+grids.  When \fort{GridLocation} is set to \fort{EdgeCenter}, then \fort{PointRange/List}
+refer to edge elements.  For 3--D grids, when \fort{GridLocation} is set to
+\fort{FaceCenter}, \fort{IFaceCenter}, etc., then \fort{PointRange/List} refer
+to face elements.  The interpretation of \fort{PointRange/List} is summarized
+in the table below:
+
+\begin{center}
+\begin{tabular}{||c|c|c|c||}
+ \hline
+\texttt{CellDimension} & \multicolumn{3}{c||}{\texttt{GridLocation}} \\
+& \texttt{Vertex} & \texttt{EdgeCenter} & \texttt{*FaceCenter} \\
+ \hline
+1 & vertices & $-$ & $-$ \\
+2 & vertices & edges & $-$ \\
+3 & vertices & edges & faces \\
+ \hline
+\end{tabular}
+\end{center}
+
+In the table, \fort{*FaceCenter} stands for the possible types: \fort{FaceCenter},
+\fort{IFaceCenter}, \fort{JFaceCenter} or \fort{KFaceCenter}.
+
+For structured grids, face centers are indexed using the minimum of the
+connecting vertex indices, as described in \autoref{s:structgrid}.  For
+unstructured grids, edge and face elements are indexed using their element
+numbering as defined in the \fort{Elements\_t} data structures.
+
+The BC patch defined by \fort{PointRange/List} is a surface region over which
+the particular set of boundary conditions is applied.  However, in the current
+standard there is no mechanism to specify whether boundary conditions are
+enforced in the weak or strong form.  If boundary conditions are imposed using
+collocation (i.e., strong form), there is also no requirement that they be
+imposed at the same locations used to define the BC patch (via
+\fort{PointRange/List}).  In the case when BC patches are defined in terms of
+vertices (or edges in 3--D), then the bounding vertices will be located on
+multiple BC patches.  If boundary conditions are imposed using collocation at
+vertices, then for this case there is no mechanism to determine which BC patch
+takes precedence for any of these bounding vertices.
 
 Some boundary conditions require a normal direction to be specified in
 order to be properly imposed.
@@ -377,7 +378,7 @@ For structured zones a computational-coordinate normal can be derived
 from the BC patch specification by examining redundant index components.
 Alternatively, for structured zones this information can be provided
 directly by |InwardNormalIndex|.
-From Note 5, this vector points into the zone and can have only one
+From Note 4, this vector points into the zone and can have only one
 non-zero element.
 For  exterior faces of a zone in 3-D, |InwardNormalIndex| should take the
 following values:
@@ -463,16 +464,15 @@ BC patches for a given zone in an existing CGNS database will have
 sequential values from 1 to $N$ without holes or repetitions.
 Use of |Ordinal| is discouraged and is on a user-beware basis.
 
-\subsubsection*{FUNCTION \texttt{ListLength}:}
+\subsubsection*{FUNCTION \texttt{ListLength[]}:}
 
 \noindent return value: |int| \\
-\noindent dependencies: |PointRange|, |PointList|, |ElementRange|, |ElementList|
+\noindent dependencies: |PointRange|, |PointList|
 
 \fort{BC\_t} requires the structure function \fort{ListLength}, which
-is used to specify the number of vertices or cell faces
-corresponding to a given \fort{PointRange}, \fort{PointList},
-\fort{ElementRange}, or \fort{ElementList}.
-If \fort{PointRange} is specified, then \fort{ListLength} is obtained
+is used to specify the number of vertices or edge/face elements
+making up the BC patch.  If
+\fort{PointRange} is specified, then \fort{ListLength} is obtained
 from the number of points (inclusive) between the beginning and ending
 indices of \fort{PointRange}.
 If \fort{PointList} is specified, then \fort{ListLength} is the number
@@ -486,7 +486,7 @@ If \fort{ElementRange} or \fort{ElementList} is specified, then
 
 \fort{ListLength} is also the number of elements in the list
 \fort{InwardNormalList}.
-Note that syntactically \texttt{PointList/ElementList} and
+Note that syntactically \texttt{PointList} and
 \fort{InwardNormalList} must have the same number of elements.
 
 If neither \texttt{PointRange} or \texttt{PointList} is specified in a
@@ -502,14 +502,15 @@ Its intended use is for simple boundary-condition types, where the
 equations imposed do not depend on local flow conditions.
 
 \begin{alltt}
-  BCDataSet\_t< int ListLength > :=
+  BCDataSet\_t< int CellDimension, int IndexDimension, int ListLengthParameter,
+                GridLocation\_t GridLocationParameter > :=
     \{
     List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
 
     BCTypeSimple\_t BCTypeSimple ;                                           (r)
 
-    BCData\_t<ListLength> DirichletData ;                                    (o)
-    BCData\_t<ListLength> NeumannData ;                                      (o)
+    BCData\_t<ListLengthBCData[]> DirichletData ;                            (o)
+    BCData\_t<ListLengthBCData[]> NeumannData ;                              (o)
 
     GridLocation\_t GridLocation ;                                           (o/d)
 
@@ -539,43 +540,22 @@ equations imposed do not depend on local flow conditions.
 \item \fort{BCTypeSimple} is the only required field.
       All other fields are optional and the \fort{Descriptor\_t} list
       may be empty.
-\item \fort{GridLocation}, \fort{PointRange}, and \fort{PointList}
-      may only be used when \fort{BCDataSet\_t} is located below a
-      \fort{Zone\_t} structure in the database hierarchy, and thus has a
-      parent \fort{BC\_t} structure.
-      \fort{GridLocation}, \fort{PointRange}, and \fort{PointList}
-      do not apply when \fort{BCDataSet\_t} is located below a
-      \fort{FamilyBC\_t} structure.
-\item \fort{PointRange} and \fort{PointList} refer to either vertices or
-      cell faces, depending on the value of \fort{GridLocation}.
-      \fort{GridLocation} may be set to \fort{Vertex},
-      \fort{IFaceCenter}, \fort{JFaceCenter}, \fort{KFaceCenter},
-      \fort{FaceCenter}, \fort{CellCenter}, or \fort{EdgeCenter}.
-      When \fort{GridLocation} is set to \fort{Vertex}, then
-      \fort{PointList} or \fort{PointRange} refer to node indices, for
-      both structured and unstructured grids.
-      When \fort{GridLocation} is set to \fort{FaceCenter}, then
-      \fort{PointList} or \fort{PointRange} refer to face elements.
-\item If \fort{GridLocation} is absent, then \fort{PointRange} and
-      \fort{PointList} are ignored.
-      Similarly, if both \fort{PointRange} and \fort{PointList} are
-      absent, then \fort{GridLocation} is ignored.
-      In both cases, boundary conditions are to be applied at the
-      locations defining the BC patch in the parent \fort{BC\_t}
-      structure.
-\item Only one of \fort{PointRange} and \fort{PointList} may be
-      specified.
+\item \fort{GridLocation} is optional; if absent its default value is
+      \fort{GridLocationParameter}.  For 2--D grids (\fort{CellDimension} = 2),
+      \fort{GridLocation} may take the values of \fort{Vertex} or \fort{EdgeCenter}.
+      For 3--D grids (\fort{CellDimension} = 3), \fort{GridLocation} may take the
+      values of \fort{Vertex}, \fort{EdgeCenter}, \fort{FaceCenter}, \fort{IFaceCenter},
+      \fort{JFaceCenter} or \fort{KFaceCenter}.
+\item \fort{PointRange} and \fort{PointList} are both optional;
+      only one of them may be specified.  They must define a face subrange of the zone.
 \end{notes}
 
-If neither \fort{PointRange} or \fort{PointList} is specified,
-the structure parameter \fort{ListLength} must be passed into
-\fort{BCDataSet\_t}, and specifies the number of vertices or cell faces
-making up the BC patch.
-If \fort{PointRange} or \fort{PointList} is specified in
-\fort{BCDataSet\_t}, the structure function \fort{ListLength} is used to
-compute the corresponding number of vertices or cell faces.
-In either case, \fort{ListLength} is passed into the \fort{BCData\_t}
-structure, specifying the length of arrays containing BC data.
+\fort{BCDataSet\_t} requires the structure parameters \fort{CellDimension},
+\fort{IndexDimension}, \fort{ListLengthParameter} and
+\fort{GridLocationParameter}.  These are all used to control the grid location
+and length of data arrays in the \fort{Dirichlet} and \fort{Neumann}
+substructures.  They are inputs for the structure functions \fort{ListLength[]}
+and \fort{ListLengthBCData[]} defined below.
 
 |BCTypeSimple| specifies the boundary-condition type, which gives general
 information on the bound\-ary-con\-di\-tion equations to be enforced.
@@ -593,18 +573,16 @@ in \autoref{s:BC_specdata}.
 
 The substructures \fort{DirichletData} and \fort{NeumannData} contain
 boundary-condition data which may be constant over the BC patch or
-defined locally at each vertex or cell face of the patch.
-For locally-defined data, the locations at which the boundary
-conditions are to be applied may be specified by \fort{PointRange} or
-\fort{PointList}, together with \fort{GridLocation}.
-There should be a correspondence between the locations defined under
-\fort{BCDataset\_t} and the locations defined under the parent
-\fort{BC\_t} structure.
-For example, if the BC patch in a structured grid is defined by
-vertices, then the \fort{BCDataSet} information must either exist at
-the same vertex locations (for \fort{GridLocation} $=$ \fort{Vertex}),
-or else must exist at the corresponding cell face locations (for
-\fort{GridLocation} $=$ \fort{FaceCenter}).
+defined locally at each vertex or edge/face of the patch.
+Locally defined data can be specified in one of two ways.
+If \fort{GridLocation}, \fort{PointRange} and \fort{PointList} are all absent,
+then the data is defined consistent with the BC patch specification of the
+parent \fort{BC\_t} structure.  In this case, the location of the locally defined
+data is given by \fort{GridLocationParameter} and the length of the data arrays
+are given by \fort{ListLengthParameter}.  If \fort{GridLocation} and one of
+\fort{PointRange} or \fort{PointList} is present, then the same rules provided
+in Section~\autoref{s:BCdefn} apply.  In this case, the length of the data arrays
+is given by \fort{ListLength[]}.
 
 Reference quantities applicable to the set of boundary-condition data are
 contained in the \fort{ReferenceState} structure.
@@ -620,6 +598,27 @@ The \fort{UserDefinedData\_t} data structure allows arbitrary
 user-defined data to be stored in \fort{Descriptor\_t} and
 \fort{DataArray\_t} children without the restrictions or implicit
 meanings imposed on these node types at other node locations.
+
+\subsubsection*{FUNCTION \texttt{ListLength[]}:}
+
+\noindent return value: |int| \\
+\noindent dependencies: |PointRange|, |PointList|
+
+\fort{BCDataSet\_t} requires the structure function \fort{ListLength}, which is
+used to specify the length of locally defined Dirichlet and Neumann data arrays
+when the grid location of these quatities differs from that of the BC patch
+definition. The definition of \fort{ListLength} is identical to that provided in
+\fort{BC\_t} (\autoref{s:BCdefn}).
+
+\subsubsection*{FUNCTION \texttt{ListLengthBCData[]}:}
+
+\noindent return value: |int| \\
+\noindent dependencies: |ListLengthParameter|, |PointRange|, |PointList|
+
+\fort{BCDataSet\_t} also requires the structure function
+\fort{ListLengthBCData}. If \fort{PointRange} or \fort{PointList} is present,
+then \fort{ListLengthBCData} takes the value of \fort{ListLength}.  If both are
+absent, then it takes the value \fort{ListLengthParameter}.
 
 \subsection{Boundary Condition Data Structure Definition: \texttt{BCData\_t}}
 \label{s:BCData}
@@ -1430,8 +1429,8 @@ appropriate boundary-condition type.
 
 Symmetry plane for a patch on the $i$-min face of a 3-D structured zone.  
 \begin{alltt}
-  !  IndexDimension = 3
-  BC\_t<3,3> BC1 =
+  !  CellDimension = 3, IndexDimension = 3
+  BC\_t<3,3,3> BC1 =
     \{\{
     BCType\_t BCType = BCSymmetryPlane ;
 
@@ -1459,8 +1458,8 @@ entire wall is specified to be 273 K.
 The BC patch is on the $j$-min face and is bounded by the indices
 (1,1,1) and (33,1,9).
 \begin{alltt}
-  !  IndexDimension = 3
-  BC\_t<3,3> BC2 =
+  !  CellDimension = 3, IndexDimension = 3
+  BC\_t<3,3,3> BC2 =
     \{\{
     BCType\_t BCType = BCWallViscousIsothermal ;
 
@@ -1561,12 +1560,14 @@ values of 0.94 and 2.85, respectively.  A velocity profile is specified
 at face midpoints, given by the array |v_inflow(j)|.  No dimensional or
 nondimensional information is provided.
 \begin{alltt}
-  !  IndexDimension = 2
-  BC\_t<2,?> BC3 =
+  !  CellDimension = 2, IndexDimension = 2
+  BC\_t<2,2,?> BC3 =
     \{\{
     BCType\_t BCType = BCInflowSubsonic ;
 
-    IndexRange\_t<2> ElementRange = 
+    GridLocation\_t GridLocation = FaceCenter ;
+
+    IndexRange\_t<2> PointRange = 
       \{\{ 
       int[2] Begin = [1,2] ;
       int[2] End   = [1,6] ;
@@ -1612,7 +1613,7 @@ the values are provided.
 \texttt{v\_inflow()}.
 The length of the array is given by \texttt{ListLength}, which represents
 the number of cell faces because \texttt{BC3} is specified using
-\fort{ElementRange}.
+the value of \fort{FaceCenter} for \fort{GridLocation}.
 Note that the beginning and ending indices on the array
 \texttt{v\_inflow()} are unimportant (they are user inputs); there just
 needs to be five values provided.
@@ -1627,8 +1628,8 @@ pressure is specified; for supersonic outflow, no boundary-condition
 equations are
 specified.
 \begin{alltt}
-  !  IndexDimension = 3
-  BC\_t<3,3> BC4 =
+  !  CellDimension = 3, IndexDimension = 3
+  BC\_t<3,3,3> BC4 =
     \{\{
     BCType\_t BCType = BCOutflow ;
 
@@ -1696,7 +1697,8 @@ flow quantities.
 None of the extrapolated quantities for the different boundary condition
 possibilities need be stated.
 \begin{alltt}
-  BC\_t<2,2> BC5 =
+  !  CellDimension = 2, IndexDimension = 2
+  BC\_t<2,2,2> BC5 =
     \{\{
     BCType\_t BCType = BCFarfield ;
 
@@ -1790,8 +1792,8 @@ temperature for the entire wall is specified to be 273 K.
 The BC patch is on the $j$-min face and is bounded by the indices
 (1,1,1) and (33,1,9).
 \begin{alltt}
-  !  IndexDimension = 3
-  BC\_t<3,3> BC2 =
+  !  CellDimension = 3, IndexDimension = 3
+  BC\_t<3,3,3> BC2 =
     \{\{
     BCType\_t BCType = BCWallViscousIsothermal ;
 

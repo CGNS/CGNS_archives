@@ -122,6 +122,8 @@ the simulation, and is defined as follows:
     DataArray\_t<char, 2, [32, NumberOfSteps]> ArbitraryGridMotionPointers ; (o)
     DataArray\_t<char, 2, [32, NumberOfSteps]> GridCoordinatesPointers ;     (o)
     DataArray\_t<char, 2, [32, NumberOfSteps]> FlowSolutionPointers ;        (o)
+    DataArray\_t<char, 2, [32, NumberOfSteps]> ZoneGridConnectivityPointers ;(o)
+    DataArray\_t<char, 2, [32, NumberOfSteps]> ZoneSubRegionPointers ;       (o)
 
     List( DataArray\_t<> DataArray1 ... DataArrayN ) ;                       (o)
 
@@ -143,8 +145,9 @@ the simulation, and is defined as follows:
       instance of \fort{ZoneIterativeData\_t} and shall not
       include the names \fort{ArbitraryGridMotionPointers},
       \fort{DataClass}, \fort{DimensionalUnits},
-      \fort{FlowSolutionPointers}, \fort{Grid\-Co\-ord\-i\-nates\-Point\-ers}, or
-      \fort{RigidGridMotionPointers}.
+      \fort{FlowSolutionPointers}, \fort{Grid\-Co\-ord\-i\-nates\-Point\-ers},
+      \fort{RigidGridMotionPointers}, \fort{ZoneGridConnectivityPointers}, or
+      \fort{ZoneSubRegionPointers}.
 \end{notes}
 
 The data arrays with data-name identifiers \fort{\textit{xxx}Pointers}
@@ -478,6 +481,15 @@ The function \fort{DataSize[]} is the size of the \fort{DataArray}s
 containing the grid velocity components.
 It is identical to the function \fort{DataSize[]} defined for
 \fort{FlowSolution\_t} (see \autoref{s:FlowSolution}).
+
+\subsection{Zone Grid Connectivities}
+\label{s:zonegridconnectivities}
+
+Multiple \fort{ZoneGridConnectivity\_t}
+nodes may be used to specify time-dependent changes in the connectivity information
+associated with the zone. The time variation is the recorded in the
+\fort{ZoneIterativeData\_t} node as
+\fort{ZoneGridConnectivityPointers}.
 
 \subsection{Examples for Time-Dependent Flow}
 \label{s:Examplestimedep}

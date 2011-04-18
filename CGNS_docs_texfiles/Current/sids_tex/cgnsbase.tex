@@ -32,7 +32,7 @@ version number.
 
 Physically, this version number is located directly under the root node
 of the file.
-The \textit{SIDS-to-ADF} (or \textit{SIDS-to-HDF}) \textit{File Mapping
+The \textit{SIDS File Mapping
 Manual} defines this location more precisely.
 
 Historically, the version number was used to describe the version of the
@@ -283,18 +283,18 @@ For unstructured zones, the element connectivity may also be recorded.
 
     FamilyName_t FamilyName ;                                               (o)
 
-    List( FlowSolution_t<IndexDimension, VertexSize, CellSize> 
+    List( FlowSolution_t<CellDimension, IndexDimension, VertexSize, CellSize> 
           FlowSolution1 ... FlowSolutionN ) ;                               (o)
 
-    List( DiscreteData_t<IndexDimension, VertexSize, CellSize> 
+    List( DiscreteData_t<CellDimension, IndexDimension, VertexSize, CellSize> 
           DiscreteData1 ... DiscreteDataN ) ;                               (o)
 
     List( IntegralData_t IntegralData1 ... IntegralDataN ) ;                (o)
 
-    ZoneGridConnectivity_t<IndexDimension, CellDimension>
-       ZoneGridConnectivity ;                                               (o)
+    List( ZoneGridConnectivity_t<IndexDimension, CellDimension>
+       ZoneGridConnectivity1 ... ZoneGridConnectivityN ;                    (o)
 
-    ZoneBC_t<IndexDimension, PhysicalDimension> ZoneBC ;                    (o)
+    ZoneBC_t<CellDimension, IndexDimension, PhysicalDimension> ZoneBC ;     (o)
 
     ZoneIterativeData_t<NumberOfSteps> ZoneIterativeData ;                  (o)
 

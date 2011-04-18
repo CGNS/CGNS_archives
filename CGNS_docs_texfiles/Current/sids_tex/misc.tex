@@ -264,7 +264,8 @@ in the data arrays.
 All data contained within this structure must be defined at the same
 grid location and have the same amount of rind-point data.
 \begin{alltt}
-  DiscreteData\_t< int IndexDimension, int VertexSize[IndexDimension], 
+  DiscreteData\_t< int CellDimension, int IndexDimension, 
+                  int VertexSize[IndexDimension],
                   int CellSize[IndexDimension] > :=
     \{
     List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
@@ -272,6 +273,9 @@ grid location and have the same amount of rind-point data.
     GridLocation\_t GridLocation ;                                           (o/d)
 
     Rind\_t<IndexDimension> Rind ;                                           (o/d)
+
+    IndexRange\_t<IndexDimension> PointRange ;                               (o)
+    IndexArray\_t<IndexDimension, ListLength[], int> PointList ;             (o)
 
     List( DataArray\_t<DataType, IndexDimension, DataSize[]> 
           DataArray1 ... DataArrayN ) ;                                     (o)
@@ -291,28 +295,32 @@ grid location and have the same amount of rind-point data.
       Legitimate names must be unique within a given instance
       of \texttt{DiscreteData\_t} and shall not include the
       names \texttt{DataClass}, \texttt{DimensionalUnits},
-      \texttt{GridLocation}, or \texttt{Rind}.
+      \texttt{GridLocation}, \fort{PointRange}, \fort{PointList}, or \texttt{Rind}.
 \item There are no required fields for \texttt{DiscreteData\_t}.
       \texttt{GridLocation} has a default of \texttt{Vertex} if absent.
       \texttt{Rind} also has a default if absent; the default
       is equivalent to having an instance of \texttt{Rind}
       whose \texttt{RindPlanes} array contains all zeros (see
       \autoref{s:Rind}).
+\item Both of the fields \texttt{PointRange} and
+      \texttt{PointList} are optional.  Only one of these
+      two fields may be specified.
 \item The structure parameter \texttt{DataType} must be consistent
       with the data stored in the \texttt{DataArray\_t} entities (see
       \autoref{s:DataArray}).
 \item For unstructured zones \texttt{GridLocation} options are limited
-      to \texttt{Vertex} or \texttt{CellCenter}, meaning that solution
-      data may only be expressed at these locations.
-      The data arrays must follow the node ordering
-      if \texttt{GridLocation = Vertex}, and the element ordering if
-      \texttt{GridLocation = CellCenter}.
+      to \texttt{Vertex} or \texttt{CellCenter}, unless
+      one of \texttt{PointRange} or \texttt{PointList} is present.
+\item Indexing of data within the \texttt{DataArray\_t} structures, must be
+      consistent with the associated numbering of vertices or elements.
 \end{notes}
 
-|DiscreteData_t| requires three structure parameters; |IndexDimension|
-identifies the dimensionality of the grid size arrays, and |VertexSize|
-and |CellSize| are the number of core vertices and cells, respectively,
-in each index direction.
+|DiscreteData_t| requires four structure parameters:
+|CellDimension| identifies the dimensionality of cells or
+elements, |IndexDimension| identifies the dimensionality of the grid
+size arrays, and |VertexSize| and |CellSize| are the number of core vertices and
+cells, respectively, in each index direction. For unstructured
+zones, \fort{IndexDimension} is always 1.
 
 The arrays of discrete data are stored in the list of |DataArray_t|
 entities.
@@ -321,6 +329,45 @@ to the grid; if absent, the data is assumed to coincide with grid
 vertices (i.e., |GridLocation = Vertex|).
 All data within a given instance of |DiscreteData_t| must reside at the
 same grid location.
+
+For structured grids, the value of |GridLocation| alone specifies the location
+and indexing of the discrete data.  Vertices are explicity indexed.  Cell
+centers and face centers are indexed using the minimum of the connecting vertex
+indices, as described in the section Structured Grid Notation and Indexing
+Conventions (\autoref{s:structgrid}).
+
+For unstructured grids, the value of |GridLocation| alone specifies location and
+indexing of discrete data only for vertex and cell-centered data.  The
+reason for this is that element-based grid connectivity provided in the
+\texttt{Elements\_t} data structures explicitly indexes only vertices and cells.
+For data stored at alternate grid locations (e.g. edges), additional
+connectivity information is needed.  This is provided by the optional fields
+\texttt{PointRange} and \texttt{PointList}; these refer to
+vertices, edges, faces or cell centers, depending on the values of
+\texttt{CellDimension} and \texttt{GridLocation}.  The following table shows
+these relations.
+
+\begin{center}
+\begin{tabular}{||c|c|c|c|c||}
+ \hline
+\texttt{CellDimension} & \multicolumn{4}{c||}{\texttt{GridLocation}} \\
+& \texttt{Vertex} & \texttt{EdgeCenter} & \texttt{*FaceCenter} & \texttt{CellCenter} \\
+ \hline
+1 & vertices & $-$ & $-$ & cells (line elements) \\
+2 & vertices & edges & $-$ & cells (area elements) \\
+3 & vertices & edges & faces & cells (volume elements) \\
+ \hline
+\end{tabular}
+\end{center}
+
+In the table, \fort{*FaceCenter} stands for the possible types: \fort{FaceCenter},
+\fort{IFaceCenter}, \fort{JFaceCenter} or \fort{KFaceCenter}.
+
+Although intended for edge or face-based discrete data for unstructured grids,
+the fields \texttt{PointRange/List} may also be used to (redundantly) index
+vertex and cell-centered data.  In all cases, indexing of discrete data
+corresponds to the element numbering as defined in the \texttt{Elements\_t} data
+structures.
 
 \texttt{Rind} is an optional field that indicates
 the number of rind planes (for structured grids) or rind points or
@@ -350,13 +397,29 @@ user-defined data to be stored in \fort{Descriptor\_t} and
 \fort{DataArray\_t} children without the restrictions or implicit
 meanings imposed on these node types at other node locations.
 
+\subsubsection*{FUNCTION \texttt{ListLength[]}:}
+
+\noindent return value: |int| \\
+\noindent dependencies: |PointRange|, |PointList|
+
+\fort{DiscreteData\_t} requires the structure function \fort{ListLength}, which
+is used to specify the number of entities (e.g. vertices) corresponding to a
+given \fort{PointRange} or \fort{PointList}. If
+\fort{PointRange} is specified, then \fort{ListLength} is obtained from
+the number of points (inclusive) between the beginning and ending indices of
+\fort{PointRange}. If \fort{PointList} is specified, then
+\fort{ListLength} is the number of indices in the list of points. In this
+situation, \fort{ListLength} becomes a user input along with the indices of the
+list \fort{PointList}. By ``user'' we mean the application code that is
+generating the CGNS database.
+
 %\noindent {\bf FUNCTION} |DataSize[]|:
 \subsubsection*{FUNCTION \texttt{DataSize[]}:}
 
 \noindent return value: one-dimensional |int| array of length
           |IndexDimension| \\
 \noindent dependencies: |IndexDimension|, |VertexSize[]|, |CellSize[]|,
-          |GridLocation|, |Rind|
+          |GridLocation|, |Rind|, |ListLength|
 
 The function \fort{DataSize[]} is the size of discrete-data arrays.
 It is identical to the function \fort{DataSize[]} defined for
@@ -584,19 +647,15 @@ volume properties as well.
     \{
     BCType\_t BCType;                                                        (r)
 
-    List( BCDataSet\_t<ListLength>; BCDataSet1 ... BCDataSetN ) ;            (o)
+    List( FamilyBCDataSet\_t<ListLength>; BCDataSet1 ... BCDataSetN ) ;      (o)
     \} ;
 \end{alltt}
 
 \begin{notes}
-\item Default names for the \fort{BCDataSet\_t} list are as shown; users
+\item Default names for the \fort{FamilyBCDataSet\_t} list are as shown; users
       may choose other legitimate names.
       Legitimate names must be unique within a given instance of
       \fort{FamilyBC\_t} and shall not include the name \fort{BCType}.
-\item When \fort{BCDataSet\_t} structures are used to define boundary
-      conditions for a CFD family, the use of \fort{GridLocation},
-      \fort{PointRange}, and \fort{PointList} in the \fort{BCDataSet\_t}
-      structures is not allowed.
 \end{notes}
 
 \fort{BCType} specifies the boundary-condition type, which gives general
@@ -606,7 +665,7 @@ Boundary conditions are to be applied at the locations specified by the
 
 The \fort{FamilyBC\_t} structure provides for a list of
 boundary-condition data sets.
-In general, the proper \fort{BCDataSet\_t} instance to impose on
+In general, the proper \fort{FamilyBCDataSet\_t} instance to impose on
 the CFD family is determined by the \fort{BCType} association table
 (\autoref{t:BCType_assoc} on p.~\pageref*{t:BCType_assoc}).
 The mechanics of determining the proper data set to impose is described
@@ -614,14 +673,92 @@ in \autoref{s:BCType_assoc}.
 
 For a few boundary conditions, such as a symmetry plane or polar
 singularity, the value of \fort{BCType} completely describes the
-equations to impose, and no instances of \fort{BCDataSet\_t} are needed.
+equations to impose, and no instances of \fort{FamilyBCDataSet\_t} are needed.
 For ``simple'' boundary conditions, where a single set of Dirichlet
-and/or Neumann data is applied, a single \fort{BCDataSet\_t} will likely
+and/or Neumann data is applied, a single \fort{FamilyBCDataSet\_t} will likely
 appear (although this is not a requirement).
 For ``compound'' boundary conditions, where the equations to impose
 are dependent on local flow conditions, several instances of
-\fort{BCDataSet\_t} will likely appear; the procedure for choosing the
+\fort{FamilyBCDataSet\_t} will likely appear; the procedure for choosing the
 proper data set is more complex as described in \autoref{s:BCType_assoc}.
+
+\subsection{Family Boundary Condition Data Set Structure Definition: \texttt{FamilyBCDataSet\_t}}
+\label{s:FamilyBCDataSet}
+
+|FamilyBCDataSet_t| contains Dirichlet and Neumann data for a single set of
+boundary-condition equations. Its intended use is for simple boundary-condition
+types, where the equations imposed do not depend on local flow conditions.
+
+\begin{alltt}
+  FamilyBCDataSet\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    BCTypeSimple\_t BCTypeSimple ;                                           (r)
+
+    BCData\_t<1> DirichletData ;                                             (o)
+    BCData\_t<1> NeumannData ;                                               (o)
+
+    ReferenceState\_t ReferenceState ;                                       (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t} and
+      \fort{UserDefinedData\_t} lists are as shown; users may choose other
+      legitimate names.
+      Legitimate names must be unique within a given instance
+      of \fort{FamilyBCDataSet\_t} and shall not include the names
+      \fort{BCTypeSimple},
+      \fort{DataClass}, \fort{DimensionalUnits}, \fort{DirichletData},
+      \fort{NeumannData} or \fort{ReferenceState}.
+\item \fort{BCTypeSimple} is the only required field.
+      All other fields are optional and the \fort{Descriptor\_t} list
+      may be empty.
+\end{notes}
+
+|BCTypeSimple| specifies the boundary-condition type, which gives general
+information on the bound\-ary-con\-di\-tion equations to be enforced.
+|BCTypeSimple_t| is defined in \autoref{s:BCType} along with the meanings
+of all the |BCTypeSimple| values.
+|BCTypeSimple| is also used for matching boundary condition data sets as
+discussed in \autoref{s:BCType_assoc}.
+
+Boundary-condition data is separated by equation type into Dirichlet
+and Neumann conditions.  Dirichlet boundary conditions impose the
+value of the given variables, whereas Neumann boundary conditions
+impose the normal derivative of the given variables.  The mechanics of
+specifying Dirichlet and Neumann data for boundary conditions is covered
+in \autoref{s:BC_specdata}.
+
+The substructures \fort{DirichletData} and \fort{NeumannData} contain
+boundary-condition data defined as globally constant over the family.
+
+Reference quantities applicable to the set of boundary-condition data are
+contained in the \fort{ReferenceState} structure.
+|DataClass| defines the default for the class of data contained in the
+boundary-condition data.
+If the boundary conditions contain dimensional data, |DimensionalUnits|
+may be used to describe the system of dimensional units employed.
+If present, these three entities take precedence of all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+Note that \fort{FamilyBCDataSet\_t} is similar to the data structure
+\fort{BCDataSet\_t} (\autoref{s:BCDataSet}).  The primary difference is that
+\fort{FamilyBCDataSet\_t} only allows for globally constant Dirichlet and
+Neumann data.
 
 \subsection{User-Defined Data Structure Definition: \texttt{UserDefinedData\_t}}
 \label{s:UserDefinedData}
