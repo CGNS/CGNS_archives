@@ -1,7 +1,10 @@
-Box 22 5
+Box 26 7
    \textbf{\Large DataArray Node}
-   (See Figures \ref*{f:GridCoordinates}, \ref*{f:Elements}, \ref*{f:Axisymmetry}, \ref*{f:RotatingCoordinates}, \ref*{f:FlowSolution}, \ref*{f:GridConnectivity}, \ref*{f:Periodic}, \ref*{f:BCData}, \ref*{f:Area}, \ref*{f:GasModel}, \ref*{f:ViscosityModel}, \ref*{f:ThermalConductivityModel}, \ref*{f:TurbulenceClosure}, \ref*{f:TurbulenceModel},
-   \ref*{f:ThermalRelaxationModel}, \ref*{f:ChemicalKineticsModel}, \ref*{f:EMElectricFieldModel}, \ref*{f:EMMagneticFieldModel}, \ref*{f:EMConductivityModel}, \ref*{f:ConvergenceHistory}, \ref*{f:IntegralData}, \ref*{f:ReferenceState}, \ref*{f:BaseIterativeData}, \ref*{f:ZoneIterativeData}, \ref*{f:RigidGridMotion}, \ref*{f:ArbitraryGridMotion}, \ref*{f:UserDefinedData}, \ref*{f:Gravity})
+   (See \autoref{f:GridCoordinates}, \autoref{f:Elements}, \autoref{f:Axisymmetry}, \autoref{f:RotatingCoordinates}, \autoref{f:FlowSolution},
+        \autoref{f:GridConnectivity}, \autoref{f:Periodic}, \autoref{f:BCData}, \autoref{f:Area}, \autoref{f:GasModel}, \autoref{f:ViscosityModel},
+        \autoref{f:ThermalConductivityModel}, \autoref{f:TurbulenceClosure}, \autoref{f:TurbulenceModel}, \autoref{f:ThermalRelaxationModel}, \autoref{f:ChemicalKineticsModel}, \autoref{f:EMElectricFieldModel},
+        \autoref{f:EMMagneticFieldModel}, \autoref{f:EMConductivityModel}, \autoref{f:ConvergenceHistory}, \autoref{f:IntegralData}, \autoref{f:ReferenceState}, \autoref{f:BaseIterativeData},
+        \autoref{f:ZoneIterativeData}, \autoref{f:RigidGridMotion}, \autoref{f:ArbitraryGridMotion}, \autoref{f:UserDefinedData}, \autoref{f:Gravity})
 SetTrack none
 Down 0
 Left 4
@@ -19,7 +22,7 @@ Box 20 11
    \hspace*{\indData}\fort{TimeExponent}, \fort{TemperatureExponent},\rule[-0.5ex]{0pt}{1ex}
    \hspace*{\indData}\fort{AngleExponent}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:DimensionalExponents}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:DimensionalExponents}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -41,7 +44,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{DataClass}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DataClass\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -50,7 +53,7 @@ Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{Descriptor\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -59,4 +62,4 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{DimensionalUnits}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DimensionalUnits\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}

@@ -1,8 +1,11 @@
-Box 22 6
+Box 26 8
    \textbf{\Large DimensionalUnits Node}
-   (See Figures \ref*{f:CGNSBase}, \ref*{f:Zone}, \ref*{f:GridCoordinates}, \ref*{f:Axisymmetry}, \ref*{f:RotatingCoordinates}, \ref*{f:FlowSolution}, \ref*{f:Periodic}, \ref*{f:ZoneBC}, \ref*{f:BC}, \ref*{f:BCDataSet}, \ref*{f:BCData}, \ref*{f:FlowEquationSet},
-   \ref*{f:GasModel}, \ref*{f:ViscosityModel}, \ref*{f:ThermalConductivityModel}, \ref*{f:TurbulenceClosure}, \ref*{f:TurbulenceModel}, \ref*{f:ThermalRelaxationModel}, \ref*{f:ChemicalKineticsModel}, \ref*{f:EMElectricFieldModel}, \ref*{f:EMMagneticFieldModel}, \ref*{f:EMConductivityModel}, \ref*{f:ConvergenceHistory}, \ref*{f:IntegralData}, \ref*{f:ReferenceState}, \ref*{f:DataArray},
-   \ref*{f:BaseIterativeData}, \ref*{f:ZoneIterativeData}, \ref*{f:RigidGridMotion}, \ref*{f:ArbitraryGridMotion}, \ref*{f:UserDefinedData}, \ref*{f:Gravity})
+   (See \autoref{f:CGNSBase}, \autoref{f:Zone}, \autoref{f:GridCoordinates}, \autoref{f:Axisymmetry}, \autoref{f:RotatingCoordinates},
+        \autoref{f:FlowSolution}, \autoref{f:Periodic}, \autoref{f:ZoneBC}, \autoref{f:BC}, \autoref{f:BCDataSet}, \autoref{f:BCData},
+        \autoref{f:FlowEquationSet}, \autoref{f:GasModel}, \autoref{f:ViscosityModel}, \autoref{f:ThermalConductivityModel}, \autoref{f:TurbulenceClosure}, \autoref{f:TurbulenceModel},
+        \autoref{f:ThermalRelaxationModel}, \autoref{f:ChemicalKineticsModel}, \autoref{f:EMElectricFieldModel}, \autoref{f:EMMagneticFieldModel}, \autoref{f:EMConductivityModel}, \autoref{f:ConvergenceHistory},
+        \autoref{f:IntegralData}, \autoref{f:ReferenceState}, \autoref{f:DataArray}, \autoref{f:BaseIterativeData}, \autoref{f:ZoneIterativeData},
+        \autoref{f:RigidGridMotion}, \autoref{f:ArbitraryGridMotion}, \autoref{f:UserDefinedData}, \autoref{f:Gravity})
 SetTrack none
 Down 0
 Left 4

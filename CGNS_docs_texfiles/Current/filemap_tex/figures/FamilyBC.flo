@@ -1,14 +1,20 @@
 Box 22 4
    \textbf{\Large FamilyBC Node}
-   (See Figure \ref*{f:Family})
+   (See \autoref{f:Family})
 SetTrack none
 Down 0
 Left 4
 SetTrack line
-Down 4
+Down 6.5
 Right 3
 TxtPos [l] [l] ~
-Box 20 4
+Box 20 9
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Label:} \fort{BCDataSet\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:BC}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{FamilyBCDataSet\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{C1}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} Length of string\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{BCTypeSimple} value\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,$N$\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:FamilyBCDataSet}\rule[-0.5ex]{0pt}{1ex}
+

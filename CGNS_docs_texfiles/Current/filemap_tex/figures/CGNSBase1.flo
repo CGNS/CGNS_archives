@@ -23,7 +23,7 @@ Box 18 13
    \textbf{Cardinality:} 0,$N$\rule[-0.5ex]{0pt}{1ex}
    \textbf{Parameters:}    \fort{CellDimension}, \rule[-0.5ex]{0pt}{1ex}
    \hspace*{\indParameters}\fort{PhysicalDimension}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:Zone}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:Zone}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Right 2
 SetTrack line
@@ -50,7 +50,7 @@ Box 18 9
    \textbf{Dimension Values:} 1\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:} \fort{NumberOfSteps}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:BaseIterativeData}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:BaseIterativeData}\rule[-0.5ex]{0pt}{1ex}
 ToTag
 Down 5
 Right 1
@@ -59,7 +59,7 @@ Box 18 6
    \textbf{Label:} \fort{IntegralData\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data-Type:} \fort{MT}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,$N$\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:IntegralData}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:IntegralData}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 2
 SetTrack line
@@ -73,7 +73,7 @@ Box 18 9
    \textbf{Dimension Values:} 1\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:} Number of iterations\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:ConvergenceHistory}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:ConvergenceHistory}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 2
 SetTrack line
@@ -84,7 +84,7 @@ Box 18 6
    \textbf{Label:} \fort{Family\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data-Type:} \fort{MT}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,$N$\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:Family}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:Family}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 2
 SetTrack line
@@ -96,4 +96,4 @@ Box 18 7
    \textbf{Data-Type:} \fort{MT}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
    \textbf{Parameters:} \fort{CellDimension}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:FlowEquationSet}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:FlowEquationSet}\rule[-0.5ex]{0pt}{1ex}

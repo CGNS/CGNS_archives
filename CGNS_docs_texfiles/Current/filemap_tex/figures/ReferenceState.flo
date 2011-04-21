@@ -1,6 +1,6 @@
 Box 22 4
    \textbf{\Large ReferenceState Node}
-   (See Figures \ref*{f:CGNSBase}, \ref*{f:Zone})
+   (See \autoref{f:CGNSBase}, \autoref{f:Zone})
 SetTrack none
 Down 0
 Left 4
@@ -11,7 +11,7 @@ TxtPos [l] [l] ~
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{Descriptor\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -20,7 +20,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{DataClass}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DataClass\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -29,7 +29,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{DimensionalUnits}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DimensionalUnits\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -44,7 +44,7 @@ Box 20 10
    \textbf{Data:} Reference state data\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,$N$\rule[-0.5ex]{0pt}{1ex}
    \textbf{Parameters:} \fort{DataType}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -66,4 +66,4 @@ Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{UserDefinedData\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}

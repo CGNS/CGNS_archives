@@ -1,6 +1,6 @@
 SetTrack line
 Box 12 3
-   \textbf{ADF Root Node}
+   \textbf{Root Node}
 Down 1
 Box 12 3
    \fort{CGNSBase1}

@@ -1,6 +1,6 @@
 Box 22 4
    \textbf{\Large RotatingCoordinates Node}
-   (See Figures \ref*{f:CGNSBase}, \ref*{f:Family})
+   (See \autoref{f:CGNSBase}, \autoref{f:Family})
 SetTrack none
 Down 0
 Left 4
@@ -16,7 +16,7 @@ Box 20 9
    \textbf{Dimension Values:} \fort{PhysicalDimension}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:} Coordinates of center of rotation\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 1\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -30,7 +30,7 @@ Box 20 9
    \textbf{Dimension Values:} \fort{PhysicalDimension}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:} Angular velocity components\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 1\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -39,7 +39,7 @@ Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{Descriptor\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -48,7 +48,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{DataClass}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DataClass\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -57,7 +57,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{DimensionalUnits}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DimensionalUnits\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -66,4 +66,4 @@ Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{UserDefinedData\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}

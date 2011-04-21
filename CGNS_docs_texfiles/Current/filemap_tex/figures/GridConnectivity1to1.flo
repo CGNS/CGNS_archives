@@ -1,6 +1,6 @@
 Box 22 4
    \textbf{\Large GridConnectivity1to1 Node}
-   (See Figure \ref*{f:ZoneGridConnectivity})
+   (See \autoref{f:ZoneGridConnectivity})
 SetTrack none
 Down 0
 Left 4
@@ -53,7 +53,7 @@ Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{Descriptor\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -62,7 +62,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{Ordinal}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{Ordinal\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:Zone}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:Zone}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -73,7 +73,7 @@ Box 20 6
    \textbf{Label:} \fort{GridConnectivityProperty\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data-Type:} \fort{MT}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:GridConnectivityProperty}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:GridConnectivityProperty}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -82,7 +82,7 @@ Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{UserDefinedData\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 12
 Down 4

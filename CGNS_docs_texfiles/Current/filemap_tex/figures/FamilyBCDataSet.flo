@@ -1,63 +1,34 @@
 Box 22 4
-   \textbf{\Large BCDataSet Node}
-   (See \autoref{f:BC})
+   \textbf{\Large FamilyBCDataSet Node}
+   (See \autoref{f:FamilyBC})
 SetTrack none
 Down 0
 Left 4
 SetTrack line
-Down 5.5
+Down 5
 Right 3
 TxtPos [l] [l] ~
-Box 20 7
+Box 20 6
    \textbf{Name:} \fort{DirichletData}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{BCData\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data-Type:} \fort{MT}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Functions:} \fort{ListLength}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Child Nodes:} \autoref{f:BCData}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
-Down 8
+Down 7
 Right 3
-Box 20 7
+Box 20 6
    \textbf{Name:} \fort{NeumannData}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{BCData\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data-Type:} \fort{MT}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Functions:} \fort{ListLength}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Child Nodes:} \autoref{f:BCData}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
-Down 6.5
-Right 3
-Box 20 4
-   \textbf{Name:} GridLocation\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Label:} \fort{GridLocation\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See:} \autoref{f:FlowSolution}\rule[-0.5ex]{0pt}{1ex}
-SetTrack none
-Left 4
-SetTrack line
-Down 5
-Right 3
-Box 20 4
-   \textbf{Name:} PointRange\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Label:} \fort{IndexRange\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See:} \autoref{f:BC}\rule[-0.5ex]{0pt}{1ex}
-SetTrack none
-Left 4
-SetTrack line
-Down 5
-Right 3
-Box 20 4
-   \textbf{Name:} PointList\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Label:} \fort{IndexArray\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See:} \autoref{f:BC}\rule[-0.5ex]{0pt}{1ex}
-SetTrack none
-Left 4
-SetTrack line
-Down 5
+Down 6
 Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}

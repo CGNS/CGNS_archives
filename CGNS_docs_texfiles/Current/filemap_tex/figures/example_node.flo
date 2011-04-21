@@ -11,7 +11,7 @@ Box 19 11
    \textbf{Name:}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data-Type:}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Dimensions:}\rule[-0.5ex]{0pt}{1ex}\raisebox{2ex}[0pt][0pt]{\hspace*{5em}\textit{ADF node contents}}
+   \textbf{Dimensions:}\rule[-0.5ex]{0pt}{1ex}\raisebox{2ex}[0pt][0pt]{\hspace*{5em}\textit{node contents}}
    \textbf{Dimension Values:}\rule[-0.5ex]{0pt}{1ex}\raisebox{1.5ex}[0pt][0pt]{\scalebox{1.5}[7]{\ \}}}
    \textbf{Data:}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:}\rule[-0.5ex]{0pt}{1ex}

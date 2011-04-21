@@ -1005,6 +1005,35 @@ grids.
       \fort{DataSize}
 \end{Ventryic}
 
+\paragraph{\texttt{ZoneSubRegion\_t}}
+
+The \fort{ZoneSubRegion\_t} node allows for the ability to give flowfield or
+other information over a subset of the entire zone in a CGNS file.
+This subset may be over a portion of a boundary, or it may be over a portion
+of the entire field.
+
+\textit{\uline{Node Attributes}}
+\begin{Ventryic}{\textbf{Dimension Values:}}
+\item [\textbf{Name:}]
+      User defined
+\item [\textbf{Label:}]
+      \fort{ZoneSubRegion\_t}
+\item [\textbf{DataType:}]
+      \fort{I4}
+\item [\textbf{Dimension:}]
+      1
+\item [\textbf{Dimension Values:}]
+      \fort{RegionCellDimension}
+\item [\textbf{Children:}]
+      See \autoref{f:ZoneSubRegion}
+\item [\textbf{Cardinality:}]
+      0,$N$
+\item [\textbf{Parameters:}]
+      \fort{IndexDimension}, \fort{VertexSize}, \fort{CellSize}
+\item [\textbf{Functions:}]
+      \fort{DataSize}
+\end{Ventryic}
+
 \subsubsection{Connectivity Group}
 
 \paragraph{\texttt{Transform} Node}
@@ -1293,14 +1322,16 @@ the intent is that it should be specified by a single child of type
 
 \paragraph{\texttt{ZoneGridConnectivity\_t}}
 
-Each \fort{Zone\_t} node may have at most one child of type
-\fort{ZoneGridConnectivity}. It holds no data, but serves as the point
+Each \fort{Zone\_t} node may have zero or more children of type
+\fort{ZoneGridConnectivity\_t}. It holds no data, but serves as the point
 below which all connectivity data associated with the zone can be found.
+Multiple \fort{ZoneGridConnectivity\_t} nodes may be used to specify
+time-dependent changes in the connectivity information.
 
 \textit{\uline{Node Attributes}}
 \begin{Ventryic}{\textbf{Dimension Values:}}
 \item [\textbf{Name:}]
-      \fort{ZoneGridConnectivity}
+      \fort{ZoneGridConnectivity} or user defined
 \item [\textbf{Label:}]
       \fort{ZoneGridConnectivity\_t}
 \item [\textbf{DataType:}]
@@ -1308,7 +1339,7 @@ below which all connectivity data associated with the zone can be found.
 \item [\textbf{Children:}]
       See \autoref{f:ZoneGridConnectivity}
 \item [\textbf{Cardinality:}]
-      0,1
+      0,$N$
 \item [\textbf{Parameters:}]
       \fort{IndexDimension}, \fort{CellDimension}
 \end{Ventryic}
@@ -2042,6 +2073,33 @@ particular CFD family.
       See \autoref{f:FamilyBC}
 \item [\textbf{Cardinality:}]
       0,1
+\end{Ventryic}
+
+\paragraph{\texttt{FamilyBCDataSet\_t}}
+
+A \fort{FamilyBCDataSet\_t} node contains Dirichlet and Neumann
+data for a single set of boundary condition equations to be applied
+to a Family. It's intended use is for simple boundary condition types,
+where the equations imposed do not depend on local flow conditions.
+
+\textit{\uline{Node Attributes}}
+\begin{Ventryic}{\textbf{Dimension Values:}}
+\item [\textbf{Name:}]
+      User defined
+\item [\textbf{Label:}]
+      \fort{FamilyBCDataSet\_t}
+\item [\textbf{DataType:}]
+      \fort{C1}
+\item [\textbf{Dimension:}]
+      1
+\item [\textbf{Dimension Values:}]
+      Length of string
+\item [\textbf{Data:}]
+      \fort{BCTypeSimple} value
+\item [\textbf{Children:}]
+      See \autoref{f:FamilyBCDataSet}
+\item [\textbf{Cardinality:}]
+      0,$N$
 \end{Ventryic}
 
 \paragraph{\texttt{GeometryReference\_t}}

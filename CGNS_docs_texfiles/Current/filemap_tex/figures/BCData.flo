@@ -1,7 +1,7 @@
 Box 22 5
    \textbf{\Large BCData Node}
    \textbf{\Large DirichletData or NeumannData}
-   (See Figure \ref*{f:BCDataSet})
+   (See \autoref{f:BCDataSet})
 SetTrack none
 Down 0
 Left 4
@@ -12,7 +12,7 @@ TxtPos [l] [l] ~
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{Descriptor\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -21,7 +21,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{DataClass}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DataClass\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -30,7 +30,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{DimensionalUnits}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DimensionalUnits\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -45,7 +45,7 @@ Box 20 10
    \textbf{Data:} Vector of local BC data quantities\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,$N$\rule[-0.5ex]{0pt}{1ex}
    \textbf{Parameters:} \fort{ListLength}, \fort{DataType}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -60,7 +60,7 @@ Box 20 10
    \textbf{Data:} Global BC data quantity\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,$N$\rule[-0.5ex]{0pt}{1ex}
    \textbf{Parameters:} \fort{DataType}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -69,4 +69,4 @@ Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{UserDefinedData\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}

@@ -1,6 +1,6 @@
 Box 22 4
    \textbf{\Large Area Node}
-   (See Figure \ref*{f:BCProperty})
+   (See \autoref{f:BCProperty})
 SetTrack none
 Down 0
 Left 4
@@ -29,7 +29,7 @@ Box 20 9
    \textbf{Dimension Values:} 1\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:} Size of area\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 1\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -43,7 +43,7 @@ Box 20 9
    \textbf{Dimension Values:} 32\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:} Name of region\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 1\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -52,7 +52,7 @@ Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{Descriptor\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -61,4 +61,4 @@ Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{UserDefinedData\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}

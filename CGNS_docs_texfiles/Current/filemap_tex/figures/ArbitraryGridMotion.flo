@@ -1,6 +1,6 @@
 Box 22 4
    \textbf{\Large ArbitraryGridMotion Node}
-   (See Figure \ref*{f:Zone})
+   (See \autoref{f:Zone})
 SetTrack none
 Down 0
 Left 4
@@ -17,7 +17,7 @@ Box 20 10
    \textbf{Data:} Grid velocity values\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,$N$\rule[-0.5ex]{0pt}{1ex}
    \textbf{Parameters:} \fort{IndexDimension}, \fort{DataSize}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Child Nodes:} Figure \ref*{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:DataArray}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -26,7 +26,7 @@ Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{Descriptor\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -35,7 +35,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{DataClass}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DataClass\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -44,7 +44,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{DimensionalUnits}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DimensionalUnits\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -53,7 +53,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{GridLocation}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{GridLocation\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:FlowSolution}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:FlowSolution}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -62,7 +62,7 @@ Right 3
 Box 20 4
    \textbf{Name:} \fort{Rind}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{Rind\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:GridCoordinates}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:GridCoordinates}\rule[-0.5ex]{0pt}{1ex}
 SetTrack none
 Left 4
 SetTrack line
@@ -71,4 +71,4 @@ Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{UserDefinedData\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
