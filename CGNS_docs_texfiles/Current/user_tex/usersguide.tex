@@ -133,8 +133,8 @@
 \postauthor{\par\end{flushleft}}
 \title{{\bfseries CFD General Notation System\\
 A User's Guide To CGNS}\\*[0.25in]
-{\Large Document Version 3.1.1\\
-CGNS Version 3.1}}
+{\Large Document Version 3.1.2\\
+CGNS Version 3.1.3}}
 \author{Christopher L. Rumsey\\
 \textit{NASA Langley Research Center}\\*[1em]
 Diane M. A. Poirier\\
@@ -1875,7 +1875,7 @@ boundary conditions now can be written using the following code segment.
 \newline\indent      enddo
 \newline c  write boundary conditions for ilo face
 \newline\indent      call cg\_boco\_write\_f(index\_file,index\_base,index\_zone,'Ilo',
-\newline + \indent BCTunnelInflow,ElementList,icount,ipnts,index\_bc,ier)
+\newline + \indent BCTunnelInflow,PointList,icount,ipnts,index\_bc,ier)
 \newline c  we know that for the unstructured zone, the following face elements
 \newline c  have been defined as outflow (real working code would check!):
 \newline\indent      nelem\_start=2689
@@ -1887,7 +1887,7 @@ boundary conditions now can be written using the following code segment.
 \newline\indent      enddo
 \newline c  write boundary conditions for ihi face
 \newline\indent      call cg\_boco\_write\_f(index\_file,index\_base,index\_zone,'Ihi',
-\newline + \indent BCExtrapolate,ElementList,icount,ipnts,index\_bc,ier)
+\newline + \indent BCExtrapolate,PointList,icount,ipnts,index\_bc,ier)
 \newline c  we know that for the unstructured zone, the following face elements
 \newline c  have been defined as walls (real working code would check!):
 \newline\indent      nelem\_start=2817
@@ -1899,8 +1899,17 @@ boundary conditions now can be written using the following code segment.
 \newline\indent      enddo
 \newline c  write boundary conditions for wall faces
 \newline\indent      call cg\_boco\_write\_f(index\_file,index\_base,index\_zone,'Walls',
-\newline + \indent BCWallInviscid,ElementList,icount,ipnts,index\_bc,ier)
+\newline + \indent BCWallInviscid,PointList,icount,ipnts,index\_bc,ier)
 \newline c
+\newline c  the above are all face-center locations for the BCs - must indicate this,
+\newline c  otherwise Vertices will be assumed!
+\newline\indent      do ibc=1,index\_bc
+\newline c  (the following call positions you in BC\_t - it assumes there
+\newline c  is only one Zone\_t and one ZoneBC\_t - real working code would check!)
+\newline\indent\indent        call cg\_goto\_f(index\_file,index\_base,ier,'Zone\_t',1,
+\newline + \indent\indent    'ZoneBC\_t',1,'BC\_t',ibc,'end')
+\newline\indent\indent        call cg\_gridlocation\_write\_f(FaceCenter,ier)
+\newline\indent      enddo
 \newline c  close CGNS file
 \newline\indent      call cg\_close\_f(index\_file,ier)
 }
@@ -1908,21 +1917,21 @@ boundary conditions now can be written using the following code segment.
 --------------------------------------------------------------------
 
 Note that we assume here that we know in advance the element numbers
-associated with each of the boundaries.
-We have written these element numbers as a {\tt ElementList}, but, because
-they are in order, we could just as easily have used {\tt ElementRange}
-instead.
+associated with each of the boundaries.  We have written these element
+numbers as a {\tt PointList}, but, because they are in order, we could
+just as easily have used {\tt PointRange} instead.
 In that case, only two {\tt ipnts} values would be needed, equal to
 {\tt nelem\_start} and {\tt nelem\_end}, and {\tt icount} would be 2.
+Finally, note that
+the {\tt GridLocation\_t} node under {\tt BC\_t} must be written using
+the API call {\tt cg\_goto\_f} (which positions you
+correctly in the tree) followed by {\tt cg\_gridlocation\_write\_f}.
 
-Note that it is also allowable to use {\tt PointList} or {\tt PointRange}
-{\it in addition to} setting {\tt GridLocation} to {\tt FaceCenter}.
-This combination has the meaning of pointing to elements rather than
-to vertices because, by default,
-boundary conditions are assumed to apply at vertices (nodes);
-but when {\tt GridLocation} is something other than {\tt Vertex},
-then the boundary conditions for an unstructured
-zone no longer refer to nodes, but to elements.
+Note that the use of {\tt ElementList} and {\tt ElementRange} (recommended in
+previous versions of CGNS) has been 
+deprecated and should not be used in new code. 
+These are still accepted, but will be internally replaced with the 
+appropriate values of {\tt PointList/PointRange} and {\tt GridLocation\_t}.
 
 A portion of the layout of the CGNS file for the {\tt ZoneBC\_t}
 node and its children is shown in Fig.~\ref{FIGtree_cartesian_UBC}.  The {\tt ZoneBC\_t}
