@@ -172,17 +172,18 @@ and/or from the CGNS web site, at \textit{http://cgns.sourceforge.net/}.
       Converts CGNS files to and from Plot3D format.
       Has a text-based menu allowing the manipulation of a CGNS base.\\
       Contact: Bob Bush (\textit{bushrh@pweh.com})
-\item [ADFviewer]
-      An ADF/CGNS file viewer and editor, written in \textit{Tcl/Tk}.
-      The GUI allows complete editing of ADF/CGNS files, and handles
-      links and data conversions.
+\item [CGNSview]
+      An CGNS file viewer and editor, written in \textit{Tcl/Tk}.
+      The GUI allows complete editing of CGNS files (both ADF and HDF5),
+      and handles links and data conversions. It works at the CGIO
+      interface level, and thus is not affected by ``bad'' CGNS files.
       It includes built-in CGNS node and label information, and
-      documentation support through HTML (including access to the ADF
-      and CGNS docs).\\
-      Contact: Bruce Wedan (\textit{brucewedan@hotmail.com})
+      documentation support through HTML (including access to all
+      CGNS docs).\\
+      Contact: Bruce Wedan (\textit{brucewedan@gmail.com})
 \item [CGNS Tools]
       A variety of tools for viewing, editing, and manipulating the
-      contents of CGNS files; requires \textit{Tcl/Tk} 8.3.
+      contents of CGNS files; requires \textit{Tcl/Tk} 8.3 or above.
       Included are:
       \begin{itemize*}
       \item \textit{CGNSplot}, for plotting grids
@@ -198,8 +199,8 @@ and/or from the CGNS web site, at \textit{http://cgns.sourceforge.net/}.
             a CGNS file
       \end{itemize*}
       These may be used as stand-alone utilities, or initiated from
-      \textit{ADFviewer}, which is included.\\
-      Contact: Bruce Wedan (\textit{brucewedan@hotmail.com})
+      \textit{CGNSview}, which is included.\\
+      Contact: Bruce Wedan (\textit{brucewedan@gmail.com})
 \item [CGNS Viewer]
       An alpha release of another ADF/CGNS file viewer and editor.
       Requires the GTK+ library version 1.2 or newer (installed by default

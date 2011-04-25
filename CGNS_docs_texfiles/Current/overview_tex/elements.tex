@@ -40,243 +40,30 @@ applications programs.
 These elements include the following:
 
 \begin{itemize}
-\item The ADF (``Advanced Data Format'') Database Manager, consisting
-      of both a file format specification and its I/O software, which
-      handles the actual reading and writing of data from and to
-      external storage media.
-      In versions 2.4 and later of the CGNS software, the user can
-      choose to use the HDF5 storage file format (supported externally
-      by NCSA) in place of ADF.
 \item The Standard Interface Data Structures (SIDS), which specify the
       intellectual content of CFD data and the conventions that govern
       naming and terminology.
-\item The SIDS-to-ADF File Mapping and SIDS-to-HDF File Mapping
-      conventions, which specify the exact location where the CFD
-      data defined by the SIDS is to be stored within the ADF or HDF5
-      file(s).
+\item The SIDS File Mapping,
+      which specify the exact location where the CFD
+      data defined by the SIDS is to be stored within a database file.
+\item The Database Manager, consisting
+      of both a file format specification and its I/O software, which
+      handles the actual reading and writing of data from and to
+      external storage media.
 \end{itemize}
-
-It should be noted that because of HDF5's parallel and compression      
-capability as well as its support, the CGNS Steering Committee has made 
-the decision to slowly transition (beginning in 2005) to HDF5 as the    
-official data storage mechanism.                                        
-However, ADF will continue to be available for use, with the CGNS
-mid-level library capable of (1) using either format and (2) translating
-back and forth between the two.
-
-The ADF and HDF5 Database Managers provide minimal collections of data
-access functions.
-This collection we refer to as the ``ADF Core,'' and the ``HDF5 Core.''
-In principle, it is possible to install CGNS I/O into an application
-using only the ADF Core or HDF5 Core routines.
-However, such an approach would require the installer to access the data
-at a very fundamental level and would result in lengthy sequences of
-core function calls.
-Therefore, the system also includes a Mid-Level Library, an API
-(Application Programming Interface) that contains additional routines
-intended to facilitate higher-level access to the data.
-These are CFD-knowledgeable routines suitable for direct installation
-into applications codes.
 
 The following sections discuss in more detail the roles of the CGNS
 elements and introduce their documentation.
 
-\subsection{ADF Files and the ADF Core}
+\subsection{Structure of a CGNS Database}
 
-In this section, we refer solely to the ADF Database Manager.  
-However, the HDF5 storage format, which can be invoked as an alternative
-storage method in place of ADF, possesses similar functionality.
-Refer to the HDF5 website at \url{http://hdf.ncsa.uiuc.edu/HDF5/} for
-more information.
+In this section, the conceptual structure of a CGNS database, and the
+nodes from which it is built, are discussed. This describes the way
+in which the CGNS software ``sees'' the database, not necessarily the way
+in which it is implementated. The details of the implementation are
+left to the underlying database manager.
 
-ADF (Advanced Data Format), with its software implementation called the
-ADF Core, constitutes an extremely general database manager that is
-particularly suited to the storage of large numerical data sets.
-The Core is composed of a set of routines that perform standard
-operations on a database consisting of ADF files.
-Typical operations include the following: open, close, create, delete,
-read, and write.
-
-An ADF file is, by definition, a file that has been written by the ADF
-Core.
-ADF files are written onto the external medium in a binary format that
-is completely determined by the Core.
-It is by this means that file portability is ensured.
-Consequently, the file contents are not accessible except by using the
-Core routines.
-The Core routines are internally documented, but they contain no
-user-serviceable parts and \emph{should not be modified}.
-
-The principal advantages of such an independently designed storage
-system are portability, data integrity, and the opportunity for
-self-identification of files.
-The ADF Core can always open and read an ADF file regardless of its
-origin or specific content.
-The universal availability of ADF, resulting from its nonproprietary
-nature, is also an important feature.
-
-All ADF Core routines are coded in C, but both C and Fortran function
-calls are provided.
-The Core routines provide only the minimum functionality required to
-access the database.
-
-The conceptual form of an ADF file is that of a tree, each node of which
-has the same internal structure.
-Each node contains the following:
-
-\begin{itemize*}
-\item identification information
-\item pointers to its subnodes
-\item descriptors of any data recorded at the node
-\item the data itself
-\end{itemize*}
-
-This format was chosen with the storage of scientific data in mind, but
-it is general enough that the ADF system could be used to store a wide
-variety of types of information.
-There is nothing in the ADF file specifications that restricts the data
-types to CFD-related information.
-
-It is possible, through a mechanism of links, for a database implemented
-in ADF to span more than one ADF file.
-In the case of CFD, for instance, this feature allows multiple flow
-solutions to share the same grid without duplicating the data.
-
-ADF contains no mechanisms to ensure the security or availability of ADF
-files.
-It is the user's responsibility to keep track of the locations, file
-permissions, and names of ADF files.
-ADF does not assume or modify any functions of the operating system.
-In particular, there is no file ``locking''; i.e., there is nothing to
-prevent two applications from accessing the same file simultaneously.
-ADF file links are ``soft'' --- if the linked file is moved or deleted, the
-connection is broken.
-
-A more thorough overview of ADF may be found in the \textit{SIDS-to-ADF
-File Mapping} document, and complete documentation appears in the
-\textit{ADF User's Guide}.
-
-\subsection{Standard Interface Data Structures (SIDS)}
-
-The establishment of a standard for storing CFD-related information
-requires a detailed specification of the content and meaning of the data
-to be stored.
-For example, it is necessary to state the meaning of the words ``boundary
-condition'' in a form sufficiently concrete to be recorded precisely, and
-yet sufficiently flexible to embrace current and future practice.
-The \textit{Standard Interface Data Structures}
-(SIDS) document describes this ``intellectual content'' of CFD-related
-data in detail.
-
-An exact description of the intellectual content is required not only
-to define the precise form of the data but also to guarantee that the
-meaning of the data is consistently interpreted by practitioners.
-Thus the SIDS include a collection of naming conventions that
-specify the precise meaning of nomenclature (e.g., the strings
-\fort{DensityStatic} and \fort{BCWallViscous}).
-
-The SIDS are written in a self-contained C-like descriptive language.
-SIDS data structures are defined in a hierarchical manner in which more
-complex entities are built from simpler ones.
-These structures are closely reflected in CGNS-compliant ADF (or HDF5)
-files: simple entities are often stored in single nodes, while more
-complex structures are stored in entire subtrees.
-
-\subsection{SIDS-to-ADF File Mapping and SIDS-to-HDF File Mapping}
-
-\subsubsection{General File Mapping Principles}
-
-Because of the generality of the ADF (or HDF5) tree structure, there are
-many conceivable means of encoding CFD data.
-But for any application to access, say, the boundary conditions for zone
-``UnderWing'', requires a single convention with regard to where in the
-file that data has been stored.
-The \textit{SIDS-to-ADF File Mapping} document, sometimes referred to
-as the ``File Mapping,'' establishes the precise ADF node, and location
-within that node, where each piece of CGNS data should be recorded.
-Similarly, the SIDS-to-HDF File Mapping document does the same thing for
-HDF5.
-The CGNS Mid-Level Library relies on the File Mapping to locate
-CFD-related data within the file.
-
-The mapping provides ADF (or HDF5) locations for an extensive set of CFD
-data.
-Most applications will make use of only a small subset of this data.
-Further, inasmuch as applications are viewed as editors that are in the
-process of building the database, most of them are intended for use on
-incomplete data sets.
-Therefore, it is not required that all the data elements specified by
-the CGNS conventions be complete in order for a database to be CGNS
-compliant.
-The user must ensure that the current state of the database will support
-whatever application he may launch.
-Of course, the application should gracefully handle any absence or
-deficiency of data.
-
-CGNS conventions do not specify the following:
-
-\begin{itemize*}
-\item the use the applications programs may make of the data
-\item the means by which the applications programs modify the data
-\item the form in which the data is stored internal to an application
-\end{itemize*}
-
-\noindent
-The validity, accuracy and completeness of the data are determined
-entirely by the applications software.
-
-The tree structure of ADF (or HDF5) makes it possible for applications
-to ignore data for which they have no use.
-(In fact, they cannot even discover the data's existence without a
-specific inquiry.)
-Therefore, it is permissible for an ADF (or HDF5) file containing a CGNS
-database to contain additional nodes not specified by the mapping.
-Such nodes will be disregarded by software not prepared to use them.
-However, if data essential to the CFD process is stored in a manner
-not consistent with CGNS conventions, that data becomes invisible and
-therefore useless to other applications.
-
-Note that the SIDS serve not only to facilitate the mapping of data onto
-the ADF (or HDF5) file structure but also to standardize the meaning of
-the recorded data.
-Thus there are two kinds of conventions operative within CGNS.
-Adherence to the File Mapping conventions guarantees that the software
-will be able to find and read the data.
-Adherence to the SIDS guarantees uniformity of meaning among users and
-between applications.
-The \textit{SIDS-to-ADF File Mapping} document establishes the
-use of ADF in the context of CGNS (the \textit{SIDS-to-HDF File
-Mapping} document does the same thing for HDF5); the SIDS define the
-nomenclature, content, and meaning of the stored data.
-
-The File Mapping generally avoids the storage of redundant data.
-Sometimes an application may require an alternate (but intellectually
-equivalent) form of the data; in such cases it is recommended that the
-alternate form be prepared at the time of use and kept separate from the
-CGNS data.
-This avoids habitual reliance on the alternate form, which would
-invalidate the standard.
-If the alternate form is appended to the ADF (or HDF5) file, care must
-be taken to update the primary (CGNS) form whenever permanent changes
-are made.
-
-\subsubsection{Structure of ADF Files and ADF Nodes}
-
-In this section, the structure of ADF files and nodes is discussed.
-The HDF5 storage format, which can be invoked as an alternative storage
-method in place of ADF, is not referred to at all in this section.
-Refer to the HDF5 website at \url{http://hdf.ncsa.uiuc.edu/HDF5/} for
-more information on the structure of HDF5 files and nodes.
-
-Further description of the File Mapping requires some understanding of
-the internal structure of ADF Files.
-In this document, we summarize this structure as it is used in CGNS.
-The \textit{SIDS-to-ADF File Mapping} document contains a complete
-description of the ADF file structure as used in CGNS.
-The \textit{ADF User's Guide} contains a complete description of ADF
-file structure without regard to its use in CGNS.
-
-An ADF file consists of a collection of elements called nodes.
+A CGNS database consists of a collection of elements called nodes.
 These nodes are arranged in a tree structure that is logically similar
 to a UNIX file system.
 The nodes are said to be connected in a ``child-parent'' relationship
@@ -289,7 +76,9 @@ according to the following simple rules:
 \item The root node has no parent.
 \end{enumerate}
 
-Each node in an ADF file has exactly the same internal structure.
+\subsubsection{Structure of a Node}
+
+Each node has exactly the same internal structure.
 The entities associated with each node are the following:
 
 \begin{itemize*}
@@ -305,7 +94,7 @@ The entities associated with each node are the following:
 
 \paragraph{Node Identifier.}
 The Node ID is a floating point number assigned by the system when the
-ADF file is opened or created.
+database is opened or created.
 Applications may record the ID and use it to return directly to the
 corresponding node when required.
 The Node ID is valid only while the file is open; subsequent openings of
@@ -321,7 +110,7 @@ The Label, also a character string, is specified by the CGNS mapping
 conventions and identifies the kind of data being recorded.
 For example, a node with label \fort{Zone\_t} may record (at and below
 it) information on the zone with Name ``UnderWing.''
-It is a general (ADF) rule that no node may have more than one child
+No node may have more than one child
 with the same name, but the CGNS mapping conventions commonly specify
 many children with the same label.
 For some nodes, the mapping conventions specify that the name
@@ -332,7 +121,7 @@ serve the transfer of data between users and between applications.
 These names and their meanings are established by the SIDS.
 
 \paragraph{Data Type, Dimension, Dimension Values, Data.}
-ADF nodes may or may not contain data.
+Nodes may or may not contain data.
 For those that do, CGNS specifies a single array whose type (integer,
 etc.), dimension, and size are recorded in the Data Type, Dimension, and
 Dimension Value fields, respectively.
@@ -340,22 +129,22 @@ The mapping conventions specify some nodes that serve to establish the
 tree structure and point to further data below but contain no data
 themselves.
 For these nodes, the Data Type is \fort{MT}, and the other fields are
-empty.
+empty. A Link to another node within the current or an external
+database is indicated by a Data Type of \fort{LK}.
 
 \paragraph{Child Table.}
 The Child Table contains a list of the node's children.
-It is maintained by the system as children are created and deleted.
-Its role in CGNS is the same as in ADF in general.
+It is maintained by the database manager as children are created and deleted.
 
 \subsubsection{High-Level Organization of the CGNS Database}
 
-For a full specification of the location of CFD data in the ADF (or
-HDF5) file, the user should see the \textit{SIDS-to-ADF File Mapping}
-document or the \textit{SIDS-to-HDF File Mapping} document.
+For a full specification of the location of CFD data in the
+CGNS database, the user should see the \textit{SIDS File Mapping}
+document.
 For convenience, we summarize the high-level structure below.
 
 A CGNS database consists of a tree of nodes implemented as all or part
-of one or more ADF (or HDF5) files.
+of one or more database files.
 All information is identified by and accessed through a single node in
 one of these files.
 There is thus no notion of a CGNS \textit{file}, only of a CGNS
@@ -366,14 +155,13 @@ By definition, the root node of a CGNS database has the Label
 \fort{CGNSBase\_t}.
 The Name of the database can be specified by the user and is stored in
 the ``Name'' field of the \fort{CGNSBase\_t} node.
-Note that this is the root of the CGNS database, not the root node of
-the ADF (or HDF5) file.
 Current CGNS conventions require that the \fort{CGNSBase\_t} node be
-located directly below the ADF (or HDF5) root node.
+located directly below a ``root node'' in the database file
+identified by the name ``\fort{/}''.
 
-An ADF (or HDF5) file may contain multiple CGNS databases, and thus
+An database file may contain multiple CGNS databases, and thus
 multiple \texttt{CGNSBase\_t} nodes.
-However, each node labeled \fort{CGNSBase\_t} in a single ADF (or HDF5)
+However, each node labeled \fort{CGNSBase\_t} in a single
 file must have a unique name.
 The user or application must know the name of the file containing
 the entry-level node and, if there is more than one node labeled
@@ -408,10 +196,153 @@ processed by any supplied CGNS software (except, of course, that the
 text may be stored and retrieved).
 
 It is possible, by using the linking capability of CGNS, for a child of
-any node to be a node in another ADF (or HDF5) file, or elsewhere within
+any node to be a node in another database file, or elsewhere within
 the same file.
 This mechanism enables one database to share a grid, for example, with
 another database without duplicating the information.
+
+\subsection{Standard Interface Data Structures (SIDS)}
+
+The establishment of a standard for storing CFD-related information
+requires a detailed specification of the content and meaning of the data
+to be stored.
+For example, it is necessary to state the meaning of the words ``boundary
+condition'' in a form sufficiently concrete to be recorded precisely, and
+yet sufficiently flexible to embrace current and future practice.
+The \textit{Standard Interface Data Structures}
+(SIDS) document describes this ``intellectual content'' of CFD-related
+data in detail.
+
+An exact description of the intellectual content is required not only
+to define the precise form of the data but also to guarantee that the
+meaning of the data is consistently interpreted by practitioners.
+Thus the SIDS include a collection of naming conventions that
+specify the precise meaning of nomenclature (e.g., the strings
+\fort{DensityStatic} and \fort{BCWallViscous}).
+
+The SIDS are written in a self-contained C-like descriptive language.
+SIDS data structures are defined in a hierarchical manner in which more
+complex entities are built from simpler ones.
+These structures are closely reflected in CGNS-compliant
+files: simple entities are often stored in single nodes, while more
+complex structures are stored in entire subtrees.
+
+\subsection{SIDS File Mapping}
+
+Because of the generality of the tree structure, there are
+many conceivable means of encoding CFD data.
+But for any application to access, say, the boundary conditions for zone
+``UnderWing'', requires a single convention with regard to where in the
+file that data has been stored.
+The \textit{SIDS File Mapping} document, sometimes referred to
+as the ``File Mapping,'' establishes the precise node, and properties
+of that node, where each piece of CGNS data should be recorded.
+The CGNS Mid-Level Library relies on the File Mapping to locate
+CFD-related data within the file.
+
+The mapping provides locations for an extensive set of CFD
+data.
+Most applications will make use of only a small subset of this data.
+Further, inasmuch as applications are viewed as editors that are in the
+process of building the database, most of them are intended for use on
+incomplete data sets.
+Therefore, it is not required that all the data elements specified by
+the CGNS conventions be complete in order for a database to be CGNS
+compliant.
+The user must ensure that the current state of the database will support
+whatever application he may launch.
+Of course, the application should gracefully handle any absence or
+deficiency of data.
+
+CGNS conventions do not specify the following:
+
+\begin{itemize*}
+\item the use the applications programs may make of the data
+\item the means by which the applications programs modify the data
+\item the form in which the data is stored internal to an application
+\end{itemize*}
+
+\noindent
+The validity, accuracy and completeness of the data are determined
+entirely by the applications software.
+
+The tree structure also makes it possible for applications
+to ignore data for which they have no use.
+(In fact, they cannot even discover the data's existence without a
+specific inquiry.)
+Therefore, it is permissible for a file containing a CGNS
+database to contain additional nodes not specified by the mapping.
+Such nodes will be disregarded by software not prepared to use them.
+However, if data essential to the CFD process is stored in a manner
+not consistent with CGNS conventions, that data becomes invisible and
+therefore useless to other applications.
+
+Note that the SIDS serve not only to facilitate the mapping of data onto
+the file structure but also to standardize the meaning of
+the recorded data.
+Thus there are two kinds of conventions operative within CGNS.
+Adherence to the File Mapping conventions guarantees that the software
+will be able to find and read the data.
+Adherence to the SIDS guarantees uniformity of meaning among users and
+between applications.
+The \textit{SIDS File Mapping} document establishes the
+context of CGNS for a database manager; the SIDS define the
+nomenclature, content, and meaning of the stored data.
+
+The File Mapping generally avoids the storage of redundant data.
+Sometimes an application may require an alternate (but intellectually
+equivalent) form of the data; in such cases it is recommended that the
+alternate form be prepared at the time of use and kept separate from the
+CGNS data.
+This avoids habitual reliance on the alternate form, which would
+invalidate the standard.
+
+\subsection{Database Manager}
+
+A database manager contains the I/O software,
+which handles the actual reading and writing
+of data from and to external storage media. It must conform, at least
+in context, to that specified by the
+\textit{SIDS File Mapping} document,
+and provide a minimal number of data access routines
+(referred to as core routines).
+In principle, it is possible to install CGNS I/O into an application
+using only these core routines.
+However, such an approach would require the installer to access the data
+at a very fundamental level and would result in lengthy sequences of
+core function calls.
+Therefore, the CGNS system also includes a \textit{Mid-Level Library},
+an API (Application Programming Interface) that contains
+additional routines intended to facilitate higher-level access to the
+data.
+These are CFD-knowledgeable routines suitable for direct installation
+into applications codes.
+
+The CGNS software was originally developed around
+\textit{ADF (Advanced Data Format)}
+as it's database manager, thus much of the concepts and structures
+of CGNS originated from there.
+
+In version 2.4 of the CGNS software,
+\textit{HDF5 (Hierarchical Data Format} was
+introduced as an alternative database manager. At that time, either
+ADF or HDF5 (but not both) was selectable at build time.
+
+It should be noted that because of HDF5's parallel and compression      
+capability as well as its support, the CGNS Steering Committee has made 
+the decision to slowly transition (beginning in 2005) to HDF5 as the    
+official data storage mechanism.                                        
+However, ADF will continue to be available for use, with the CGNS
+mid-level library capable of (1) using either format and (2) translating
+back and forth between the two.
+
+Beginning with CGNS version 3.0,
+both ADF and HDF5 are supported concurrently and transparently
+by CGNS. To facilitate this, a new set of core routines, described in
+the \textit{CGIO User's Guide}, have been
+developed as a replacement to the individual ADF and HDF5 core routines.
+These allow general access to the low-level I/O, irrespective of the
+underlying database manager.
 
 \subsection{Mid-Level Library, or API}
 
@@ -439,11 +370,12 @@ The five CGNS elements described above are documented individually,
 as follows:
 
 \begin{itemize*}
-\item \textit{ADF User's Guide}
 \item \textit{Standard Interface Data Structures}
-\item \textit{SIDS-to-ADF File Mapping Manual}
-\item \textit{SIDS-to-HDF File Mapping Manual}
+\item \textit{SIDS File Mapping Manual}
 \item \textit{Mid-Level Library}
+\item \textit{CGIO User's Guide}
+\item \textit{ADF Implementation}
+\item \textit{HDF5 Implementation}
 \end{itemize*}
 
 \noindent
@@ -467,8 +399,8 @@ of CGNS.
 Prospective users are presumably unfamiliar with CGNS.
 They will probably wish to begin with the current Overview document, or,
 if they require more detailed information, the AIAA papers listed above.
-Beyond that, most will find a quick read of the \textit{SIDS-to-ADF
-File Mapping Manual} (or the \textit{SIDS-to-HDF File Mapping Manual})
+Beyond that, most will find a quick read of the
+\textit{SIDS File Mapping Manual}
 enlightening as to the logical form of the contents of CGNS files.
 Browsing the figures in the File
 Mapping Manual, as well as the SIDS
@@ -517,11 +449,11 @@ It will likely be necessary to consult the
 SIDS to determine the precise meaning
 of the nomenclature.
 
-Applications code developers wishing to read or write data in ADF (or
-HDF5) files, that isn't supported by the Mid-Level Library, will have
-to use the ADF (or HDF5) Core routines directly, and will need the
-\textit{ADF User's Guide} for ADF, and separate HDF5 documentation (not
-available here) for HDF5.
+Applications code developers wishing to read or write data
+that isn't supported by the Mid-Level Library, will have
+to use the CGIO low-level routines to access the underlying database
+manager directly. The \textit{CGIO User's Guide} documents these
+routines in detail.
 
 \subsubsection{CGNS System Developers}
 
