@@ -175,17 +175,15 @@ and unstructured), flow solution,
 connectivity, BCs, and auxiliary information.
 CGNS is also easily extensible, and allows
 for file-stamping and user-inserted-commenting.  It employs
-ADF (Advanced Data Format), a system which creates binary
-files that are portable across computer platforms.  CGNS also
-includes a second layer of software known as the mid-level
-library, or API (Application Programming Interface), which
-eases the implementation of CGNS into existing CFD codes.\footnote{With
-the release of CGNS Version 2.4, the mid-level library may be
-built using either ADF or HDF
-(Hierarchical Data Format) as the underlying data format.
-The remainder of this \textit{User's Guide} only refers to ADF, but at the
-mid-level library level the differences should be transparent to most
-users.}
+\textit{ADF (Advanced Data Format)}, and/or
+\textit{HDF5 (Hierarchical Data Format)}
+as a database manager which creates binary files that are portable
+across computer platforms. It provides a layer of software, the
+\textit{CGIO Interface} which allows access
+to these database managers at a low-level, and
+a second layer of software known as the \textit{Mid-Level Library},
+or API (Application Programming Interface), which
+eases the implementation of CGNS into existing CFD codes.
 
 
 In 1999, control of CGNS was completely transferred to a public
@@ -310,8 +308,7 @@ introductory guide only.
 The rules and conventions governing how the nodes in a CGNS 
 file are organized, including their names and labels, are 
 specified in the SIDS
-document \cite{ALLMARAS}, with additional details in 
-\cite{CGNS1} \cite{CGNS2}.
+document \cite{ALLMARAS}, with additional details in \cite{CGNS2}.
 These documents also specify in detail how CFD information
 is to be stored within the nodes in a standardized fashion so that 
 other users can easily access and read it.
@@ -327,7 +324,8 @@ for the user to fully understand the SIDS document or Appendix~\ref{sec:sidsover
 The mid-level, or API calls have been created to aid users
 in writing and reading CGNS files that are SIDS-compliant.  
 \footnote{There are currently two levels of programming access to CGNS.
-The lowest level consists of ADF- or HDF5-level calls.  These calls
+The lowest level consists of CGIO-level calls which interact directly
+with the database manager. These calls
 perform the most basic functions, such as creating a child node,
 writing data, reading data, etc.
 However, these low-level calls know nothing at all about the SIDS,
@@ -2594,17 +2592,15 @@ from one to the grid coordinates of the other.}
 
 \subsection{Handling Errors}
 
-The API has an extensive number of checks for errors, relating
-both to illegal usage of ADF as well as relating
-to SIDS-noncompliance.
-However, it is not guaranteed that
-the API will catch all problems prior to reaching the core level.
-The list of errors that can arise in the ADF core
-routines themselves are not listed here; they
-can be found in the file {\tt ADF\_interface.c} under
-``Error strings,'' and in the ADF User's Guide \cite{CGNS1}.
+The API has an extensive number of checks for errors, relating both to
+invalid data input as well as SIDS-noncompliance.
+However, it is not guaranteed that the API will catch all problems prior
+to reaching the core level. Even then, additional errors can arise due
+to I/O or invalid input. The list of errors that can arise in the CGIO
+or database manager core routines may be found in the
+CGIO User's Guide \cite{CGNS1}.
 
-If an error occurs, the message given by the ADF or the API
+If an error occurs, the message given by the API or core
 routine should hopefully be descriptive enough to point to the source
 of the error.
 
@@ -2699,7 +2695,7 @@ A:  It is currently very difficult to {\it guarantee} that a user has created
 a SIDS-compliant CGNS file, that others can read and understand.  But because
 the API (mid-level-library) has many checks for non-compliance, it is
 much more difficult for you to make a mistake when using it
-than if you utilize ADF (core-level) calls.
+than if you utilize CGIO (core-level) calls.
 Included with
 the CGNS distribution is a crude compliance checker, {\it cgnscheck}
 located in the tools subdirectory. This may be run from the command line,
@@ -2944,14 +2940,12 @@ listed as being ``under'' a node, there are actually two possibilities:
 the information can be stored {\it as data \underbar{in} the current node},
 or it can be stored {\it as data \underbar{in or under} a separate child node}.
 This distinction is illustrated in Fig.~\ref{FIGdataorchild}.  
-The SIDS-to-ADF
-mapping document \cite{CGNS2} determines which of the two
+The SIDS File Mapping document \cite{CGNS2} determines which of the two
 possibilities are used for each situation, and must always be
-consulted along with the SIDS document.  (Note there is also a SIDS-to-HDF5
-document available.) Throughout the remainder
+consulted along with the SIDS document. Throughout the remainder
 of this appendix, the location of information (whether
 as data or as a separate child node) will always be explicitly
-specified, according to the SIDS-to-ADF mapping document.
+specified, according to the SIDS File Mapping document.
 
 % Figure
 \begin{figure}[hpbt]
@@ -3101,7 +3095,7 @@ was deemed necessary because most CFD codes currently perform
 operations on the zones of multiple-zone grids in a certain order.
 To duplicate existing non-CGNS applications, it is 
 necessary to insure that zones can be read in the desired
-sequence.  (ADF does not necessarily retrieve data in the same 
+sequence.  (the database manager may not retrieve data in the same
 order in which it was stored, so the API reader for zones was
 built to do this.)  Hence, when {\it naming} zones, the user should
 make sure they are named alphanumerically (if an ordering is
@@ -3877,24 +3871,24 @@ scales, to ensure compliance with the guidelines.  \label{Itemnote5}
 \bibitem{ALLMARAS}
 CGNS Project Group,
 ``The CFD General Notation System Standard Interface Data Structures,''
-Version 2.0 beta 2, February 2001;
-http://www.grc.nasa.gov/www/cgns/sids/index.html
+Version 3.1.3, April 2011;
+http://www.grc.nasa.gov/www/cgns/CGNS\_docs\_current/sids/index.html
 %%%
 
 %%%
 \bibitem{CGNS1}
 CGNS Project Group,
-``The CFD General Notation System Advanced Data Format (ADF) User's Guide,''
+``The CFD General Notation System CGIO User's Guide,''
 April 2001;
-http://www.grc.nasa.gov/www/cgns/adf/index.html
+http://www.grc.nasa.gov/www/cgns/CGNS\_docs\_current/cgio/index.html
 %%%
 
 %%%
 \bibitem{CGNS2}
 CGNS Project Group,
-``The CFD General Notation System SIDS-to-ADF File Mapping Manual,''
-Version 1.2 revision 8, February 2001;
-http://www.grc.nasa.gov/www/cgns/filemap/index.html
+``The CFD General Notation System SIDS File Mapping Manual,''
+Version 3.1.2, April 2011;
+http://www.grc.nasa.gov/www/cgns/CGNS\_docs\_current/filemap/index.html
 %%%
 
 %%%
@@ -3910,7 +3904,7 @@ AIAA Paper 98-3007, June 1998.
 CGNS Project Group,
 ``The CFD General Notation System Mid-Level Library,''
 July 2001;
-http://www.grc.nasa.gov/www/cgns/midlevel/index.html
+http://www.grc.nasa.gov/www/cgns/CGNS\_docs\_current/midlevel/index.html
 %%%
 
 %%%
