@@ -32,8 +32,8 @@ version number.
 
 Physically, this version number is located directly under the root node
 of the file.
-The \textit{SIDS File Mapping
-Manual} defines this location more precisely.
+The \textit{SIDS File Mapping Manual}
+defines this location more precisely.
 
 Historically, the version number was used to describe the version of the
 Mid-Level Library used to write or modify the file.
@@ -278,7 +278,7 @@ For unstructured zones, the element connectivity may also be recorded.
 
     List( RigidGridMotion_t RigidGridMotion1 ... RigidGridMotionN ) ;       (o)
 
-    List( ArbitraryGridMotion_t
+    List( ArbitraryGridMotion_t<IndexDimension, VertexSize, CellSize>
           ArbitraryGridMotion1 ... ArbitraryGridMotionN ) ;                 (o)
 
     FamilyName_t FamilyName ;                                               (o)
@@ -292,7 +292,10 @@ For unstructured zones, the element connectivity may also be recorded.
     List( IntegralData_t IntegralData1 ... IntegralDataN ) ;                (o)
 
     List( ZoneGridConnectivity_t<IndexDimension, CellDimension>
-       ZoneGridConnectivity1 ... ZoneGridConnectivityN ;                    (o)
+          ZoneGridConnectivity1 ... ZoneGridConnectivityN ;                 (o)
+
+    List( ZoneSubRegion_t<IndexDimension, VertexSize, CellSize>
+          ZoneSubRegion1 ... ZoneSubRegion ) ;                              (o)
 
     ZoneBC_t<CellDimension, IndexDimension, PhysicalDimension> ZoneBC ;     (o)
 
@@ -415,6 +418,9 @@ reference-state data and convergence history information, is contained
 in the list of |IntegralData_t| structures.
 It is envisioned that these structures will be seldom used in practice
 but are provided nonetheless.
+
+The \fort{ZoneSubRegion\_t} node allows flowfield or other information
+to be specified over a subset of the entire zone. 
 
 For unstructured zones only, the node-based \fort{DataArray\_t}
 vectors (\fort{GridLocation = Vertex}) in \fort{FlowSolution\_t} or
