@@ -366,11 +366,13 @@ call cg\_axisym\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor
       (\textcolor{input}{\textit{Input}})
 \item [\texttt{ReferencePoint}]
       Origin used for defining the axis of rotation.
+      (In Fortran, this is an array of Real*4 values.)
       (\textcolor{input}{Input} for \texttt{cg\_axisym\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_axisym\_read})
 \item [\texttt{AxisVector}]
       Direction cosines of the axis of rotation, through the reference
       point.
+      (In Fortran, this is an array of Real*4 values.)
       (\textcolor{input}{Input} for \texttt{cg\_axisym\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_axisym\_read})
 \item [\texttt{ier}]
@@ -404,10 +406,12 @@ call cg\_rotating\_read\_f(\textcolor{output}{\textit{RotationRateVector}}, \tex
 \item [\texttt{RotationRateVector}]
       Components of the angular velocity of the grid about the center
       of rotation.
+      (In Fortran, this is an array of Real*4 values.)
       (\textcolor{input}{Input} for \texttt{cg\_rotating\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_rotating\_read})
 \item [\texttt{RotationCenter}]
       Coordinates of the center of rotation.
+      (In Fortran, this is an array of Real*4 values.)
       (\textcolor{input}{Input} for \texttt{cg\_rotating\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_rotating\_read})
 \item [\texttt{ier}]

@@ -77,7 +77,9 @@ call cg\_gravity\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolo
       Base index number, where $1 \leq \text{\texttt{B}} \leq \text{\texttt{nbases}}$.
       (\textcolor{input}{\textit{Input}})
 \item [\texttt{GravityVector}]
-      Description of the convergence information recorded in the data arrays.
+      Components of the gravity vector.
+      The number of components must equal \texttt{PhysicalDimension}.
+      (In Fortran, this is an array of Real*4 values.)
       (\textcolor{input}{Input} for \texttt{cg\_gravity\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_gravity\_read})
 \item [\texttt{ier}]

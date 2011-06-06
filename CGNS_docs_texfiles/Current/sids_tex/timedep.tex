@@ -257,6 +257,8 @@ OriginLocation
    & $\L$ \\
 RigidRotationAngle
    & Rotation angles about each axis of the translated coordinate system.
+     If rotating about more than one axis, the rotation is performed first
+     about the x-axis, then the y-axis, then the z-axis.
      If not specified, \fort{RigidRotationAngle} is set to zero.
    & $\A$ \\
 RigidVelocity

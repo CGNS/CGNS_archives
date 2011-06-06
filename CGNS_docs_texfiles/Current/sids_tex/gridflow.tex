@@ -967,7 +967,6 @@ with grid vertices (i.e., |GridLocation| |=| |Vertex|).
 All data within a given instance of |FlowSolution_t| must reside at the
 same grid location.
 
-\begin{changes}
 For structured grids, the value of |GridLocation| alone specifies the location
 and indexing of the flow solution data.  Vertices are explicity indexed.  Cell
 centers and face centers are indexed using the minimum of the connecting vertex
@@ -1006,7 +1005,6 @@ the fields \texttt{PointRange/List} may also be used to (redundantly) index
 vertex and cell-centered data.  In all cases, indexing of flow solution data
 corresponds to the element numbering as defined in the \texttt{Elements\_t} data
 structures.
-\end{changes}
 
 \texttt{Rind} is an optional field that indicates
 the number of rind planes (for structured grids) or rind points or
@@ -1034,7 +1032,6 @@ user-defined data to be stored in \fort{Descriptor\_t} and
 \fort{DataArray\_t} children without the restrictions or implicit
 meanings imposed on these node types at other node locations.
 
-\begin{changes}
 \subsubsection*{FUNCTION \texttt{ListLength[]}:}
 
 \noindent return value: |int| \\
@@ -1050,7 +1047,6 @@ the number of points (inclusive) between the beginning and ending indices of
 situation, \fort{ListLength} becomes a user input along with the indices of the
 list \fort{PointList}. By ``user'' we mean the application code that is
 generating the CGNS database.
-\end{changes}
 
 %\noindent {\bf FUNCTION} |DataSize[]|:
 \subsubsection*{FUNCTION \texttt{DataSize[]}:}
@@ -1066,13 +1062,11 @@ it will be the same as |VertexSize| or |CellSize| depending on
 |GridLocation|.
 The definition of the function |DataSize[]| is as follows:
 \begin{alltt}
-\begin{changes}
   if (PointRange/PointList is present) then
     \{
     DataSize[] = ListLength[] ;
     \}
-\end{changes}
-  \begin{changes}else\end{changes} if (Rind is absent) then
+  else if (Rind is absent) then
     \{
     if (GridLocation = Vertex) or (GridLocation is absent)
       \{
@@ -1303,20 +1297,23 @@ one may wish to store additional data on surfaces. In this case, the
 
 \texttt{PointRange/List} refer to vertices, edges, faces or cell centers,
 depending on the values of \texttt{RegionCellDimension} and \texttt{GridLocation}.
-Note that it is the dimensionality of the subregion (i.e. \texttt{RegionCellDimension}),
-rather than the dimensionality of the zone in which it is embedded
-(i.e. \texttt{CellDimension} of the zone), that determines the types of elements
+Note that it is both the dimensionality of the zone (\texttt{CellDimension})
+as well as the dimensionality of the subregion (\texttt{RegionCellDimension}),
+that determines the types of elements
 permissible in \texttt{PointRange/List}. The following table shows these relations.
 
 \begin{center}
-\begin{tabular}{||c|c|c|c|c||}
+\begin{tabular}{||c|c|c|c|c|c||}
  \hline
-\texttt{CellDimension} & \multicolumn{4}{c||}{\texttt{GridLocation}} \\
-& \texttt{Vertex} & \texttt{EdgeCenter} & \texttt{*FaceCenter} & \texttt{CellCenter} \\
+\texttt{CellDimension} & {RegionCellDimension} & \multicolumn{4}{c||}{\texttt{GridLocation}} \\
+& & \texttt{Vertex} & \texttt{EdgeCenter} & \texttt{*FaceCenter} & \texttt{CellCenter} \\
  \hline
-1 & vertices & $-$ & $-$ & cells (line elements) \\
-2 & vertices & edges & $-$ & cells (area elements) \\
-3 & vertices & edges & faces & cells (volume elements) \\
+1 & 1 & vertices & $-$ & $-$ & cells (line elements) \\ \hline
+2 & 1 & vertices & edges & $-$ & $-$ \\
+2 & 2 & vertices & edges & $-$ & cells (area elements) \\ \hline
+3 & 1 & vertices & edges & $-$ & $-$ \\
+3 & 2 & vertices & edges & faces & $-$ \\
+3 & 3 & vertices & edges & faces & cells (volume elements) \\
  \hline
 \end{tabular}
 \end{center}

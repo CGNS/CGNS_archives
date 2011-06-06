@@ -364,6 +364,7 @@ call cg\_1to1\_average\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \te
       interfaces.
       (\texttt{phys\_dim} is the number of coordinates required to define
       a vector in the field.)
+      (In Fortran, this is an array of Real*4 values.)
       (\textcolor{input}{Input} for \texttt{cg\_conn\_periodic\_write},
       \texttt{cg\_1to1\_periodic\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_conn\_periodic\_read},
@@ -371,6 +372,9 @@ call cg\_1to1\_average\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \te
 \item [\texttt{RotationAngle}]
       An array of size \texttt{phys\_dim} defining the rotation angle from
       the current interface to the connecting interface.
+      If rotating about more than one axis, the rotation is performed
+      first about the x-axis, then the y-axis, then the z-axis.
+      (In Fortran, this is an array of Real*4 values.)
       (\textcolor{input}{Input} for \texttt{cg\_conn\_periodic\_write},
       \texttt{cg\_1to1\_periodic\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_conn\_periodic\_read},
@@ -378,6 +382,7 @@ call cg\_1to1\_average\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \te
 \item [\texttt{Translation}]
       An array of size \texttt{phys\_dim} defining the translation from
       the current interface to the connecting interface.
+      (In Fortran, this is an array of Real*4 values.)
       (\textcolor{input}{Input} for \texttt{cg\_conn\_periodic\_write},
       \texttt{cg\_1to1\_periodic\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_conn\_periodic\_read},
