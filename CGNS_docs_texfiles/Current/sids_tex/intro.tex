@@ -304,8 +304,35 @@ No changes were made to the data structures for Version 2.5.
 The following changes were made for Version 3.1
 
 \begin{itemize}
+\item Added a \texttt{PYRA\_13} element in the description of the unstructured grid 
+      element numbering conventions for pyramid elements
+      (\autoref{s:unstructgrid_3d}).
+\item Modified the description of the \texttt{Elements\_t} structure to incorporate 
+      the new definition of the \texttt{NGON\_n} element type, and add the 
+      \texttt{NFACE\_n} element type. Also added examples illustrating their use, 
+      including for polyhedral elements
+      (\autoref{s:Elements}).
 \item References to \texttt{Null} were changed to \texttt{xxxxNull}, and references to 
-\texttt{UserDefined} were changed to \texttt{xxxxUserDefined}, as appropriate. 
-Also made sure that the \texttt{xxxxNull} is listed first, and the 
-\texttt{xxxxUserDefined} is listed second.
+      \texttt{UserDefined} were changed to \texttt{xxxxUserDefined}, as appropriate. 
+      Also made sure that the \texttt{xxxxNull} is listed first, and the 
+      \texttt{xxxxUserDefined} is listed second.
+\item Added section Model Type Structure Definition
+      (\autoref{s:ModelType}).
+\item Added \texttt{ZoneSubRegion\_t} (CPEX 0030) (\autoref{s:ZoneSubRegion}). 
+      Made changes associated with CPEX 
+      0031: (1) added CellDimension to several places in \texttt{Zone\_t}, (2) added 
+      new ParentElements and ParentElementsPosition in \texttt{Elements\_t}, 
+      (3) added CellDimension and revamped usage of PointList and PointRange in 
+      \texttt{FlowSolution\_t}, (4) added CellDimension to several places in 
+      \texttt{ZoneBC\_t}, (5) added CellDimension and revamped usage of PointList 
+      and PointRange in \texttt{BC\_t}, (6) changes in \texttt{BCDataSet\_t}, 
+      (7) added CellDimension and revamped usage of PointList and PointRange in 
+      \texttt{DiscreteData\_t}, (8) changes in \texttt{FamilyBC\_t}, (9) creation 
+      of new \texttt{FamilyBCDataSet\_t}, (10) changes in Zone Grid Connectivities, 
+      and (11) and addition of \texttt{ZoneGridConnectivityPointers} and 
+      \texttt{ZoneSubRegionPointers} in \texttt{ZoneIterativeData\_t}. 
+\item Added clarity that if rotating about more than 1 axis, then it is done in a 
+      particular order in \texttt{Periodic\_t} and in Data-Name Identifiers for 
+      Rigid Grid Motion. 
+      (\autoref{t:id_rigidgrid})
 \end{itemize}
