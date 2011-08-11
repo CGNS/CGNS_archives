@@ -315,6 +315,12 @@ call cg\_npe\_f(\textcolor{input}{type}, \textcolor{output}{\textit{npe}}, \text
       (\textcolor{output}{\textit{Output}})
 \end{Ventryi}
 
+It is important to note that each element under a given \texttt{Zone\_t} -- including
+all cells, faces, edges, boundary elements, etc. -- must have a unique element index
+number. The numbering should be consecutive (i.e., no gaps).
+This global numbering system insures that each and every element
+within a zone is uniquely identified by its number.
+
 If the specified \texttt{Elements\_t} node doesn't yet exist,
 it may be created using either \texttt{cg\_sec\-tion\_write} or
 \texttt{cg\_section\_partial\_write}.
