@@ -28,6 +28,9 @@ call cg\_get\_file\_type\_f(\textcolor{input}{fn}, \textcolor{output}{\textit{fi
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{follow\_links}}\raggedright
 \item [\texttt{filename}]
       Name of the CGNS file, including path name if necessary.
@@ -145,6 +148,9 @@ call cg\_add\_path\_f(\textcolor{input}{path}, \textcolor{output}{\textit{ier}})
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{option}}\raggedright
 \item [\texttt{option}]

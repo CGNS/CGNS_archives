@@ -20,6 +20,9 @@ call cg\_state\_read\_f(\textcolor{output}{\textit{StateDescription}}, \textcolo
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode. 
+See ``64-bit Fortran Portability and Issues" section.) 
+
 \begin{Ventryi}{\texttt{StateDescription}}\raggedright
 \item [\texttt{StateDescription}]
       Text description of reference state.
@@ -69,6 +72,9 @@ call cg\_gravity\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolo
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{GravityVector}}\raggedright
 \item [\texttt{fn}]
       CGNS file index number.
@@ -103,6 +109,9 @@ call cg\_convergence\_read\_f(\textcolor{output}{\textit{niterations}}, \textcol
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{NormDefinitions}}\raggedright
 \item [\texttt{niterations}]
@@ -156,6 +165,9 @@ call cg\_integral\_read\_f(\textcolor{input}{Index}, \textcolor{output}{\textit{
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{nintegrals}}\raggedright
 \item [\texttt{Name}]
       Name of the \texttt{IntegralData\_t} data structure.
@@ -190,6 +202,9 @@ call cg\_user\_data\_read\_f(\textcolor{input}{Index}, \textcolor{output}{\texti
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{nintegrals}}\raggedright
 \item [\texttt{nuserdata}]
@@ -232,6 +247,8 @@ E.g.,
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 \begin{Ventryi}{\texttt{nintegrals}}\raggedright
 \item [\texttt{data}]
       Data allocated by the Mid-Level Library.

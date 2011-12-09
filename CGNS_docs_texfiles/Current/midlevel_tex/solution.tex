@@ -36,6 +36,9 @@ call cg\_sol\_size\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{in
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{ptset\_type}}\raggedright
 \item [\texttt{fn}]
       CGNS file index number.
@@ -161,6 +164,9 @@ call cg\_field\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{solution\_array}}\raggedright
 \item [\texttt{fn}]
       CGNS file index number.
@@ -280,6 +286,9 @@ call cg\_discrete\_size\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcol
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{DiscreteName}}\raggedright
 \item [\texttt{fn}]
       CGNS file index number.
@@ -395,6 +404,9 @@ call cg\_subreg\_gcname\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{ptset\_type}}\raggedright
 \item [\texttt{fn}]

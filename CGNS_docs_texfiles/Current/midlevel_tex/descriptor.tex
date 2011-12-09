@@ -22,6 +22,9 @@ call cg\_descriptor\_read\_f(\textcolor{input}{D}, \textcolor{output}{\textit{na
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{ndescriptors}}\raggedright
 \item [\texttt{ndescriptors}]
       Number of \texttt{Descriptor\_t} nodes under the current node.
@@ -68,6 +71,9 @@ call cg\_ordinal\_read\_f(\textcolor{output}{\textit{Ordinal}}, \textcolor{outpu
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{Ordinal}}\raggedright
 \item [\texttt{Ordinal}]

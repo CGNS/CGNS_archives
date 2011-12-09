@@ -33,6 +33,9 @@ call cg\_equationset\_elecmagn\_read\_f(\textcolor{output}{\textit{ElecFldModelF
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{ThermalConductModelFlag}}\raggedright
 \item [\texttt{EquationDimension}]
       Dimensionality of the governing equations; it is the number of
@@ -123,6 +126,9 @@ call cg\_diffusion\_read\_f(\textcolor{output}{\textit{diffusion\_model}}, \text
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{diffusion\_model}}\raggedright
 \item [\texttt{EquationsType}]
       Type of governing equations.
@@ -171,6 +177,9 @@ call cg\_model\_read\_f(\textcolor{input}{ModelLabel}, \textcolor{output}{\texti
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{ModelLabel}}\raggedright
 \item [\texttt{ModelLabel}]

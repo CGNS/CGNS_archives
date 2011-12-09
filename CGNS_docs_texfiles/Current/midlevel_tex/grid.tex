@@ -33,6 +33,9 @@ call cg\_grid\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{i
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{Output}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{GridCoordinateName}}\raggedright
 \item [\texttt{fn}]
       CGNS file index number.
@@ -89,6 +92,9 @@ call cg\_coord\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{coord\_array}}\raggedright
 \item [\texttt{fn}]
@@ -236,6 +242,9 @@ call cg\_npe\_f(\textcolor{input}{type}, \textcolor{output}{\textit{npe}}, \text
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{ElementSectionName}}\raggedright
 \item [\texttt{fn}]
       CGNS file index number.
@@ -363,6 +372,9 @@ call cg\_axisym\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{ReferencePoint}}\raggedright
 \item [\texttt{fn}]
       CGNS file index number.
@@ -407,6 +419,9 @@ call cg\_rotating\_read\_f(\textcolor{output}{\textit{RotationRateVector}}, \tex
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{RotationRateVector}}\raggedright
 \item [\texttt{RotationRateVector}]

@@ -21,6 +21,9 @@ call cg\_gopath\_f(\textcolor{input}{fn}, \textcolor{input}{path}, \textcolor{ou
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{depth}}\raggedright
 \item [\texttt{fn}]
       CGNS file index number.
@@ -196,6 +199,8 @@ call cg\_delete\_node\_f(\textcolor{input}{NodeName}, \textcolor{output}{\textit
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{NodeName}}\raggedright
 \item [\texttt{NodeName}]

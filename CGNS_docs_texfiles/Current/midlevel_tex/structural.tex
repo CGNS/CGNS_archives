@@ -25,6 +25,9 @@ call cg\_cell\_dim\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{ou
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{basename}}\raggedright
 \item [\texttt{fn}]
       CGNS file index number.
@@ -80,6 +83,9 @@ call cg\_index\_dim\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{i
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{index\_dim}}\raggedright
 \item [\texttt{fn}]
@@ -178,6 +184,9 @@ call cg\_simulation\_type\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, 
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{SimulationType}}\raggedright
 \item [\texttt{fn}]

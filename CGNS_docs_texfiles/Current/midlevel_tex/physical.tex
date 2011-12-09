@@ -29,6 +29,9 @@ call cg\_array\_read\_as\_f(\textcolor{input}{A}, \textcolor{input}{DataType}, \
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{DimensionVector}}\raggedright
 \item [\texttt{narrays}]
       Number of \texttt{DataArray\_t} nodes under the current node.
@@ -83,6 +86,9 @@ call cg\_dataclass\_read\_f(\textcolor{output}{\textit{dataclass}}, \textcolor{o
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{dataclass}}\raggedright
 \item [\texttt{dataclass}]
       Data class for the nodes at this level.
@@ -130,6 +136,9 @@ call cg\_conversion\_read\_f(\textcolor{output}{\textit{ConversionFactors}}, \te
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{ConversionOffset}}\raggedright
 \item [\texttt{DataType}]
@@ -195,6 +204,9 @@ call cg\_unitsfull\_read\_f(\textcolor{output}{\textit{mass}}, \textcolor{output
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{temperature}}\raggedright
 \item [\texttt{mass}]
@@ -304,6 +316,9 @@ call cg\_expfull\_read\_f(\textcolor{output}{\textit{exponents}}, \textcolor{out
 
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
 
 \begin{Ventryi}{\texttt{exponents}}\raggedright
 \item [\texttt{DataType}]

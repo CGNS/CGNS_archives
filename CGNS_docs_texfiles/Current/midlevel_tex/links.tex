@@ -16,6 +16,9 @@ call cg\_link\_read\_f(\textcolor{output}{\textit{filename}}, \textcolor{output}
 \noindent
 \textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
 
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
 \begin{Ventryi}{\texttt{name\_in\_file}}\raggedright
 \item [\texttt{nodename}]
       Name of the link node to create, e.g., \texttt{GridCoordinates}.
