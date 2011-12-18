@@ -43,7 +43,7 @@ Left 1
 Box 18 9
    \textbf{Name:} DataArray\# or user defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DataArray\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Data-Type:} \fort{I4}, \fort{R4}, \fort{R8}, or \fort{C1}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{I4}, \fort{I8}, \fort{R4}, \fort{R8}, or \fort{C1}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimensions:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimension Values:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:} Data quantity\rule[-0.5ex]{0pt}{1ex}

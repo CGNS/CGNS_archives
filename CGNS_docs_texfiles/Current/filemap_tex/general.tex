@@ -229,7 +229,11 @@ this data to a ``C'' application.
 \subsubsection{The Dimension Values}
 
 The Dimension Values are a list of integers expressing the actual sizes
-of the stored array in each of the dimensions specified.
+of the stored array in each of the dimensions specified. With the
+introduction of 64-bit capability with CGNS Version 3.1.3, these
+dimensions are stored internally as 64-bit integers, regardless of the
+compilation mode (32 or 64-bit mode). They are returned to the
+application, however, as \ital{cgsize\_t}.
 
 In the case of rectangular
 arrays of physical data, the dimension values are set to the actual
@@ -241,7 +245,7 @@ it may have been extracted.
 
 In the case of list data, the dimension value is the length of the
 list. Lists of characters may contain termination bytes such as
-``\texttt{\\\\n}''; this means an entire document can be
+``\texttt{\\\\\\n}''; this means an entire document can be
 stored in the data field.
 
 \subsubsection{The Data}

@@ -18,6 +18,17 @@ as children.
 Also within the parent's box are references to the figures corresponding
 to its parents in turn.
 
+\bold{Note:} In some of the figures the data type is specified as
+\ital{cgsize\_t}. This data type has been introduced
+with the advent of CGNS library version 3.1.3, and is the natural size
+of a word for a given compilation of the library. For a 32-bit compilation,
+\ital{cgsize\_t} will be a 32-bit integer (\fort{I4}),
+and for a 64-bit compilation it will be a 64-bit integer (\fort{I8}).
+Regardless of how the file is written, the data is returned to an
+application as \ital{cgsize\_t}. When reading \fort{I8}
+values in a 32-bit application, an error will be generated if the size
+of the data exceeds the 32-bit integer limitation.
+
 \renewcommand{\topfraction}{1.00}
 \renewcommand{\bottomfraction}{1.00}
 \renewcommand{\textfraction}{0.0}
@@ -358,8 +369,9 @@ to its parents in turn.
 \clearpage
 \begin{figure}[!htp]
 \centering
-\resizebox{!}{\textheight-2\baselineskip}{\input{figures/GridConnectivity1to1.pic}}
+%\resizebox{!}{\textheight-2\baselineskip}{\input{figures/GridConnectivity1to1.pic}}
 %\input{figures/GridConnectivity1to1.pic}
+\resizebox{\linewidth}{!}{\input{figures/GridConnectivity1to1.pic}}
 \caption{\fort{GridConnectivity1to1\_t} Data Structure}
 \label{f:GridConnectivity1to1}
 \end{figure}

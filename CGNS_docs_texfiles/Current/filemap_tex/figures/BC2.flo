@@ -41,7 +41,7 @@ SetTrack none
 Down 6
 Left 10
 Right
-Text 20 8
+Text 20 11
    \textit{Notes:}
    
    \textbullet ~~The nodes \fort{PointRange} and \fort{PointList} provide
@@ -49,6 +49,9 @@ Text 20 8
    \hspace*{\indbullet}Only one of them may be used.
    \textbullet ~~\fort{InwardNormalIndex} is only meaningful for
    \hspace*{\indbullet}structured zones.
+   \textbullet ~~\ital{cgsize\_t} is determined by the application from which
+   \hspace*{\indbullet}the node is written. For a 32-bit application \ital{cgsize\_t}
+   \hspace*{\indbullet}will be \fort{I4}, and \fort{I8} for a 64-bit application.
 ToTag
 Down 7.5
 SetTrack line

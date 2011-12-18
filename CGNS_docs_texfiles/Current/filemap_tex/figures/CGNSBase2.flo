@@ -50,6 +50,16 @@ Box 18 6
    \textbf{Data-Type:} \fort{MT}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
    \textbf{Child Nodes:} \autoref{f:Gravity}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Down 6
+Left 10
+Right
+Text 20 5
+   \textit{Notes:}
+   
+   \textbullet ~~\ital{cgsize\_t} is determined by the application from which
+   \hspace*{\indbullet}the node is written. For a 32-bit application \ital{cgsize\_t}
+   \hspace*{\indbullet}will be \fort{I4}, and \fort{I8} for a 64-bit application.
 ToTag
 Down 6
 Right 1

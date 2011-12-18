@@ -394,7 +394,7 @@ the node is found; that is, they are structure parameters.
 For example, the SIDS specify that the Data Type of \fort{DataArray\_t}
 is a structure parameter, ``\fort{DataType}'', which may assume
 any of the values ``\fort{I\textit{n}}'', ``\fort{R\textit{n}}'',
-``\fort{C\textit{n}}'', or ``\fort{bit}''.
+or ``\fort{C\textit{n}}''.
 
 The other two attributes of \fort{DataArray\_t}, \fort{Dimensions}
 and \fort{DataSize}, also depend on the context where they are being used.
@@ -440,8 +440,13 @@ and only if} it is one of the SIDS-defined quantities.
 
 Integer array nodes perform the same function as nodes of type
 \fort{DataArray\_t}, but store integer instead of real arrays. They are
-always of type \fort{int[]}, with the dimensions and values given either
+always of type \fort{int[]} or \ital{cgsize\_t}\fort{[]},
+with the dimensions and values given either
 explicitly in the appropriate fields, or as parameters or functions.
+The \ital{cgsize\_t} data type is used wherever
+there is the potential of exceeding the size limit for a
+32-bit integer (\fort{I4}), such as \fort{PointList},
+\fort{PointRange}, and \fort{ElementRange}.
 
 \textit{\uline{Node Attributes}}
 \begin{Ventryic}{\textbf{Dimension Values:}}
@@ -452,7 +457,7 @@ explicitly in the appropriate fields, or as parameters or functions.
       \fort{int}, \fort{int[IndexDimension]}, \fort{int[2*IndexDimension]},
       or \fort{int[1 + ... + IndexDimension]}
 \item [\textbf{DataType:}]
-      \fort{I4}
+      \fort{I4} or \ital{cgsize\_t}
 \item [\textbf{Dimension:}]
       1
 \item [\textbf{Dimension Values:}]
@@ -566,7 +571,7 @@ for overset grids.
 \item [\textbf{Label:}]
       \fort{IndexRange\_t}
 \item [\textbf{DataType:}]
-      \fort{I4}
+      \ital{cgsize\_t}
 \item [\textbf{Dimension:}]
       2
 \item [\textbf{Dimension Values:}]
@@ -597,7 +602,7 @@ to \fort{IndexRange\_t}.
 \item [\textbf{Label:}]
       \fort{IndexArray\_t}
 \item [\textbf{DataType:}]
-      \fort{I4}, or (for \fort{InwardNormalList}) \fort{R4} or \fort{R8}
+      \ital{cgsize\_t}, or (for \fort{InwardNormalList}) \fort{R4} or \fort{R8}
 \item [\textbf{Dimension:}]
       2
 \item [\textbf{Dimension Values:}]
@@ -2334,7 +2339,7 @@ conditions, and a variety of auxiliary data.
 \item [\textbf{Label:}]
       \fort{Zone\_t}
 \item [\textbf{DataType:}]
-      \fort{I4}
+      \ital{cgsize\_t}
 \item [\textbf{Dimension:}]
       2
 \item [\textbf{Dimension Values:}]

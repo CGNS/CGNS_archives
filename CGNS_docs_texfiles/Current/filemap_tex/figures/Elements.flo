@@ -9,7 +9,7 @@ Left 1
 Box 18 8
    \textbf{Name:} \fort{ElementRange}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{IndexRange\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Data-Type:} \fort{I4}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \ital{cgsize\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimension Values:} 2\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:} Begin, end\rule[-0.5ex]{0pt}{1ex}
@@ -22,7 +22,7 @@ Left 1
 Box 18 9
    \textbf{Name:} \fort{ParentElements}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DataArray\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Data-Type:} \fort{I4}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \ital{cgsize\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimensions:} 2\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimension Values:} \fort{ElementSize},2\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:}    \fort{Parent1[ElementSize]},\rule[-0.5ex]{0pt}{1ex}
@@ -46,6 +46,16 @@ Box 18 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{UserDefinedData\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{See:} \autoref{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Down 4
+Left 10
+Right
+Text 18 5
+   \textit{Notes:}
+   
+   \textbullet ~~\ital{cgsize\_t} is determined by the application from which
+   \hspace*{\indbullet}the node is written. For a 32-bit application \ital{cgsize\_t}
+   \hspace*{\indbullet}will be \fort{I4}, and \fort{I8} for a 64-bit application.
 ToTag
 Down 7
 SetTrack line
@@ -53,7 +63,7 @@ Right 1
 Box 18 10
    \textbf{Name:} \fort{ElementConnectivity}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DataArray\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Data-Type:} \fort{I4}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \ital{cgsize\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimension Values:} \fort{ElementDataSize}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:} Element connectivity table\rule[-0.5ex]{0pt}{1ex}
@@ -68,7 +78,7 @@ Right 1
 Box 18 9
    \textbf{Name:} \fort{ParentElementsPosition}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{DataArray\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Data-Type:} \fort{I4}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \ital{cgsize\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimensions:} 2\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimension Values:} \fort{ElementSize},2\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:}    \fort{SideOfParent1[ElementSize]},\rule[-0.5ex]{0pt}{1ex}

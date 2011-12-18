@@ -18,6 +18,15 @@ SetTrack line
 Down 5
 Right 3
 Box 20 4
+   \textbf{Name:} \fort{PointRange}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{IndexRange\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See:} \autoref{f:GridConnectivity}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 4
+SetTrack line
+Down 5
+Right 3
+Box 20 4
    \textbf{Name:} \fort{PointList}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{IndexArray\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{See:} \autoref{f:GridConnectivity}\rule[-0.5ex]{0pt}{1ex}
@@ -33,21 +42,7 @@ Box 20 4
 SetTrack none
 Left 4
 SetTrack line
-Down 7.5
-Right 3
-Box 20 9
-   \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Label:} \fort{IndexRange\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Data-Type:} \fort{I4}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Dimensions:} 2\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Dimension Values:} \fort{IndexDimension},2\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Data:} \fort{Begin[]}, \fort{End[]}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Cardinality:} 0,$N$\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Parameters:} \fort{IndexDimension}\rule[-0.5ex]{0pt}{1ex}
-SetTrack none
-Left 4
-SetTrack line
-Down 7.5
+Down 5
 Right 3
 Box 20 4
    \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}

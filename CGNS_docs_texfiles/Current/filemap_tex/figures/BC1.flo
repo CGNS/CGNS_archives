@@ -9,7 +9,7 @@ Left 1
 Box 18 11
    \textbf{Name:} \fort{PointList}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{IndexArray\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Data-Type:} \fort{I4}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \ital{cgsize\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimensions:} 2\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimension Values:} \fort{IndexDimension},\rule[-0.5ex]{0pt}{1ex}
    \hspace*{\indDimensionValues}\fort{ListLength[]}\rule[-0.5ex]{0pt}{1ex}
@@ -56,7 +56,7 @@ Right 1
 Box 18 9
    \textbf{Name:} \fort{PointRange}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Label:} \fort{IndexRange\_t}\rule[-0.5ex]{0pt}{1ex}
-   \textbf{Data-Type:} \fort{I4}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \ital{cgsize\_t}\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimensions:} 2\rule[-0.5ex]{0pt}{1ex}
    \textbf{Dimension Values:} \fort{IndexDimension},2\rule[-0.5ex]{0pt}{1ex}
    \textbf{Data:} \fort{Begin[]}, \fort{End[]}\rule[-0.5ex]{0pt}{1ex}

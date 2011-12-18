@@ -1,4 +1,5 @@
 #! /bin/sh
 
 echo "flow $1.flo > $1.pic"
+#../../../flow/flow $1.flo > $1.pic
 flow $1.flo > $1.pic
