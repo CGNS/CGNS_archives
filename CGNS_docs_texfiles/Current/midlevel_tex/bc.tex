@@ -20,7 +20,7 @@
 \textcolor{output}{\textit{ier}} = cg\_nbocos(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{int *nbocos}}); & r - m \\
 \textcolor{output}{\textit{ier}} = cg\_boco\_info(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{char *boconame}}, & r - m \\
 ~~~~~~\textcolor{output}{\textit{BCType\_t *bocotype}}, \textcolor{output}{\textit{PointSetType\_t *ptset\_type}}, \textcolor{output}{\textit{cgsize\_t *npnts}}, & \\
-~~~~~~\textcolor{output}{\textit{int *NormalIndex}}, \textcolor{output}{\textit{cgsize\_t *NormalListFlag}}, & \\
+~~~~~~\textcolor{output}{\textit{int *NormalIndex}}, \textcolor{output}{\textit{cgsize\_t *NormalListSize}}, & \\
 ~~~~~~\textcolor{output}{\textit{DataType\_t *NormalDataType}}, \textcolor{output}{\textit{int *ndataset}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_boco\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int BC}, \textcolor{output}{\textit{cgsize\_t *pnts}}, & r - m \\
 ~~~~~~\textcolor{output}{\textit{void *NormalList}}); & \\
@@ -34,7 +34,7 @@ call cg\_boco\_normal\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \te
 call cg\_boco\_gridlocation\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{input}{location}, \textcolor{output}{\textit{ier}}); & - w m \\
 call cg\_nbocos\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{nbocos}}, \textcolor{output}{\textit{ier}}) & r - m \\
 call cg\_boco\_info\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{output}{\textit{boconame}}, \textcolor{output}{\textit{bocotype}}, \textcolor{output}{\textit{ptset\_type}}, & r - m \\
-~~~~~\textcolor{output}{\textit{npnts}}, \textcolor{output}{\textit{NormalIndex}}, \textcolor{output}{\textit{NormalListFlag}}, \textcolor{output}{\textit{NormalDataType}}, \textcolor{output}{\textit{ndataset}}, & \\
+~~~~~\textcolor{output}{\textit{npnts}}, \textcolor{output}{\textit{NormalIndex}}, \textcolor{output}{\textit{NormalListSize}}, \textcolor{output}{\textit{NormalDataType}}, \textcolor{output}{\textit{ndataset}}, & \\
 ~~~~~\textcolor{output}{\textit{ier}}) & \\
 call cg\_boco\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{output}{\textit{pnts}}, \textcolor{output}{\textit{NormalList}}, \textcolor{output}{\textit{ier}}) & r - m \\
 call cg\_boco\_gridlocation\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{BC}, \textcolor{output}{\textit{location}}, \textcolor{output}{\textit{ier}}); & r - m \\
@@ -122,18 +122,17 @@ See ``64-bit Fortran Portability and Issues" section.)
       (\textcolor{input}{Input} for \texttt{cg\_boco\_normal\_write};
       \textcolor{output}{\textit{output}} for \texttt{cg\_boco\_info})
 \item [\texttt{NormalListFlag}]
-      For \texttt{cg\_boco\_normal\_write}, \texttt{NormalListFlag} is a
-      flag indicating if the normals are defined in \texttt{NormalList};
-      1 if they are defined, 0 if they're not.
-
-      For \texttt{cg\_boco\_info}, if the normals are defined in
-      \texttt{NormalList}, \texttt{NormalListFlag} is the number of points
+      Flag indicating if the normals are defined in \texttt{NormalList}
+      and are to be written out; 1 if they are defined, 0 if they're not.
+      (\textcolor{input}{Input})
+\item [\texttt{NormalListSize}]
+      If the normals are defined in
+      \texttt{NormalList}, \texttt{NormalListSize} is the number of points
       in the patch times \texttt{phys\_dim}, the number of coordinates
       required to define a vector in the field.
       If the normals are not defined in \texttt{NormalList},
-      \texttt{NormalListFlag} is 0.
-      (\textcolor{input}{Input} for \texttt{cg\_boco\_normal\_write};
-      \textcolor{output}{\textit{output}} for \texttt{cg\_boco\_info})
+      \texttt{NormalListSize} is 0.
+      (\textcolor{output}{\textit{Output}})
 \item [\texttt{NormalDataType}]
       Data type used in the definition of the normals.
       Admissible data types for the normals are \texttt{RealSingle} and
