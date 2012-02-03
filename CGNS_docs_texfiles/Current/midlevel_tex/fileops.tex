@@ -15,7 +15,6 @@
 \textcolor{output}{\textit{ier}} = cg\_set\_file\_type(\textcolor{input}{int file\_type});                           & r w m \\
 \textcolor{output}{\textit{ier}} = cg\_get\_file\_type(\textcolor{input}{int fn}, \textcolor{output}{\textit{int *file\_type}});                           & r w m \\
 \hline
-\hline
 call cg\_open\_f(\textcolor{input}{filename}, \textcolor{input}{mode}, \textcolor{output}{\textit{fn}}, \textcolor{output}{\textit{ier}})          & r w m \\
 call cg\_version\_f(\textcolor{input}{fn}, \textcolor{output}{\textit{version}}, \textcolor{output}{\textit{ier}})              & r w m \\
 call cg\_close\_f(\textcolor{input}{fn}, \textcolor{output}{\textit{ier}})                         & r w m \\
@@ -139,7 +138,6 @@ of a 2.5 compatible CGNS file.
 \textcolor{output}{\textit{ier}} = cg\_set\_path(\textcolor{input}{const char *path}); & r w m \\
 \textcolor{output}{\textit{ier}} = cg\_add\_path(\textcolor{input}{const char *path}); & r w m \\
 \hline
-\hline
 call cg\_set\_compress\_f(\textcolor{input}{compress}, \textcolor{output}{\textit{ier}})          & r w m \\
 call cg\_get\_compress\_f(\textcolor{output}{\textit{compress}}, \textcolor{output}{\textit{ier}})          & r w m \\
 call cg\_set\_path\_f(\textcolor{input}{path}, \textcolor{output}{\textit{ier}})          & r w m \\
@@ -232,4 +230,42 @@ There is no Fortran counterpart to function \texttt{cg\_configure} or
 for linked files. The links need to be either absolute or relative
 pathnames. As a result, it is recommended that the search path options
 not be used as they may be removed in future versions.
+
+\subsection{Interfacing with CGIO}
+\label{s:cgiointer}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_get\_cgio(\textcolor{input}{int fn}, \textcolor{output}{\textit{int *cgio\_num}}); & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_root\_id(\textcolor{input}{int fn}, \textcolor{output}{\textit{double *rootid}}); & r w m \\
+\hline
+call cg\_get\_cgio\_f(\textcolor{input}{fn}, \textcolor{output}{\textit{cgio\_num}}, \textcolor{output}{\textit{ier}}) & r w m \\
+call cg\_root\_id\_f(\textcolor{input}{fn}, \textcolor{output}{\textit{rootid}}, \textcolor{output}{\textit{ier}}) & r w m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\noindent (Note that for Fortran calls, all integer arguments are integer*4 in 32-bit mode and integer*8 in 64-bit mode.
+See ``64-bit Fortran Portability and Issues" section.)
+
+\begin{Ventryi}{\texttt{cgio\_num}}\raggedright
+\item [\texttt{fn}]
+      CGNS file index number.
+      (\textcolor{input}{\textit{Input}})
+\item [\texttt{cgio\_num}]
+      CGIO indentifier for the CGNS file.
+      (\textcolor{output}{\textit{Output}})
+\item [\texttt{rootid}]
+      Root node identifier for the CGNS file.
+      (\textcolor{output}{\textit{Output}})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+These allow for the use of the low-level CGIO functions in conjunction
+with the Mid Level Library. The function \texttt{cg\_get\_cgio} returns
+the CGIO database identifier for the specified CGNS file,
+which is used in the CGIO routines. The root node identifier for the
+CGNS file is returned by \texttt{cg\_root\_id}. 
 

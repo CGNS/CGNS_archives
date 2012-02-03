@@ -16,7 +16,7 @@
 ~~~~~~\textcolor{output}{\textit{GridLocation\_t *location}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_sol\_ptset\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{char *solname}, & - w m \\
 ~~~~~~\textcolor{input}{GridLocation\_t location}, \textcolor{input}{PointSetType\_t ptset\_type}, & \\
-~~~~~~\textcolor{input}{cgsize\_t npnts}, \textcolor{input}{cgsize\_t *pnts}, \textcolor{output}{\textit{int *S}}); & \\
+~~~~~~\textcolor{input}{cgsize\_t npnts}, \textcolor{input}{const cgsize\_t *pnts}, \textcolor{output}{\textit{int *S}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_sol\_ptset\_info(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int S}, & r - m \\
 ~~~~~~\textcolor{output}{\textit{PointSetType\_t *ptset\_type}}, \textcolor{output}{\textit{cgsize\_t *npnts}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_sol\_ptset\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int S}, \textcolor{output}{\textit{cgsize\_t *pnts}}); & r - m \\
@@ -265,7 +265,7 @@ indices for the returned array values will be wrong.
 ~~~~~~\textcolor{output}{\textit{char *DiscreteName}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_discrete\_ptset\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{char *DiscreteName}, & - w m \\
 ~~~~~~\textcolor{input}{GridLocation\_t location}, \textcolor{input}{PointSetType\_t ptset\_type}, & \\
-~~~~~~\textcolor{input}{cgsize\_t npnts}, \textcolor{input}{cgsize\_t *pnts}, \textcolor{output}{\textit{int *D}}); & \\
+~~~~~~\textcolor{input}{cgsize\_t npnts}, \textcolor{input}{const cgsize\_t *pnts}, \textcolor{output}{\textit{int *D}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_discrete\_ptset\_info(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int D}, & r - m \\
 ~~~~~~\textcolor{output}{\textit{PointSetType\_t *ptset\_type}}, \textcolor{output}{\textit{cgsize\_t *npnts}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_discrete\_ptset\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int D}, & r - m \\
@@ -382,7 +382,7 @@ To read and write the discrete data, use
 \textcolor{output}{\textit{ier}} = cg\_subreg\_ptset\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{const char *regname}, & - w m \\
 ~~~~~~\textcolor{input}{int dimension}, \textcolor{input}{GridLocation\_t location}, & \\
 ~~~~~~\textcolor{input}{PointSetType\_t ptset\_type}, \textcolor{input}{cgsize\_t npnts}, & \\
-~~~~~~\textcolor{input}{cgsize\_t *pnts}, \textcolor{output}{\textit{int *S}}); & \\
+~~~~~~\textcolor{input}{const cgsize\_t *pnts}, \textcolor{output}{\textit{int *S}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_subreg\_bcname\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{const char *regname}, & - w m \\
 ~~~~~~\textcolor{input}{int dimension}, \textcolor{input}{const char *bcname}, \textcolor{output}{\textit{int *S}}); & \\
 \textcolor{output}{\textit{ier}} = cg\_subreg\_gcname\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{const char *regname}, & - w m \\
