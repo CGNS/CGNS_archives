@@ -10,7 +10,7 @@
 \textcolor{output}{\textit{ier}} = cg\_gorel(\textcolor{input}{int fn}, ..., \textcolor{input}{"end"}); & r w m \\
 \textcolor{output}{\textit{ier}} = cg\_gopath(\textcolor{input}{int fn}, \textcolor{input}{const char *path}); & r w m \\
 \textcolor{output}{\textit{ier}} = cg\_golist(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int depth}, \textcolor{input}{char **label}, \textcolor{input}{int *index}); & r w m \\
-\textcolor{output}{\textit{ier}} = cg\_gowhere(\textcolor{input}{int *fn}, \textcolor{input}{int *B}, \textcolor{output}{\textit{int *depth}}, \textcolor{output}{\textit{char **label}}, & r w m \\
+\textcolor{output}{\textit{ier}} = cg\_where(\textcolor{output}{\textit{int *fn}}, \textcolor{output}{\textit{int *B}}, \textcolor{output}{\textit{int *depth}}, \textcolor{output}{\textit{char **label}}, & r w m \\
 ~~~~~~~~~~~~~~~~~\textcolor{output}{\textit{int *index}}); & \\
 \hline
 call cg\_goto\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{output}{\textit{ier}}, ..., \textcolor{input}{'end'}) & r w m \\
@@ -27,10 +27,10 @@ See ``64-bit Fortran Portability and Issues" section.)
 \begin{Ventryi}{\texttt{depth}}\raggedright
 \item [\texttt{fn}]
       CGNS file index number.
-      (\textcolor{input}{Input})
+      (\textcolor{input}{Input} except for \texttt{cg\_where})
 \item [\texttt{B}]
       Base index number, where $1 \leq \text{\texttt{B}} \leq \text{\texttt{nbases}}$.
-      (\textcolor{input}{Input})
+      (\textcolor{input}{Input} except for \texttt{cg\_where})
 \item [\texttt{...}]
       Variable argument list used to specify the path to a node.
       It is composed of an unlimited list of pair-arguments
@@ -87,7 +87,7 @@ See ``64-bit Fortran Portability and Issues" section.)
       The maximum depth is defined in \textit{cgnslib.h} by
       \texttt{CG\_MAX\_GOTO\_DEPTH}, and is currently equal to 20.
       (\textcolor{input}{Input} for \texttt{cg\_golist};
-      \textcolor{output}{\textit{output}} for \texttt{cg\_gowhere})
+      \textcolor{output}{\textit{output}} for \texttt{cg\_where})
 \item [\texttt{label}]
       Array of node labels for the path.
       This argument may be passed as \texttt{NULL} to
@@ -98,7 +98,7 @@ See ``64-bit Fortran Portability and Issues" section.)
       \texttt{index} set to \texttt{NULL} in order to get the current
       depth, then dimension to that value.
       (\textcolor{input}{Input} for \texttt{cg\_golist};
-      \textcolor{output}{\textit{output}} for \texttt{cg\_gowhere})
+      \textcolor{output}{\textit{output}} for \texttt{cg\_where})
 \item [\texttt{index}]
       Array of node indices for the path.
       This argument may be passed as \texttt{NULL} to
@@ -109,7 +109,7 @@ See ``64-bit Fortran Portability and Issues" section.)
       \texttt{index} set to \texttt{NULL} in order to get the current
       depth, then dimension to that value.
       (\textcolor{input}{Input} for \texttt{cg\_golist};
-      \textcolor{output}{\textit{output}} for \texttt{cg\_gowhere})
+      \textcolor{output}{\textit{output}} for \texttt{cg\_where})
 \item [\texttt{ier}]
       Error status.
       The possible values, with the corresponding C names (or Fortran
