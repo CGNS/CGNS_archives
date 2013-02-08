@@ -296,11 +296,7 @@ BC surface patch.
       \fort{InwardNormalList}, \fort{Ordinal}, \fort{PointList},
       \fort{PointRange} or \fort{ReferenceState}.
 \item \fort{GridLocation} is optional; if absent its default value is \fort{Vertex}.
-     For 2-D grids (\fort{CellDimension} = 2), \fort{GridLocation} may take
-     the additional value of \fort{EdgeCenter}.
-     For 3-D grids (\fort{CellDimension} = 3), \fort{GridLocation} may take
-     the additional values of \fort{EdgeCenter}, \fort{FaceCenter},
-     \fort{IFaceCenter}, \fort{JFaceCenter}, or \fort{KFaceCenter}.
+      For other allowble values, see the table below. 
 \item One of \fort{PointRange} or \fort{PointList} must be specified but not
      both. They must define a face subrange of the zone.
 \item \fort{InwardNormalIndex} is only an option for structured grids.
@@ -324,13 +320,11 @@ BC surface patch.
 
 |BCType| specifies the boundary-condition type, which gives general
 information on the boundary-condition equations to be enforced.
-|BCType_t| is defined in \autoref{s:BCType} along with the meanings of
-all the |BCType| values.
 
-The BC patch may be specified by \fort{PointRange} or
-\fort{ElementRange} if it constitutes a logically rectangular region.
-In all other cases, \fort{PointList} or \fort{ElementList} should be
-used to list the vertices or cell faces making up the BC patch.  When
+The BC patch may be specified by \fort{PointRange}
+if it constitutes a logically rectangular region.
+In all other cases, \fort{PointList} should be
+used to list the vertices or cell edges/faces making up the BC patch.  When
 \fort{GridLocation} is set to \fort{Vertex}, then \fort{PointList} or
 \fort{PointRange} refer to vertex indices, for both structured and unstructured
 grids.  When \fort{GridLocation} is set to \fort{EdgeCenter}, then \fort{PointRange/List}
@@ -340,19 +334,19 @@ to face elements.  The interpretation of \fort{PointRange/List} is summarized
 in the table below:
 
 \begin{center}
-\begin{tabular}{||c|c|c|c||}
+\begin{tabular}{||c|c|c|c|c||}
  \hline
-\texttt{CellDimension} & \multicolumn{3}{c||}{\texttt{GridLocation}} \\
-& \texttt{Vertex} & \texttt{EdgeCenter} & \texttt{*FaceCenter} \\
+\texttt{CellDimension} & \multicolumn{4}{c||}{\texttt{GridLocation}} \\
+& \texttt{Vertex} & \texttt{EdgeCenter} & \texttt{*FaceCenter} & \texttt{CellCenter} \\
  \hline
-1 & vertices & $-$ & $-$ \\
-2 & vertices & edges & $-$ \\
-3 & vertices & edges & faces \\
+1 & vertices & $-$ & $-$     & cells (line elements) \\
+2 & vertices & edges & $-$   & cells (area elements) \\
+3 & vertices & edges & faces & cells (volume elements) \\
  \hline
 \end{tabular}
 \end{center}
 
-In the table, \fort{*FaceCenter} stands for the possible types: \fort{FaceCenter},
+Note: In the table, \fort{*FaceCenter} stands for the possible types: \fort{FaceCenter},
 \fort{IFaceCenter}, \fort{JFaceCenter} or \fort{KFaceCenter}.
 
 For structured grids, face centers are indexed using the minimum of the
