@@ -138,7 +138,7 @@ Data-name identifiers are provided in
     
     DataClass\_t DataClass = Dimensional ;
 
-    DimensionalUnits\_t DimensionalUnits = 
+    DimensionalUnits\_t DimensionalUnits =
       \{\{
       MassUnits        = Kilogram ;
       LengthUnits      = Meter ;
@@ -792,6 +792,8 @@ node types at other node locations.
     DimensionalUnits\_t DimensionalUnits ;                                   (o)
 
     FamilyName\_t FamilyName ;                                               (o)
+
+    List( AdditionalFamilyName\_t AddFamilyName1 ... AddFamilyNameN ) ;      (o)
 
     List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
 
