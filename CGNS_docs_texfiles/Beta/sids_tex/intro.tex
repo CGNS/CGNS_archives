@@ -126,136 +126,66 @@ description of a structured-grid two-zone test case.
 \subsection{Major Differences from Previous CGNS Versions}
 \label{s:differences}
 The following items represent noteworthy alterations and additions to
-the SIDS starting with the August 1999 draft document.
-(Note that some of these changes --- notably those for unstructured
-zones, family, and geometry reference --- have existed previously in
-separate documents, but are now being merged officially into the SIDS;
-the data structures themselves are not ``new.'')
+the SIDS in reverse chronological order.
+References to CPEX in the following
+refer to CGNS Proposals for Extension.\footnote{CPEX descriptions can be found
+at http://cgns.sourceforge.net/Proposals.html; last accessed 7/26/2013.}
 
-\subsubsection{Version 2.0, Beta 1}
-The following changes were made for Version 2.0, Beta 1.
-
-\begin{itemize}
-\item The capability for recording unstructured zones has been 
-      added to the SIDS.
-      (These changes occur throughout the document, although some
-      specific items are listed below.)
-\item The values \texttt{UserDefined} and \texttt{Null} are now allowed for
-      all enumeration types (throughout document).
-\item The following nodes are now defined (some of these also
-      include additional new children sub-nodes): \texttt{Family\_t}
-      (\autoref{s:Family}), \texttt{Elements\_t} (\autoref{s:Elements}),
-      \texttt{ZoneType\_t} (\autoref{s:Zone}), \texttt{FamilyName\_t}
-      (\autoref{s:Zone}), \texttt{GeometryReference\_t}
-      (\autoref{s:GeometryReference}), \texttt{FamilyBC\_t}
-      (\autoref{s:FamilyBC}).
-\item Under \texttt{CGNSBase\_t}, the \texttt{IndexDimension} is no longer
-      recorded; it has been replaced by \texttt{CellDimension} and
-      \texttt{PhysicalDimension} (\autoref{s:CGNSBase}).
-\item Under \texttt{Zone\_t}, the optional parameter
-      \texttt{VertexSizeBoundary} has been added for unstructured zones
-      (\autoref{s:Zone}).
-\item The method for general connectivity (\texttt{GridConnectivity\_t}) 
-      has been altered.
-      It now requires the use of either (a) \texttt{PointListDonor} (an
-      integer, for \texttt{Abutting1to1} only) or (b) \texttt{CellListDonor}
-      (an integer) plus \texttt{InterpolantsDonor} (a real)
-      (\autoref{s:GridConnectivity}).
-\item The \texttt{GridLocation\_t} parameter has been moved up one level
-      (from \texttt{BCDataSet\_t} to \texttt{BC\_t}).
-      Thus, for example, if the boundary conditions are defined at
-      vertices (the default), then any associated dataset information
-      must also be specified at vertices (\autoref{s:BCdefn} and
-      \autoref{s:BCDataSet}).
-\item The data-name identifier \texttt{LengthReference}
-      has been added (\autoref{s:ReferenceState} and
-      \hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
-\item The $\nu_t$ parameter has been renamed
-      \texttt{ViscosityEddyKinematic}, and a new parameter
-      \texttt{ViscosityEddy}, representing $\mu_t$, has been defined
-      (\hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
-\end{itemize}
-
-\subsubsection{Version 2.0, Beta 2}
-The following changes were made for Version 2.0, Beta 2.
+\subsubsection{Version 3.2}
+The following changes were made for Version 3.2
 
 \begin{itemize}
-\item The following data structures related to time-dependent flow
-      have been added:
-      \texttt{BaseIterativeData\_t} (\autoref{s:BaseIterativeData}),
-      \texttt{ZoneIterativeData\_t} (\autoref{s:ZoneIterativeData}),
-      \texttt{RigidGridMotion\_t} (\autoref{s:RigidGridMotion}),
-      \texttt{ArbitraryGridMotion\_t} (\autoref{s:ArbitraryGridMotion}).
+\item Added AdditionalFamilyName\_t under BC\_t (\autoref{s:BCdefn}), 
+      Zone\_t (\autoref{s:Zone}), ZoneSubRegion\_t (\autoref{s:ZoneSubRegion}), 
+      and UserDefinedData\_t (\autoref{s:UserDefinedData}); and added
+      FamilyName\_t under Family\_t (\autoref{s:Family}) (a hierarchy of families 
+      is now possible); according to CPEX 0033 and 0034.
+\item Added new cubic elements in \autoref{s:unstructgrid}, according to CPEX 0036.
 \end{itemize}
 
-\subsubsection{Version 2.1, Beta 1}
-The following changes were made for Version 2.1, Beta 1.
+\subsubsection{Version 3.1}
+The following changes were made for Version 3.1
 
 \begin{itemize}
-\item A node type
-      \texttt{UserDefinedData\_t} (\autoref{s:UserDefinedData})
-      is added for the storage of arbitrary user defined data in
-      \texttt{Descriptor\_t} and \texttt{DataArray\_t} children without the
-      restrictions or implicit meanings imposed on these node types at
-      other node locations.
-\item Support for multi-species flows and chemistry has been added.
-      New gas models have been added to the \texttt{GasModelType\_t}
-      enumeration (\autoref{s:GasModel}), and
-      \texttt{ThermalRelaxationModel\_t} and \texttt{ChemicalKineticsModel\_t}
-      data structures have been added for describing the 
-      thermal relaxation and chemical kinetics models
-      (\autoref{s:ThermalRelaxationModel} and
-      \autoref{s:ChemicalKineticsModel}).
-      Additional flow solution data-name identifiers are included
-      (\hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
+\item Added a \texttt{PYRA\_13} element in the description of the unstructured grid
+      element numbering conventions for pyramid elements
+      (\autoref{s:unstructgrid_3d}).
+\item Modified the description of the \texttt{Elements\_t} structure to incorporate
+      the new definition of the \texttt{NGON\_n} element type, and add the
+      \texttt{NFACE\_n} element type. Also added examples illustrating their use,
+      including for polyhedral elements
+      (\autoref{s:Elements}).
+\item References to \texttt{Null} were changed to \texttt{xxxxNull}, and references to
+      \texttt{UserDefined} were changed to \texttt{xxxxUserDefined}, as appropriate.
+      Also made sure that the \texttt{xxxxNull} is listed first, and the
+      \texttt{xxxxUserDefined} is listed second.
+\item Added section Model Type Structure Definition
+      (\autoref{s:ModelType}).
+\item Added \texttt{ZoneSubRegion\_t} (CPEX 0030) (\autoref{s:ZoneSubRegion}).
+      Made changes associated with CPEX
+      0031: (1) added CellDimension to several places in \texttt{Zone\_t}, (2) added
+      new ParentElements and ParentElementsPosition in \texttt{Elements\_t},
+      (3) added CellDimension and revamped usage of PointList and PointRange in
+      \texttt{FlowSolution\_t}, (4) added CellDimension to several places in
+      \texttt{ZoneBC\_t}, (5) added CellDimension and revamped usage of PointList
+      and PointRange in \texttt{BC\_t}, (6) changes in \texttt{BCDataSet\_t},
+      (7) added CellDimension and revamped usage of PointList and PointRange in
+      \texttt{DiscreteData\_t}, (8) changes in \texttt{FamilyBC\_t}, (9) creation
+      of new \texttt{FamilyBCDataSet\_t}, (10) changes in Zone Grid Connectivities,
+      and (11) and addition of \texttt{ZoneGridConnectivityPointers} and
+      \texttt{ZoneSubRegionPointers} in \texttt{ZoneIterativeData\_t}.
+      A note regarding CPEX 0031:  The use of ElementList and ElementRange has been
+      deprecated in favor of PointList and PointRange, as described in CPEX 0031 and
+      in relevant sections of this document.
+\item Added clarity that if rotating about more than 1 axis, then it is done in a
+      particular order in \texttt{Periodic\_t} and in Data-Name Identifiers for
+      Rigid Grid Motion.
+      (\autoref{t:id_rigidgrid})
+\item Modified table in \autoref{s:BCdefn} to include CellCenter GridLocation.
 \end{itemize}
 
-\subsubsection{Version 2.2, Beta 1}
-The following changes were made for Version 2.2, Beta 1.
-
-\begin{itemize}
-\item \texttt{Axisymmetry\_t} and \texttt{RotatingCoordinates\_t} 
-      nodes have been added, allowing the recording of data relevant
-      to axisymmetric flows and rotating coordinates
-      (\autoref{s:Axisymmetry} and \autoref{s:RotatingCoordinates}).
-\item A \texttt{Gravity\_t} node has been added for storage of the
-      gravitational vector (\autoref{s:Gravity}).
-\item A \texttt{GridConnectivityProperty\_t} node has been added, allowing
-      the recording of special properties associated with particular
-      connectivity patches, such as periodic interfaces, or interfaces
-      where the data is to be averaged in some way prior to passing it
-      to a neighboring interface (\autoref{s:GridConnectivityProperty}).
-\item A \texttt{BCProperty\_t} node has been added, allowing the recording
-      of special properties associated with particular boundary
-      condition patches, such as wall function or bleed regions
-      (\autoref{s:BCProperty}).
-\item Additional flow solution data-name identifiers are included
-      for variables in rotating coordinate systems
-      (\hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
-\end{itemize}
-
-\subsubsection{Version 2.3}
-The following changes were made for Version 2.3.
-
-\begin{itemize}
-\item \texttt{ElementRange} and \texttt{ElementList} have been added to the
-      \texttt{BC\_t} data structure.
-      \texttt{ElementRange} or \texttt{ElementList} may now be used
-      to define a boundary condition patch by specifying face indices,
-      instead of using \texttt{PointRange} or \texttt{PointList} with
-      \texttt{GridLocation} set to \texttt{FaceCenter}.
-      The use of \texttt{PointRange} or \texttt{PointList} to define a
-      boundary condition patch hasn't changed.
-      They may be used to define a boundary condition patch by specifying
-      either vertex or face indices.
-
-      When \texttt{PointRange} or \texttt{PointList} is used, the choice
-      between vertex or face indices is determined by the value of
-      \texttt{GridLocation\_t}.
-      When \texttt{ElementRange} or \texttt{ElementList} is used,
-      \texttt{GridLocation\_t} is ignored.
-      (\autoref{s:BCdefn}).
-\end{itemize}
+\subsubsection{Version 2.5}
+No changes were made to the data structures for Version 2.5.
 
 \subsubsection{Version 2.4}
 The following changes were made for Version 2.4.
@@ -297,59 +227,127 @@ The following changes were made for Version 2.4.
       (\autoref{s:Rind}).
 \end{itemize}
 
-\subsubsection{Version 2.5}
-No changes were made to the data structures for Version 2.5.
-
-\subsubsection{Version 3.1}
-The following changes were made for Version 3.1
+\subsubsection{Version 2.3}
+The following changes were made for Version 2.3.
 
 \begin{itemize}
-\item Added a \texttt{PYRA\_13} element in the description of the unstructured grid 
-      element numbering conventions for pyramid elements
-      (\autoref{s:unstructgrid_3d}).
-\item Modified the description of the \texttt{Elements\_t} structure to incorporate 
-      the new definition of the \texttt{NGON\_n} element type, and add the 
-      \texttt{NFACE\_n} element type. Also added examples illustrating their use, 
-      including for polyhedral elements
-      (\autoref{s:Elements}).
-\item References to \texttt{Null} were changed to \texttt{xxxxNull}, and references to 
-      \texttt{UserDefined} were changed to \texttt{xxxxUserDefined}, as appropriate. 
-      Also made sure that the \texttt{xxxxNull} is listed first, and the 
-      \texttt{xxxxUserDefined} is listed second.
-\item Added section Model Type Structure Definition
-      (\autoref{s:ModelType}).
-\item Added \texttt{ZoneSubRegion\_t} (CPEX\footnote{CPEX descriptions can be found
-      at http://cgns.sourceforge.net/Proposals.html; last accessed 3/14/2013.}
-      0030) (\autoref{s:ZoneSubRegion}). 
-      Made changes associated with CPEX 
-      0031: (1) added CellDimension to several places in \texttt{Zone\_t}, (2) added 
-      new ParentElements and ParentElementsPosition in \texttt{Elements\_t}, 
-      (3) added CellDimension and revamped usage of PointList and PointRange in 
-      \texttt{FlowSolution\_t}, (4) added CellDimension to several places in 
-      \texttt{ZoneBC\_t}, (5) added CellDimension and revamped usage of PointList 
-      and PointRange in \texttt{BC\_t}, (6) changes in \texttt{BCDataSet\_t}, 
-      (7) added CellDimension and revamped usage of PointList and PointRange in 
-      \texttt{DiscreteData\_t}, (8) changes in \texttt{FamilyBC\_t}, (9) creation 
-      of new \texttt{FamilyBCDataSet\_t}, (10) changes in Zone Grid Connectivities, 
-      and (11) and addition of \texttt{ZoneGridConnectivityPointers} and 
-      \texttt{ZoneSubRegionPointers} in \texttt{ZoneIterativeData\_t}. 
-      A note regarding CPEX 0031:  The use of ElementList and ElementRange has been
-      deprecated in favor of PointList and PointRange, as described in CPEX 0031 and
-      in relevant sections of this document.
-\item Added clarity that if rotating about more than 1 axis, then it is done in a 
-      particular order in \texttt{Periodic\_t} and in Data-Name Identifiers for 
-      Rigid Grid Motion. 
-      (\autoref{t:id_rigidgrid})
-\item Modified table in \autoref{s:BCdefn} to include CellCenter GridLocation.
+\item \texttt{ElementRange} and \texttt{ElementList} have been added to the
+      \texttt{BC\_t} data structure.
+      \texttt{ElementRange} or \texttt{ElementList} may now be used
+      to define a boundary condition patch by specifying face indices,
+      instead of using \texttt{PointRange} or \texttt{PointList} with
+      \texttt{GridLocation} set to \texttt{FaceCenter}.
+      The use of \texttt{PointRange} or \texttt{PointList} to define a
+      boundary condition patch hasn't changed.
+      They may be used to define a boundary condition patch by specifying
+      either vertex or face indices.
+
+      When \texttt{PointRange} or \texttt{PointList} is used, the choice
+      between vertex or face indices is determined by the value of
+      \texttt{GridLocation\_t}.
+      When \texttt{ElementRange} or \texttt{ElementList} is used,
+      \texttt{GridLocation\_t} is ignored.
+      (\autoref{s:BCdefn}).
 \end{itemize}
 
-\subsubsection{Version 3.2}
-The following changes were made for Version 3.2
+\subsubsection{Version 2.2, Beta 1}
+The following changes were made for Version 2.2, Beta 1.
 
 \begin{itemize}
-\item Added AdditionalFamilyName\_t under BC\_t, Zone\_t, ZoneSubRegion\_t, and
-      UserDefinedData\_t; and added
-      FamilyName\_t under Family\_t (a hierarchy of families is now possible); according
-      to CPEX 0033 and 0034.
-\item Added new cubic elements in \autoref{s:unstructgrid}, according to CPEX 0036.
+\item \texttt{Axisymmetry\_t} and \texttt{RotatingCoordinates\_t}
+      nodes have been added, allowing the recording of data relevant
+      to axisymmetric flows and rotating coordinates
+      (\autoref{s:Axisymmetry} and \autoref{s:RotatingCoordinates}).
+\item A \texttt{Gravity\_t} node has been added for storage of the
+      gravitational vector (\autoref{s:Gravity}).
+\item A \texttt{GridConnectivityProperty\_t} node has been added, allowing
+      the recording of special properties associated with particular
+      connectivity patches, such as periodic interfaces, or interfaces
+      where the data is to be averaged in some way prior to passing it
+      to a neighboring interface (\autoref{s:GridConnectivityProperty}).
+\item A \texttt{BCProperty\_t} node has been added, allowing the recording
+      of special properties associated with particular boundary
+      condition patches, such as wall function or bleed regions
+      (\autoref{s:BCProperty}).
+\item Additional flow solution data-name identifiers are included
+      for variables in rotating coordinate systems
+      (\hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
+\end{itemize}
+
+\subsubsection{Version 2.1, Beta 1}
+The following changes were made for Version 2.1, Beta 1.
+
+\begin{itemize}
+\item A node type
+      \texttt{UserDefinedData\_t} (\autoref{s:UserDefinedData})
+      is added for the storage of arbitrary user defined data in
+      \texttt{Descriptor\_t} and \texttt{DataArray\_t} children without the
+      restrictions or implicit meanings imposed on these node types at
+      other node locations.
+\item Support for multi-species flows and chemistry has been added.
+      New gas models have been added to the \texttt{GasModelType\_t}
+      enumeration (\autoref{s:GasModel}), and
+      \texttt{ThermalRelaxationModel\_t} and \texttt{ChemicalKineticsModel\_t}
+      data structures have been added for describing the
+      thermal relaxation and chemical kinetics models
+      (\autoref{s:ThermalRelaxationModel} and
+      \autoref{s:ChemicalKineticsModel}).
+      Additional flow solution data-name identifiers are included
+      (\hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
+\end{itemize}
+
+\subsubsection{Version 2.0, Beta 2}
+The following changes were made for Version 2.0, Beta 2.
+
+\begin{itemize}
+\item The following data structures related to time-dependent flow
+      have been added:
+      \texttt{BaseIterativeData\_t} (\autoref{s:BaseIterativeData}),
+      \texttt{ZoneIterativeData\_t} (\autoref{s:ZoneIterativeData}),
+      \texttt{RigidGridMotion\_t} (\autoref{s:RigidGridMotion}),
+      \texttt{ArbitraryGridMotion\_t} (\autoref{s:ArbitraryGridMotion}).
+\end{itemize}
+
+\subsubsection{Version 2.0, Beta 1}
+The following changes were made for Version 2.0, Beta 1.
+
+\begin{itemize}
+\item The capability for recording unstructured zones has been
+      added to the SIDS.
+      (These changes occur throughout the document, although some
+      specific items are listed below.)
+\item The values \texttt{UserDefined} and \texttt{Null} are now allowed for
+      all enumeration types (throughout document).
+\item The following nodes are now defined (some of these also
+      include additional new children sub-nodes): \texttt{Family\_t}
+      (\autoref{s:Family}), \texttt{Elements\_t} (\autoref{s:Elements}),
+      \texttt{ZoneType\_t} (\autoref{s:Zone}), \texttt{FamilyName\_t}
+      (\autoref{s:Zone}), \texttt{GeometryReference\_t}
+      (\autoref{s:GeometryReference}), \texttt{FamilyBC\_t}
+      (\autoref{s:FamilyBC}).
+\item Under \texttt{CGNSBase\_t}, the \texttt{IndexDimension} is no longer
+      recorded; it has been replaced by \texttt{CellDimension} and
+      \texttt{PhysicalDimension} (\autoref{s:CGNSBase}).
+\item Under \texttt{Zone\_t}, the optional parameter
+      \texttt{VertexSizeBoundary} has been added for unstructured zones
+      (\autoref{s:Zone}).
+\item The method for general connectivity (\texttt{GridConnectivity\_t})
+      has been altered.
+      It now requires the use of either (a) \texttt{PointListDonor} (an
+      integer, for \texttt{Abutting1to1} only) or (b) \texttt{CellListDonor}
+      (an integer) plus \texttt{InterpolantsDonor} (a real)
+      (\autoref{s:GridConnectivity}).
+\item The \texttt{GridLocation\_t} parameter has been moved up one level
+      (from \texttt{BCDataSet\_t} to \texttt{BC\_t}).
+      Thus, for example, if the boundary conditions are defined at
+      vertices (the default), then any associated dataset information
+      must also be specified at vertices (\autoref{s:BCdefn} and
+      \autoref{s:BCDataSet}).
+\item The data-name identifier \texttt{LengthReference}
+      has been added (\autoref{s:ReferenceState} and
+      \hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
+\item The $\nu_t$ parameter has been renamed
+      \texttt{ViscosityEddyKinematic}, and a new parameter
+      \texttt{ViscosityEddy}, representing $\mu_t$, has been defined
+      (\hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
 \end{itemize}
