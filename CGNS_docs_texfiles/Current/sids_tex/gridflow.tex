@@ -145,7 +145,7 @@ normalization.
 \begin{example}{Cartesian Coordinates for a 2-D Structured Grid}
 \label{ex:grid1}
 
-Cartesian coordinates for a 2-D grid of size $17\times33$; the data
+This example uses Cartesian coordinates for a 2-D grid of size $17\times33$; the data
 arrays include only core vertices, and the coordinates are in units of feet.
 \begin{alltt}
   !  IndexDimension = 2
@@ -200,7 +200,7 @@ Note that FORTRAN multidimensional array indexing is used to store
 the data; this is reflected in the FORTRAN-like implied do-loops for
 |x(i,j)| and |y(i,j)|.
 
-Since the dimensional units for both $x$ and $y$ are the same, an
+Because the dimensional units for both $x$ and $y$ are the same, an
 alternate approach is to set the data class and system of units using
 |DataClass| and |DimensionalUnits| at the |GridCoordinates_t| level, and
 eliminate this information from each instance of |DataArray_t|.
@@ -240,9 +240,9 @@ level be used to retrieve the information.
 \begin{example}{Cylindrical Coordinates for a 3-D Structured Grid}
 \label{ex:grid2}
 
-Cylindrical coordinates for a 3-D grid whose core size is
-$17\times33\times9$.
-The grid contains a single plane of rind on the minimum and maximum $k$
+This example uses cylindrical coordinates for a 3-D grid whose core size is
+$17\times33\times9$;
+the grid contains a single plane of rind on the minimum and maximum $k$
 faces.
 The coordinates are nondimensional.
 \begin{alltt}
@@ -285,7 +285,7 @@ Note that the entities |CoordinateZ| and |CoordinateTheta| are abbreviated.
 \begin{example}{Cartesian Coordinates for a 3-D Unstructured Grid}
 \label{ex:grid3}
 
-Cartesian grid coordinates for a 3-D unstructured zone where
+This example uses Cartesian grid coordinates for a 3-D unstructured zone where
 \fort{VertexSize} is 15.
 \begin{alltt}
   GridCoordinates\_t<1, 15> GridCoordinates =
@@ -342,6 +342,7 @@ elements.
     \} ;
 \end{alltt}
 
+\clearpage
 \begin{notes}
 \item Default names for the \texttt{Descriptor\_t} and
       \texttt{UserDefinedData\_t} lists are as shown; users may choose
@@ -414,7 +415,10 @@ Consequently:
      TRI\_3, TRI\_6, QUAD\_4, QUAD\_8, QUAD\_9,
      TETRA\_4, TETRA\_10, PYRA\_5, PYRA\_14,
      PENTA\_6, PENTA\_15, PENTA\_18, HEXA\_8, HEXA\_20, HEXA\_27,
-     MIXED, PYRA\_13, NGON\_n, NFACE\_n );
+     MIXED, PYRA\_13, NGON\_n, NFACE\_n,
+     BAR\_4, TRI\_9, TRI\_10, QUAD\_12, QUAD\_16,
+     TETRA\_16, TETRA\_20, PYRA\_21, PYRA\_29, PYRA\_30,
+     PENTA\_24, PENTA\_38, PENTA\_40, HEXA\_32, HEXA\_56, HEXA\_64 );
 \end{alltt}
 \autoref{s:unstructgrid} illustrates the convention for element numbering.
 
@@ -470,7 +474,7 @@ used to define the polyhedral elements as a collection of these faces.
 Except for boundary faces, each face of a polyhedral element must be
 shared by another polyhedral element.
 
-I.e., for \texttt{NGON\_n}, the data array \texttt{ElementConnectivity}
+For example, for \texttt{NGON\_n}, the data array \texttt{ElementConnectivity}
 contains a list of nodes making up each face
 in the grid, with the first value for each face defining the number of
 nodes making up that face:
@@ -977,14 +981,17 @@ For unstructured grids, the value of |GridLocation| alone specifies location and
 indexing of flow solution data only for vertex and cell-centered data.  The
 reason for this is that element-based grid connectivity provided in the
 \texttt{Elements\_t} data structures explicitly indexes only vertices and cells.
-For data stored at alternate grid locations (e.g. edges), additional
+For data stored at alternate grid locations (e.g., edges), additional
 connectivity information is needed.  This is provided by the optional fields
 \texttt{PointRange} and \texttt{PointList}; these refer to
 vertices, edges, faces or cell centers, depending on the values of
-\texttt{CellDimension} and \texttt{GridLocation}.  The following table shows
+\texttt{CellDimension} and \texttt{GridLocation}.  \autoref{t:gridlocationusage1} shows
 these relations.
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption[GridLocation Usage]{\textbf{GridLocation Usage}}
+\label{t:gridlocationusage1}
 \begin{tabular}{||c|c|c|c|c||}
  \hline
 \texttt{CellDimension} & \multicolumn{4}{c||}{\texttt{GridLocation}} \\
@@ -995,7 +1002,7 @@ these relations.
 3 & vertices & edges & faces & cells (volume elements) \\
  \hline
 \end{tabular}
-\end{center}
+\end{table}
 
 In the table, \fort{*FaceCenter} stands for the possible types: \fort{FaceCenter},
 \fort{IFaceCenter}, \fort{JFaceCenter} or \fort{KFaceCenter}.
@@ -1252,6 +1259,8 @@ of the entire field.
 
     FamilyName\_t FamilyName ;                                               (o)
 
+    List( AdditionalFamilyName\_t AddFamilyName1 ... AddFamilyNameN ) ;      (o)
+
     DataClass\_t DataClass ;                                                 (o)
 
     DimensionalUnits\_t DimensionalUnits ;                                   (o)
@@ -1300,9 +1309,12 @@ depending on the values of \texttt{RegionCellDimension} and \texttt{GridLocation
 Note that it is both the dimensionality of the zone (\texttt{CellDimension})
 as well as the dimensionality of the subregion (\texttt{RegionCellDimension}),
 that determines the types of elements
-permissible in \texttt{PointRange/List}. The following table shows these relations.
+permissible in \texttt{PointRange/List}. \autoref{t:gridlocationusage2} shows these relations.
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption[GridLocation Usage with Zone Subregions]{\textbf{GridLocation Usage with Zone Subregions}}
+\label{t:gridlocationusage2}
 \begin{tabular}{||c|c|c|c|c|c||}
  \hline
 \texttt{CellDimension} & {RegionCellDimension} & \multicolumn{4}{c||}{\texttt{GridLocation}} \\
@@ -1316,7 +1328,7 @@ permissible in \texttt{PointRange/List}. The following table shows these relatio
 3 & 3 & vertices & edges & faces & cells (volume elements) \\
  \hline
 \end{tabular}
-\end{center}
+\end{table}
 
 In the table, \fort{*FaceCenter} stands for the possible types: \fort{FaceCenter},
 \fort{IFaceCenter}, \fort{JFaceCenter} or \fort{KFaceCenter}.

@@ -107,7 +107,7 @@ electromagnetics.
 the flow-equation set.
 For any data that is dimensional, \fort{DimensionalUnits} may be used to
 describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -327,7 +327,7 @@ described in \hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
 |DataClass| defines the default for the class of data contained in the
 thermodynamic gas model.  For any data that is dimensional,
 |DimensionalUnits| may be used to describe the system of dimensional units
-employed.  If present, these two entities take precedence of all
+employed.  If present, these two entities take precedence over all
 corresponding entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -432,7 +432,7 @@ database, they should be defined as \fort{DataArray}s under
 molecular viscosity model.
 For any data that is dimensional, |DimensionalUnits| may be used to
 describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -541,7 +541,7 @@ database, they should be defined as \fort{DataArray}s under
 thermal conductivity model.
 For any data that is dimensional, |DimensionalUnits| may be used to
 describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -646,7 +646,7 @@ database, they should be defined as \fort{DataArray}s under
 turbulence closure.
 For any data that is dimensional, |DimensionalUnits| may be used to
 describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -777,7 +777,7 @@ turbulence models.
 turbulence model equation set.
 For any data that is dimensional, \fort{DimensionalUnits} may be used to
 describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -786,6 +786,7 @@ user-defined data to be stored in \fort{Descriptor\_t} and
 \fort{DataArray\_t} children without the restrictions or implicit
 meanings imposed on these node types at other node locations.
 
+\clearpage
 \begin{example}{Spalart-Allmaras Turbulence Model}
 
 Description for the eddy-viscosity closure and Spalart-Allmaras
@@ -873,7 +874,7 @@ with the thermal relaxation model.
 \fort{DataClass} defines the default for the class of data being used.
 For any data that is dimensional, \fort{DimensionalUnits} may be used to
 describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -936,7 +937,7 @@ the type of chemical kinetics model.
 
 \fort{DataArray\_t} data structures may be used to store data associated
 with the chemical kinetics model.
-Recommended data-name identifiers are listed in the following table.
+Recommended data-name identifiers are listed in \autoref{t:id_chemicalkinetics}.
 
 \begin{table}[htbp]
 \centering
@@ -969,13 +970,13 @@ For example, \fort{H} represents hydrogen atoms, \fort{O} represents
 oxygen atoms, \fort{H2} represents hydrogen molecules, \fort{H2O}
 represents water molecules, and \fort{C3H5O3(NO2)3} represents
 nitroglycerin molecules.
-Any symbols off the periodic table of the elements can be used.
+Any symbols from the periodic table of the elements can be used.
 For charged molecules or particles, the word ``\fort{plus}'' or
 ``\fort{minus}'' should be spelled out in lower case.
 For example, a CNO$+$ molecule should be denoted as \fort{CNOplus}.  
 
-Other commonly used mixtures, that are usually not referred to by their
-chemical symbols, are defined in the following table.
+Other commonly used mixtures that are usually not referred to by their
+chemical symbols, are defined in \autoref{t:id_chemicalkineticssymbols}.
 Individual users may define new names, but these may not be recognized
 by other CGNS applications.
 For consistency, additional names should be proposed as SIDS extensions.
@@ -1004,7 +1005,7 @@ RP1     & RP1 rocket fuel
 \fort{DataClass} defines the default for the class of data being used.
 For any data that is dimensional, \fort{DimensionalUnits} may be used to
 describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy,
 following the standard precedence rules.
 
@@ -1020,7 +1021,7 @@ user-defined data to be stored in \fort{Descriptor\_t} and
 \fort{DataArray\_t} children without the restrictions or implicit
 meanings imposed on these node types at other node locations.
 
-\subsection{Electromagnetics Structure Definitions}
+\subsection{ Electromagnetics Structure Definitions}
 \label{s:EM}
 
 This section presents structure definitions for describing the electric
@@ -1081,7 +1082,7 @@ Recommended data-name identifiers are listed in \autoref{t:id_EM}.
 the electric field model.
 For any data that is dimensional, \fort{DimensionalUnits} may be used to
 describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy, following the standard
 precedence rules.
 
@@ -1143,7 +1144,7 @@ Recommended data-name identifiers are listed in \autoref{t:id_EM}.
 the electric field model.
 For any data that is dimensional, \fort{DimensionalUnits} may be used to
 describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy, following the standard
 precedence rules.
 
@@ -1238,7 +1239,7 @@ These are further described in
 the conductivity model.
 For any data that is dimensional, \fort{DimensionalUnits} may be used to
 describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy, following the standard
 precedence rules.
 
@@ -1247,7 +1248,7 @@ user-defined data to be stored in \fort{Descriptor\_t} and
 \fort{DataArray\_t} children without the restrictions or implicit
 meanings imposed on these node types at other node locations.
 
-\subsection{Flow Equation Examples}
+\subsection{ Flow Equation Examples}
 \label{s:flowexample}
 
 This section presents two examples of flow-equation sets.  The first is

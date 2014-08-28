@@ -93,7 +93,7 @@ data.  The function of these qualifiers is provided in the next section.
 This structure type is formulated to describe an array of scalars.
 Therefore, for vector quantities (e.g., the position vector or the velocity
 vector), separate structure entities are required for each component of the
-vector.  For example, the cartesian coordinates of a 3-D grid are described
+vector.  For example, the Cartesian coordinates of a 3-D grid are described
 by three separate |DataArray_t| entities: one for $x$, one for $y$ and one
 for $z$ (see \hyperref[ex:grid1]{Example~\ref*{ex:grid1}}).
 
@@ -161,7 +161,7 @@ These qualifiers are provided to specify the system of dimensional units
 and the dimensional exponents, respectively.
 For example, if the data is the $x$-component of velocity, then
 |DimensionalUnits| will state that the pertinent dimensional units are,
-say, |Meter| and |Second|; |DimensionalExponents| will specify the
+say, |Meter| and |Second|; |DimensionalExponents| will specify that the
 pertinent dimensional exponents are |LengthExponent| |=| |1| and
 |TimeExponent| |=| |-1|.
 Combining the information gives the units m/s.
@@ -254,8 +254,8 @@ $$
  \tilde{z} = z/L, & \tilde{w} = w/c_\infty, & \tilde{\mu} = \mu/\mu_\infty,
 \end{array}
 $$
-where $(x,y,z)$ are the cartesian coordinates, $(u,v,w)$ are the
-cartesian components of velocity, $\rho$ is static density, $p$ is
+where $(x,y,z)$ are the Cartesian coordinates, $(u,v,w)$ are the
+Cartesian components of velocity, $\rho$ is static density, $p$ is
 static pressure, $c$ is the static speed of sound, and $\mu$ is the
 molecular viscosity.
 In this example, tilde quantities $(\:\tilde{}\:)$ are nondimensional

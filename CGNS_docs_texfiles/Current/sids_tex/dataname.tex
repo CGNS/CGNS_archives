@@ -19,9 +19,8 @@ scalar quantities; this is consistent with the intended use of the
 quantities that are vectors, such as velocity, their components are
 listed.
 
-Included with the lists of standard data-name identifiers, the
-fundamental units of dimensions associated with that quantity are
-provided.
+Included with the lists of standard data-name identifiers are the
+fundamental units of dimensions associated with that quantity.
 The following notation is used for the fundamental units: $\M$ is mass,
 $\L$ is length, $\T$ is time, $\TH$ is temperature, $\A$ is angle, and
 $\I$ is electric current.
@@ -40,8 +39,13 @@ types, and the appropriate |DataType| structure parameter for
 \subsection{Coordinate Systems}
 \label{s:dataname_grid}
 
-Coordinate systems for identifying physical location are as follows:
-\begin{center}
+Coordinate systems for identifying physical location are shown in \autoref{t:coordsystems}.
+
+\renewcommand{\thetable}{\thesection.1}
+\begin{table}[htbp]
+\centering
+\caption[Coordinate Systems]{\textbf{Coordinate Systems}}
+\label{t:coordsystems}
 \begin{tabular}{l @{\qquad}c @{\qquad}c}
 \hline\hline \\*[-2ex]
 \bold{System} & \bold{3-D} & \bold{2-D}
@@ -53,7 +57,8 @@ Auxiliary   & $(\xi,\eta,\zeta)$ & $(\xi,\eta)$ or $(\xi,\zeta)$ or
                                    $(\eta,\zeta)$
 \\*[1ex] \hline\hline
 \end{tabular}
-\end{center}
+\end{table}
+
 Associated with these coordinate systems are the following unit vector 
 conventions:
 \begin{center}
@@ -65,14 +70,14 @@ $z$-direction & $\k$ & $\phi$-direction   & $\ephi$ & $\zeta$-direction & $\ezet
 \end{center}
 Note that $\er$, $\eth$ and $\ephi$ are functions of position.
 
-We envision that one of the ``standard'' coordinate systems (cartesian,
+We envision that one of the ``standard'' coordinate systems (Cartesian,
 cylindrical or spherical) will be used within a zone (or perhaps
 the entire database) to define grid coordinates and other related
 data.  The auxiliary coordinates will be used for special quantities,
 including forces and moments, which may not be defined in the same
 coordinate system as the rest of the data.  When auxiliary coordinates
 are used, a transformation must also be provided to uniquely define
-them.  For example, the transform from cartesian to orthogonal auxiliary
+them.  For example, the transform from Cartesian to orthogonal auxiliary
 coordinates is,
 $$
  \pmatrix{ \exi \cr \eeta \cr \ezeta } =
@@ -90,6 +95,7 @@ The data-name identifiers defined for coordinate systems are listed in
 All represent real \fort{DataType}s, except for \fort{ElementConnectivity}
 and \fort{ParentData}, which are integer.
 
+\renewcommand{\thetable}{\thesection.2}
 \begin{table}[htbp]
 \centering
 \caption[Data-Name Identifiers for Coordinate Systems]{\textbf{Data-Name Identifiers for Coordinate Systems}}
@@ -164,7 +170,7 @@ temperature only.
 
 The Navier-Stokes equations involve the strain tensor ($\bar{\bar{S}}$) and
 the shear-stress tensor ($\bar{\bar{\tau}}$).  Using indicial notation, the
-3-D cartesian components of the strain tensor are,
+3-D Cartesian components of the strain tensor are,
 $$
  \bar{\bar{S}}_{i,j} = \left( \pdf{u_i}{x_j} + \pdf{u_j}{x_i} \right),
 $$
@@ -240,6 +246,7 @@ See \autoref{s:ChemicalKineticsModel} for examples, and
 \autoref{t:id_chemicalkineticssymbols} on
 p.~\pageref*{t:id_chemicalkineticssymbols} for a list of defined names.
 
+\renewcommand{\thetable}{\thesection.3}
 \settowidth{\tmplengtha}{\fort{RotatingEnergyStagnationDensity}}
 \settowidth{\tmplengthb}{$\L^{3\gamma - 1}/(\M^{\gamma - 1} \T^2)$}
 \setlength{\LTleft}{0pt}
@@ -552,6 +559,7 @@ identify both the variable and the model (and version) that it comes
 from.
 The list in \autoref{t:id_turbulence} falls short in this respect.
 
+\renewcommand{\thetable}{\thesection.4}
 \begin{table}[htbp]
 \centering
 \caption[Data-Name Identifiers for Typical Turbulence Models]{\textbf{Data-Name Identifiers for Typical Turbulence Models}}
@@ -584,11 +592,11 @@ TurbulentSANuTilde       & Spalart-Allmaras one-equation model $\tilde{\nu}$ &
 CFD codes are rich in nondimensional governing parameters, such as
 Mach number and Reynolds number, and nondimensional flowfield coefficients,
 such as pressure coefficient.  The problem with these parameters is
-that their definitions and conditions that they are evaluated at can
+that the definitions and conditions at which they are evaluated can
 vary from code to code.  Reynolds number is particularly notorious in
 this respect.
 
-These parameters have posed us with a difficult dilemma.  Either we
+These parameters have posed a difficult dilemma for us.  Either we
 impose a rigid definition for each and force all database users to
 abide by it, or we develop some methodology for describing the
 particular definition that the user is employing.  The first limits
@@ -621,6 +629,7 @@ The data-name identifiers defined for nondimensional governing
 parameters and flowfield coefficients are listed in
 \autoref{t:id_nondimensional}.
 
+\renewcommand{\thetable}{\thesection.5}
 \settowidth{\tmplengtha}{\fort{Prandtl\_SpecificHeatPressure}}
 \settowidth{\tmplengthb}{$\M \L/(\T^3 \TH)$}
 \setlength{\LTleft}{0pt}
@@ -715,7 +724,12 @@ $$
  \qquad n = 1,2,\ldots 5,
 $$
 where the characteristics and corresponding characteristic variables are
-\begin{center}
+shown in \autoref{t:charvar}.
+\renewcommand{\thetable}{\thesection.6}
+\begin{table}[htbp]
+\centering
+\caption[Characteristic Variables]{\textbf{Characteristic Variables}}
+\label{t:charvar}
 \begin{tabular}{l >{\quad}c >{\quad}c}
 \hline\hline \\*[-2ex]
 \bold{Characteristic} & {\boldmath $\bar{\Lambda}_n$} & {\boldmath $W'_n$}
@@ -726,13 +740,14 @@ Vorticity & $\bar{u}$             & $w'$  \\
 Acoustic  & $\bar{u} \pm \bar{c}$ & $p' \pm u'/(\bar{\rho} \bar{c})$
 \\*[1ex] \hline\hline
 \end{tabular}
-\end{center}
+\end{table}
 Barred quantities are evaluated at the mean flow, and primed quantities
 are linearized perturbations.  The only non-zero mean-flow velocity
 component is $\bar{u}$.  The data-name identifiers defined for
 Riemann invariants and characteristic variables are listed in
 \autoref{t:id_chars}.
 
+\renewcommand{\thetable}{\thesection.7}
 \begin{table}[htbp]
 \centering
 \caption[Data-Name Identifiers for Characteristics and Riemann Invariants]{\textbf{Data-Name Identifiers for Characteristics and Riemann Invariants}}
@@ -824,6 +839,7 @@ and moments and their associated coefficients are listed in
 For coefficients, the dynamic pressure and length scales used in the
 normalization are provided.
 
+\renewcommand{\thetable}{\thesection.8}
 \setlength{\LTleft}{\fill}
 \setlength{\LTright}{\fill}
 \begin{longtable}{>{\ttfamily}l >{\quad}l >{\quad}c}
@@ -890,12 +906,13 @@ Coef\_Length          & $c_\refer$                     & $\L$
 
 Data-name identifiers related to time-dependent flow include those
 associated with the storage of grid coordinates and flow solutions
-as a function of time level or iteration.
+as a function of time level or iteration (see \autoref{t:id_timedep}).
 Also included are identifiers for storing information defining
 both rigid and arbitrary (i.e., deforming) grid motion.
 
 %\setlength{\LTleft}{\fill}
 %\setlength{\LTright}{\fill}
+\renewcommand{\thetable}{\thesection.9}
 \settowidth{\tmplengtha}{\fort{ArbitraryGridMotionPointers}}
 \settowidth{\tmplengthb}{\bold{Type}}
 \settowidth{\tmplengthc}{\bold{Units}}

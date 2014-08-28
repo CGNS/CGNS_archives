@@ -210,7 +210,7 @@ contained in the |ReferenceState| structure.  |DataClass| defines the
 zonal default for the class of data contained in the boundary conditions
 of a zone.  If the boundary conditions contain dimensional data,
 |DimensionalUnits| may be used to describe the system of dimensional
-units employed.  If present, these three entities take precedence of
+units employed.  If present, these three entities take precedence over
 all corresponding entities at higher levels of the hierarchy.  These
 precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -272,6 +272,8 @@ BC surface patch.
 
     FamilyName\_t FamilyName ;                                               (o)
 
+    List( AdditionalFamilyName\_t AddFamilyName1 ... AddFamilyNameN ) ;      (o)
+
     ReferenceState\_t ReferenceState ;                                       (o)
 
     DataClass\_t DataClass ;                                                 (o)
@@ -284,6 +286,7 @@ BC surface patch.
     \} ;
 \end{alltt}
 
+\clearpage
 \begin{notes}
 \item Default names for the \fort{Descriptor\_t}, \fort{BCDataSet\_t}, and
       \fort{UserDefinedData\_t}
@@ -331,9 +334,12 @@ grids.  When \fort{GridLocation} is set to \fort{EdgeCenter}, then \fort{PointRa
 refer to edge elements.  For 3--D grids, when \fort{GridLocation} is set to
 \fort{FaceCenter}, \fort{IFaceCenter}, etc., then \fort{PointRange/List} refer
 to face elements.  The interpretation of \fort{PointRange/List} is summarized
-in the table below:
+in \autoref{t:gridlocationusage3}.
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption[GridLocation Usage with BC Patches]{\textbf{GridLocation Usage with BC Patches}}
+\label{t:gridlocationusage3}
 \begin{tabular}{||c|c|c|c|c||}
  \hline
 \texttt{CellDimension} & \multicolumn{4}{c||}{\texttt{GridLocation}} \\
@@ -344,7 +350,7 @@ in the table below:
 3 & vertices & edges & faces & cells (volume elements) \\
  \hline
 \end{tabular}
-\end{center}
+\end{table}
 
 Note: In the table, \fort{*FaceCenter} stands for the possible types: \fort{FaceCenter},
 \fort{IFaceCenter}, \fort{JFaceCenter} or \fort{KFaceCenter}.
@@ -428,8 +434,8 @@ Boundary conditions may also be defined directly on families.
 In this case, the \fort{BCType} must be \fort{FamilySpecified}.
 If, under a \fort{BC\_t} structure, both \fort{FamilyName\_t} and
 \fort{BCType\_t} are present, and the \fort{BCType} is \emph{not}
-\fort{FamilySpecified}, then the \fort{BCType} which \emph{is} specified
-takes precedence over any \fort{BCType} which might be stored in a
+\fort{FamilySpecified}, then the \fort{BCType} that \emph{is} specified
+takes precedence over any \fort{BCType} that might be stored in a
 \fort{FamilyBC\_t} structure under the specified \fort{Family\_t}.
 
 Reference data applicable to the boundary conditions of a BC patch is
@@ -438,7 +444,7 @@ contained in the \fort{ReferenceState} structure.
 boundary conditions.
 If the boundary conditions contain dimensional data, |DimensionalUnits|
 may be used to describe the system of dimensional units employed.
-If present, these three entities take precedence of all corresponding
+If present, these three entities take precedence over all corresponding
 entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -566,7 +572,7 @@ specifying Dirichlet and Neumann data for boundary conditions is covered
 in \autoref{s:BC_specdata}.
 
 The substructures \fort{DirichletData} and \fort{NeumannData} contain
-boundary-condition data which may be constant over the BC patch or
+boundary-condition data that may be constant over the BC patch or
 defined locally at each vertex or edge/face of the patch.
 Locally defined data can be specified in one of two ways.
 If \fort{GridLocation}, \fort{PointRange} and \fort{PointList} are all absent,
@@ -575,7 +581,7 @@ parent \fort{BC\_t} structure.  In this case, the location of the locally define
 data is given by \fort{GridLocationParameter} and the length of the data arrays
 are given by \fort{ListLengthParameter}.  If \fort{GridLocation} and one of
 \fort{PointRange} or \fort{PointList} is present, then the same rules provided
-in Section~\autoref{s:BCdefn} apply.  In this case, the length of the data arrays
+in \autoref{s:BCdefn} apply.  In this case, the length of the data arrays
 is given by \fort{ListLength[]}.
 
 Reference quantities applicable to the set of boundary-condition data are
@@ -584,7 +590,7 @@ contained in the \fort{ReferenceState} structure.
 boundary-condition data.
 If the boundary conditions contain dimensional data, |DimensionalUnits|
 may be used to describe the system of dimensional units employed.
-If present, these three entities take precedence of all corresponding
+If present, these three entities take precedence over all corresponding
 entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -600,7 +606,7 @@ meanings imposed on these node types at other node locations.
 
 \fort{BCDataSet\_t} requires the structure function \fort{ListLength}, which is
 used to specify the length of locally defined Dirichlet and Neumann data arrays
-when the grid location of these quatities differs from that of the BC patch
+when the grid location of these quantities differs from that of the BC patch
 definition. The definition of \fort{ListLength} is identical to that provided in
 \fort{BC\_t} (\autoref{s:BCdefn}).
 
@@ -686,7 +692,7 @@ not cause any problems.
 boundary-condition data.
 If the boundary-condition data is dimensional, |DimensionalUnits| may be
 used to describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -832,7 +838,7 @@ $$
 where \textit{MFR} is the desired mass flow ratio and
 $A_{\it cap}$ is the capture area.
 Another interpretation is the far-upstream cross-sectional area of the
-stream tube which feeds the inlet.
+stream tube that feeds the inlet.
 Note that the capture area is usually defined with an outflow boundary
 condition, which is commonly used at an engine face.
 
@@ -1110,7 +1116,7 @@ data sets, described by the |BCDataSet_t| structure.  For simple
 boundary conditions, a single data set must be chosen from a list
 that may contain more than one element.  Likewise, for a compound
 boundary condition, a limited number of data sets must be chosen
-and applied appropriately.  The mechanism for proper choice of data
+and applied appropriately.  The mechanism for the proper choice of data
 sets is controlled by the |BCType| field of the |BC_t| structure,
 the |BCTypeSimple| field of the |BCDataSet_t| structure, and the
 boundary-condition type association table (\autoref{t:BCType_assoc}).
@@ -1378,7 +1384,7 @@ identifier.
 The various levels of BC implementation allowed are shown in
 \autoref{f:BCimplementations}, from the lowest level in which
 the application codes interpret the \fort{BCType}, to the fully
-SIDS-compliant BC implementation which completely defines the BC within
+SIDS-compliant BC implementation that completely defines the BC within
 the CGNS file.
 
 \setlength{\tmplength}{\unitlength}	% save existing unit length
@@ -1405,7 +1411,8 @@ boundary condition, and contain descriptive tags in each one to indicate
 if they are Dirichlet or Neumann data.  We have not taken this approach.
 We think grouping boundary-condition data by ``equation type'' as we have
 done better allows for future extension to other types of boundary
-conditions (e.g., 2nd-order non-reflecting BC's that result in P.D.E.'s
+conditions (e.g., 2nd-order non-reflecting BC's that result in
+partial differential equations
 to be solved at the boundary).
 
 \subsection{Boundary Condition Examples}  
@@ -1506,7 +1513,7 @@ defined in \hyperref[s:dataname]{Appendix~\ref*{s:dataname}} is the
 identifier for static temperature.
 The data contained in |Temperature| is a floating-point scalar with a
 value of 273.
-The qualifiers |DataClass| and |DimensionalUnits| specifies that the
+The qualifiers |DataClass| and |DimensionalUnits| specify that the
 temperature is dimensional with units of |Kelvin|.
 
 Since |BCWallViscousIsothermal| is a simple boundary-condition type,

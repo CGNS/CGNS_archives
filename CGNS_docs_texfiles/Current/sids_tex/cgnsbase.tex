@@ -22,9 +22,9 @@ This section concludes with a discussion of globally applicable data.
 CGNS is an evolving standard.
 Although great care is taken to make CGNS databases backward-compatible
 with previous versions whenever possible, new nodes and new features are
-still being added which make them non-forward-compatible.
+still being added that make them non-forward-compatible.
 To address this issue, each new version of the standard is labeled with
-a version number which should be written in the file.
+a version number that should be written in the file.
 This version number corresponds to the version of the SIDS and is an
 essential part of the file containing the CGNS database.
 The file can not be interpreted properly without knowledge of this
@@ -157,7 +157,7 @@ such as \fort{GridCoordinates\_t}, \fort{FlowSolution\_t},
 \fort{ZoneConnectivity} with an unstructured zone (mismatch or overset
 connectivity).
 When the cells are bidimensional, two interpolants per node are required,
-while when the cells are tridimensional, three interpolants per node must
+whereas when the cells are tridimensional, three interpolants per node must
 be provided.
 \fort{PhysicalDimension} becomes useful when expressing quantities
 such as the \fort{InwardNormalList} in the \fort{BC\_t} data structure.
@@ -283,6 +283,8 @@ For unstructured zones, the element connectivity may also be recorded.
 
     FamilyName_t FamilyName ;                                               (o)
 
+    List( AdditionalFamilyName\_t AddFamilyName1 ... AddFamilyNameN ) ;     (o)
+
     List( FlowSolution_t<CellDimension, IndexDimension, VertexSize, CellSize> 
           FlowSolution1 ... FlowSolutionN ) ;                               (o)
 
@@ -397,6 +399,8 @@ deforming) grid motion.
 
 \fort{FamilyName} identifies to which family a zone belongs.
 Families may be used to define material properties.
+Where multiple families are desired, \fort{AdditionalFamilyName} 
+nodes may be used to specify them. 
 
 Flow-solution quantities are contained in the list of |FlowSolution_t|
 structures.
@@ -531,7 +535,7 @@ structure, and if present in a given database, establish globally applicable
 information; these may also be considered to be global defaults.  Each of
 these four entities may also be defined within the |Zone_t| structure.  If
 present in a given instance of |Zone_t|, they supersede the global data and
-establish new defaults which apply only within that zone.
+establish new defaults that apply only within that zone.
 
 For example, if a different set of flow equations is solved within a
 given zone than is solved in the rest of the flowfield, then this can be

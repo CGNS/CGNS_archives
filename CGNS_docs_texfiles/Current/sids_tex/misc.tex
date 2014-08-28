@@ -49,7 +49,7 @@ Data-name identifiers associated with \fort{ReferenceState} are shown in
 
 \begin{table}[htbp]
 \centering
-\caption[Data-name Identifiers for Reference State]{\textbf{Data-name Identifiers for Reference State}}
+\caption[Data-Name Identifiers for Reference State]{\textbf{Data-Name Identifiers for Reference State}}
 \label{t:id_reference}
 \begin{tabular}{>{\ttfamily}l >{\quad}l >{\quad\bfseries}l}
 \\ \hline\hline \\*[-2ex]
@@ -95,7 +95,7 @@ the resulting data in different ways.
 reference state.
 If any reference state quantities are dimensional, |DimensionalUnits|
 may be used to describe the system of dimensional units employed.
-If present, these two entities take precedence of all corresponding
+If present, these two entities take precedence over all corresponding
 entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -138,7 +138,7 @@ Data-name identifiers are provided in
     
     DataClass\_t DataClass = Dimensional ;
 
-    DimensionalUnits\_t DimensionalUnits = 
+    DimensionalUnits\_t DimensionalUnits =
       \{\{
       MassUnits        = Kilogram ;
       LengthUnits      = Meter ;
@@ -340,14 +340,17 @@ For unstructured grids, the value of |GridLocation| alone specifies location and
 indexing of discrete data only for vertex and cell-centered data.  The
 reason for this is that element-based grid connectivity provided in the
 \texttt{Elements\_t} data structures explicitly indexes only vertices and cells.
-For data stored at alternate grid locations (e.g. edges), additional
+For data stored at alternate grid locations (e.g., edges), additional
 connectivity information is needed.  This is provided by the optional fields
 \texttt{PointRange} and \texttt{PointList}; these refer to
 vertices, edges, faces or cell centers, depending on the values of
-\texttt{CellDimension} and \texttt{GridLocation}.  The following table shows
+\texttt{CellDimension} and \texttt{GridLocation}.  \autoref{t:gridlocationusage4} shows
 these relations.
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption[GridLocation Usage with Discrete Data]{\textbf{GridLocation Usage with Discrete Data}}
+\label{t:gridlocationusage4}
 \begin{tabular}{||c|c|c|c|c||}
  \hline
 \texttt{CellDimension} & \multicolumn{4}{c||}{\texttt{GridLocation}} \\
@@ -358,7 +361,7 @@ these relations.
 3 & vertices & edges & faces & cells (volume elements) \\
  \hline
 \end{tabular}
-\end{center}
+\end{table}
 
 In the table, \fort{*FaceCenter} stands for the possible types: \fort{FaceCenter},
 \fort{IFaceCenter}, \fort{JFaceCenter} or \fort{KFaceCenter}.
@@ -504,6 +507,7 @@ This information includes the name attribute or family name, the
 boundary conditions applicable to these mesh regions, and the referencing
 to the CAD databases.
 
+\clearpage
 \begin{alltt}
   Family\_t :=
     \{
@@ -514,6 +518,8 @@ to the CAD databases.
     List( GeometryReference\_t GeometryReference1 ... GeometryReferenceN ) ; (o)
 
     RotatingCoordinates\_t RotatingCoordinates ;                             (o)
+
+    List( FamilyName\_t FamilyName1 ... FamilyNameN ) ;                      (o)
 
     List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
 
@@ -544,6 +550,10 @@ to the CAD databases.
 \item The mesh is linked to the family by attributing a family name
       to a BC patch or a zone in the data structure \fort{BC\_t} or
       \fort{Zone\_t}, respectively.
+\item A hierarchy of families is possible through the list of <tt>FamilyName\_t</tt>
+      nodes. These nodes contain both a user defined node name and a
+      family name. The node name \linebreak <tt>FamilyParent</tt> may be used to specify
+      the family name for the parent of the current <tt>Family\_t</tt> node.
 \item \fort{Ordinal} is defined in the SIDS as a user-defined integer
       with no restrictions on the values that it can contain.
       It may be used here to attribute a number to the family.
@@ -746,7 +756,7 @@ contained in the \fort{ReferenceState} structure.
 boundary-condition data.
 If the boundary conditions contain dimensional data, |DimensionalUnits|
 may be used to describe the system of dimensional units employed.
-If present, these three entities take precedence of all corresponding
+If present, these three entities take precedence over all corresponding
 entities at higher levels of the hierarchy.
 These precedence rules are further discussed in \autoref{s:precedence}.
 
@@ -760,7 +770,7 @@ Note that \fort{FamilyBCDataSet\_t} is similar to the data structure
 \fort{FamilyBCDataSet\_t} only allows for globally constant Dirichlet and
 Neumann data.
 
-\subsection{User-Defined Data Structure Definition: \texttt{UserDefinedData\_t}}
+\subsection{ User-Defined Data Structure Definition: \texttt{UserDefinedData\_t}}
 \label{s:UserDefinedData}
 
 Since the needs of all CGNS users cannot be anticipated,
@@ -787,12 +797,15 @@ node types at other node locations.
 
     FamilyName\_t FamilyName ;                                               (o)
 
+    List( AdditionalFamilyName\_t AddFamilyName1 ... AddFamilyNameN ) ;      (o)
+
     List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
 
     int Ordinal ;                                                           (o)
     \} ;
 \end{alltt}
 
+\clearpage
 \begin{notes}
 \item Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t},
       and \fort{UserDefinedData\_t} lists are as shown; users may choose
@@ -819,7 +832,7 @@ node types at other node locations.
       specified.
 \end{notes}
 
-\subsection{Gravity Data Structure Definition: \texttt{Gravity\_t}}
+\subsection{ Gravity Data Structure Definition: \texttt{Gravity\_t}}
 \label{s:Gravity}
 
 The \fort{Gravity\_t} data structure may be used to define the

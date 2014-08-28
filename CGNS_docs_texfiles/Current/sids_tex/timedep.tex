@@ -258,7 +258,7 @@ OriginLocation
 RigidRotationAngle
    & Rotation angles about each axis of the translated coordinate system.
      If rotating about more than one axis, the rotation is performed first
-     about the x-axis, then the y-axis, then the z-axis.
+     about the $x$-axis, then the $y$-axis, then the $z$-axis.
      If not specified, \fort{RigidRotationAngle} is set to zero.
    & $\A$ \\
 RigidVelocity
@@ -383,7 +383,7 @@ the type of arbitrary grid motion.
 The \fort{DataArray\_t} nodes are used to store the components of the grid
 velocity vector.
 \autoref{t:id_gridvel} lists the data-name identifiers used to record these
-vectors in cartesian, cylindrical, and spherical coordinate systems.
+vectors in Cartesian, cylindrical, and spherical coordinate systems.
 
 \begin{table}[htbp]
 \centering
@@ -501,7 +501,7 @@ associated with the zone. The time variation is the recorded in the
 \label{ex:rigidmotion}
 
 In this example, the whole mesh moves rigidly, so the only
-time-dependant data are the grid coordinates and flow solutions.
+time-dependent data are the grid coordinates and flow solutions.
 However, since the mesh moves rigidly, the grid coordinates need not be
 recorded at each time step.
 Instead, a \fort{RigidGridMotion\_t} data structure is recorded for
@@ -533,7 +533,7 @@ correspond to each time step.
     ZoneBC\_t ZoneBC
     ZoneGridConnectivity\_t ZoneGridConnectivity
 
-    \ital{--- Time dependant data}
+    \ital{--- Time dependent data}
     RigidGridMotion\_t RigidGridMotion\#1
     RigidGridMotion\_t RigidGridMotion\#2
     ...
@@ -562,7 +562,7 @@ In this example, \fort{Solution\#0} could correspond to a restart solution.
 \begin{example}{Deforming Grid Motion}
 \label{ex:deformingmotion}
 
-In this example, velocity vectors are node dependant allowing for mesh
+In this example, velocity vectors are node dependent allowing for mesh
 deformation.
 In such a case, it is difficult or even impossible to recompute the mesh
 at each time step.
@@ -601,7 +601,7 @@ definition correspond to each time step.
 \end{alltt}
 \end{example}
 
-\newpage
+%\newpage
 \begin{example}{Adapted Unstructured Mesh}
 \label{ex:adaptedunstructuredmesh}
 
@@ -758,7 +758,7 @@ Each indentation represents a level down (a child) from the parent node.
         VelocityX (DataArray\_t)
 \end{alltt}
 
-\newpage
+%\newpage
 \begin{notes}
 \item Under \fort{BaseIterativeData\_t}, one can give either
       \fort{TimeValues}, or \fort{IterationValues}, or both.

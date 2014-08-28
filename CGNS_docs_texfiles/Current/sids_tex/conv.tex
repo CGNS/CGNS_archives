@@ -9,7 +9,7 @@ The intellectual content of the CGNS database is defined in terms of
 C-like notation including typedefs and structures.  The database is made
 up of entities, and each entity has a type associated with it.  Entities
 include such things as the dimensionality of the grid, an array of grid
-coordinates, or a zone which contains all the data associated with a
+coordinates, or a zone that contains all the data associated with a
 given region.  Entities are defined in terms of types, where a type can
 be an integer or a collection of elements (a structure) or a hierarchy
 of structures or other similar constructs.
@@ -431,7 +431,7 @@ while the boundary patches may be described using 2-D elements.
 The complete element definition may include more than just the cells.
 
 Each element shape may have a different number of nodes, depending on
-whether linear or quadratic interpolation is used.
+whether linear, quadratic, or cubic interpolation is used.
 Therefore the name of each type of element is composed of two parts;
 the first part identifies the element shape, and the second part the
 number of nodes.
@@ -441,24 +441,28 @@ number of nodes.
 \centering
 \caption[Element Types in CGNS]{\textbf{Element Types in CGNS}}
 \label{t:elementtypes}
-\begin{tabular}{c >{\quad}l >{\quad}l >{\quad}l}
+\begin{tabular}{c >{\quad}l >{\quad}l >{\quad}l >{\quad}l}
 \\ \hline\hline \\*[-2ex]
-\bold{Dimensionality} &                        & \bold{Linear}        & \bold{Quadratic} \\
-\bold{of the Element} & \spantwo{\bold{Shape}} & \bold{Interpolation} & \bold{Interpolation}
+\bold{Dimensionality} &                        & \bold{Linear}        & \bold{Quadratic}     & \bold{Cubic}\\
+\bold{of the Element} & \spantwo{\bold{Shape}} & \bold{Interpolation} & \bold{Interpolation} & \bold{Interpolation}
 \\*[1ex] \hline\hline \\*[-2ex]
-0-D & Point       & \fort{NODE}     & \fort{NODE} \\
-1-D & Line        & \fort{BAR\_2}   & \fort{BAR\_3} \\
-2-D & Triangle    & \fort{TRI\_3}   & \fort{TRI\_6} \\
-    & Quadrangle  & \fort{QUAD\_4}  & \fort{QUAD\_8, QUAD\_9} \\
-3-D & Tetrahedron & \fort{TETRA\_4} & \fort{TETRA\_10} \\
-    & Pyramid     & \fort{PYRA\_5}  & \fort{PYRA\_13, PYRA\_14}\\
-    & Pentahedron & \fort{PENTA\_6} & \fort{PENTA\_15, PENTA\_18} \\
-    & Hexahedron  & \fort{HEXA\_8}  & \fort{HEXA\_20, HEXA\_27}
+0-D & Point       & \fort{NODE}     & \fort{NODE}                 & \fort{NODE} \\
+1-D & Line        & \fort{BAR\_2}   & \fort{BAR\_3}               & \fort{BAR\_4} \\
+2-D & Triangle    & \fort{TRI\_3}   & \fort{TRI\_6}               & \fort{TRI\_9, TRI\_10} \\
+    & Quadrangle  & \fort{QUAD\_4}  & \fort{QUAD\_8,}             & \fort{QUAD\_12,} \\
+    &             &                 & \fort{QUAD\_9}              & \fort{QUAD\_16} \\
+3-D & Tetrahedron & \fort{TETRA\_4} & \fort{TETRA\_10}            & \fort{TETRA\_16, TETRA\_20} \\
+    & Pyramid     & \fort{PYRA\_5}  & \fort{PYRA\_13,}            & \fort{PYRA\_21, PYRA\_29,} \\
+    &             &                 & \fort{PYRA\_14}             & \fort{PYRA\_30} \\
+    & Pentahedron & \fort{PENTA\_6} & \fort{PENTA\_15,}           & \fort{PENTA\_24, PENTA\_38,} \\
+    &             &                 & \fort{PENTA\_18}            & \fort{PENTA\_40} \\
+    & Hexahedron  & \fort{HEXA\_8}  & \fort{HEXA\_20,}            & \fort{HEXA\_32, HEXA\_56,} \\
+    &             &                 & \fort{HEXA\_27}             & \fort{HEXA\_64}
 \\*[1ex] \hline\hline
 \end{tabular}
 \end{table}
 
-Any element type not supported by CGNS can be recorded using the CGNS
+General polyhedral elements can be recorded using the CGNS
 generic element types \fort{NGON\_n} and \fort{NFACE\_n}.
 See \autoref{s:Elements} for more detail.
 
@@ -486,6 +490,12 @@ The linear form, \fort{BAR\_2}, is composed of two nodes at each
 extremity of the line.
 The quadratic form, \fort{BAR\_3}, has an additional node located at
 the middle of the line.
+The cubic form of the line, \fort{BAR\_4}, contains two nodes
+interior to the endpoints.
+The quartic form of the line, \fort{BAR\_5}, contains three nodes
+interior to the endpoints.
+
+\underbar{Linear and Quadratic Elements:}
 
 \begin{minipage}[t]{0.5\linewidth}
    \vspace{0pt}
@@ -517,9 +527,41 @@ the middle of the line.
 \bigskip
 
 \begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}c >{\ttfamily\color{red}}c}
-   \multicolumn{3}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+   \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
    \uline{\textnormal{Oriented edge}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-node}} \\[3pt]
    E1 & N1,N2 & N3
+\end{tabular}
+
+\bigskip
+\bigskip
+\underbar{Cubic Elements:}
+
+BAR\_4
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=3in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/bar_p3}
+\end{figure}
+
+\begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}c >{\ttfamily\color{red}}c}
+   \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+   \uline{\textnormal{Oriented edge}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-nodes}} \\[3pt]
+   E1 & N1,N2 & N3,N4
+\end{tabular}
+
+\bigskip
+\bigskip
+\underbar{Quartic Elements:}
+
+BAR\_5
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=3in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Bar_5}
+\end{figure}
+
+\begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}c >{\ttfamily\color{red}}c}
+   \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+   \uline{\textnormal{Oriented edge}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-nodes}} \\[3pt]
+   E1 & N1,N2 & N3,N4,N5
 \end{tabular}
 
 \subsubsection{2-D (Surface) Elements}
@@ -547,12 +589,20 @@ In a 2-D mesh, all elements must be oriented the same way; i.e., all
 normals must point toward the same side of the mesh.
 
 \paragraph{Triangular Elements}
-Two types of triangular elements are supported in CGNS, \fort{TRI\_3}
-and \fort{TRI\_6}.
+Six types of triangular elements are supported in CGNS, \fort{TRI\_3},
+\fort{TRI\_6}, \fort{TRI\_9}, \fort{TRI\_10}, \fort{TRI\_12}, and \fort{TRI\_15}.
 \fort{TRI\_3} elements are composed of three nodes located at the
 three geometric corners of the triangle.
 \fort{TRI\_6} elements have three additional nodes located at the
 middles of the three edges.
+The cubic forms of triangular elements, \fort{TRI\_9} and \fort{TRI\_10}
+contain two interior nodes along each edge, and an interior face node
+in the case of \fort{TRI\_10}.
+The quartic forms of triangular elements, \fort{TRI\_12} and \fort{TRI\_15}
+contain three interior nodes along each edge, and three interior face nodes
+in the case of \fort{TRI\_15}.
+
+\underbar{Linear and Quadratic Elements:}
 
 \begin{minipage}[t]{0.5\linewidth}
    \vspace{0pt}
@@ -617,13 +667,47 @@ middles of the three edges.
 \end{minipage}
 
 \bigskip
+\bigskip
+\newpage
+\underbar{Cubic Elements:}
+
+TRI\_9~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TRI\_10
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=2.5in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/Tri_9}
+   \includegraphics[width=2.5in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/Tri_10}
+\end{figure}
+
+\vspace{1.5\baselineskip}
+
+\begin{minipage}[t]{0.35\linewidth}
+   \vspace{0pt}
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}     & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N4,N5 \\
+      E2  & N2,N3 & N6,N7 \\
+      E3  & N3,N1 & N8,N9
+   \end{tabular}
+\end{minipage}%
+\begin{minipage}[t]{0.65\linewidth}
+   \vspace{0pt}
+   \begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}l >{\ttfamily}l}
+      \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+      \textnormal{Face} & \textnormal{Corner} & \textnormal{Mid-edge} & \textnormal{Mid-face} & \textnormal{Oriented} \\
+      \uline{\textnormal{}} & \uline{\textnormal{nodes}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} & \uline{\textnormal{edges}} \\[3pt]
+      F1 & N1,N2,N3 & N4,N5,N6,N7,N8,N9  & N10  & E1,E2,E3
+   \end{tabular}
+\end{minipage}
+
+\bigskip
 
 \uline{\textit{Notes}}%
 \begin{Ventryi}{\fort{N1,\ldots,N27}}
-   \item [\fort{N1,\ldots,N6}]
+   \item [\fort{N1,\ldots,N10}]
          Grid point identification number.
-         Integer $\ge 0$ or blank, and \fort{N1} $\ne$ \fort{N2}
-         $\ne$ \ldots $\ne$ \fort{N6}.
+         Integer $\ge 0$ or blank, and no two values may be the same.
          Grid points \fort{N1}, \fort{N2}, and \fort{N3} are in
          consecutive order about the triangle.
    \item [\fort{E1,E2,E3}]
@@ -632,13 +716,70 @@ middles of the three edges.
          Face identification number.
 \end{Ventryi}
 
+\bigskip
+\bigskip
+\newpage
+\underbar{Quartic Elements:}
+
+TRI\_12~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TRI\_15
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=2.5in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Tri_12}
+   \includegraphics[width=2.5in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Tri_15}
+\end{figure}
+
+\vspace{1.5\baselineskip}
+
+\begin{minipage}[t]{0.35\linewidth}
+   \vspace{0pt}
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}     & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N4,N5,N6 \\
+      E2  & N2,N3 & N7,N8,N9 \\
+      E3  & N3,N1 & N10,N11,N12
+   \end{tabular}
+\end{minipage}%
+\begin{minipage}[t]{0.65\linewidth}
+   \vspace{0pt}
+   \begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}l >{\ttfamily}l}
+      \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+      \textnormal{Face} & \textnormal{Corner} & \textnormal{Mid-edge} & \textnormal{Mid-face} & \textnormal{Oriented} \\
+      \uline{\textnormal{}} & \uline{\textnormal{nodes}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} & \uline{\textnormal{edges}} \\[3pt]
+      F1 & N1,N2,N3 & N4,N5,N6,N7,N8,                & N13,N14,N15  & E1,E2,E3\\
+       ~ &    ~     &                N9,N10,N11,N12  &     ~        &        ~
+   \end{tabular}
+\end{minipage}
+
+\bigskip
+
+\uline{\textit{Notes}}%
+\begin{Ventryi}{\fort{N1,\ldots,N27}}
+   \item [\fort{N13}]
+         Is located at the centroid of sub-triangle N1-N5-N11.
+   \item [\fort{N14}]
+         Is located at the centroid of sub-triangle N2-N8-N5.
+   \item [\fort{N15}]
+         Is located at the centroid of sub-triangle N3-N11-N8.
+\end{Ventryi}
+
 \paragraph{Quadrilateral Elements}
-CGNS supports three types of quadrilateral elements, \fort{QUAD\_4},
-\fort{QUAD\_8}, and \fort{QUAD\_9}.
+CGNS supports seven types of quadrilateral elements, \fort{QUAD\_4},
+\fort{QUAD\_8}, \fort{QUAD\_9}, \fort{QUAD\_12}, \fort{QUAD\_16}, \fort{QUAD\_P4\_16}, and \fort{QUAD\_25}.
 \fort{QUAD\_4} elements are composed of four nodes located at the
 four geometric corners of the quadrangle.
 In addition, \fort{QUAD\_8} and \fort{QUAD\_9} elements have four
 mid-edge nodes, and \fort{QUAD\_9} adds a mid-face node.
+The cubic forms of quadrilateral elements, \fort{QUAD\_12} and \fort{QUAD\_16}
+contain two interior nodes along each edge, and four interior face nodes
+in the case of \fort{QUAD\_16}.
+The quartic forms of quadrilateral elements, \fort{QUAD\_P4\_16} and \fort{QUAD\_25}
+contain three interior nodes along each edge, and nine interior face nodes
+in the case of \fort{QUAD\_25}.
+
+\newpage
+\underbar{Linear and Quadratic Elements:}
 
 \begin{minipage}[t]{0.5\linewidth}
    \vspace{0pt}
@@ -741,14 +882,45 @@ mid-edge nodes, and \fort{QUAD\_9} adds a mid-face node.
    F1 & N1,N2,N3,N4 & N5,N6,N7,N8   & N9 & E1,E2,E3,E4
 \end{tabular}
 
+\newpage
+\underbar{Cubic Elements:}
+
+QUAD\_12~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~QUAD\_16
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=2.5in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/quad_p3_12}
+   \includegraphics[width=2.5in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/quad_p3_16}
+\end{figure}
+
+\begin{minipage}[t]{0.5\linewidth}
+   \vspace{0pt}
+   \centering
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}        & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N5,N6 \\
+      E2  & N2,N3 & N7,N8 \\
+      E3  & N3,N4 & N9,N10 \\
+      E4  & N4,N1 & N11,N12
+   \end{tabular}
+\end{minipage}
+
 \medskip
+
+\begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}c >{\ttfamily}l}
+   \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+   \uline{\textnormal{Face}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-edge nodes}} & \uline{\textnormal{Mid-face node}} & \uline{\textnormal{Oriented edges}} \\[3pt]
+   F1 & N1,N2,N3,N4 & N5,N6,N7,N8,N9,N10,N11,N12   & N13,N14,N15,N16 & E1,E2,E3,E4
+\end{tabular}
+
+\vspace{1.5\baselineskip}
 
 \uline{\textit{Notes}}%
 \begin{Ventryi}{\fort{N1,\ldots,N27}}
-   \item [\fort{N1,\ldots,N9}]
+   \item [\fort{N1,\ldots,N16}]
          Grid point identification number.
-         Integer $\ge 0$ or blank, and \fort{N1} $\ne$ \fort{N2}
-         $\ne$ \ldots $\ne$ \fort{N9}.
+         Integer $\ge 0$ or blank, and no two values may be the same.
          Grid points \fort{N1}\ldots\fort{N4} are in
          consecutive order about the quadrangle.
    \item [\fort{E1,\ldots,E4}]
@@ -756,6 +928,39 @@ mid-edge nodes, and \fort{QUAD\_9} adds a mid-face node.
    \item [\fort{F1}]
          Face identification number.
 \end{Ventryi}
+
+\newpage
+\underbar{Quartic Elements:}
+
+QUAD\_P4\_16~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~QUAD\_25
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=2.5in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Quad_p4_16}
+   \includegraphics[width=2.5in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Quad_25}
+\end{figure}
+
+\begin{minipage}[t]{0.5\linewidth}
+   \vspace{0pt}
+   \centering
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}        & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N5,N6,N7 \\
+      E2  & N2,N3 & N8,N9,N10 \\
+      E3  & N3,N4 & N11,N12,N13 \\
+      E4  & N4,N1 & N14,N15,N16
+   \end{tabular}
+\end{minipage}
+
+\medskip
+
+\begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}c >{\ttfamily}l}
+   \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+   \uline{\textnormal{Face}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-edge nodes}} & \uline{\textnormal{Mid-face node}} & \uline{\textnormal{Oriented edges}} \\[3pt]
+   F1 & N1,N2,N3,N4 & N5,N6,N7,N8,N9,N10,N11,N12   & N17,N18,N19,N20,N21 & E1,E2,E3,E4\\
+   ~  &      ~      & N13,N14,N15,N16              & N22,N23,N24,N25     & ~
+\end{tabular}
 
 \subsubsection{3-D (Volume) Elements}
 \label{s:unstructgrid_3d}
@@ -766,12 +971,21 @@ CGNS supports four different shapes of 3-D elements --- tetrahedra,
 pyramids, pentahedra, and hexahedra.
 
 \paragraph{Tetrahedral Elements}
-CGNS supports two types of tetrahedral elements, \fort{TETRA\_4}
-and \fort{TETRA\_10}.
+CGNS supports seven types of tetrahedral elements, \fort{TETRA\_4},
+\fort{TETRA\_10}, \fort{TETRA\_16}, \fort{TETRA\_20}, \fort{TETRA\_22}, \fort{TETRA\_34}, and \fort{TETRA\_35}.
 \fort{TETRA\_4} elements are composed of four nodes located at the
 four geometric corners of the tetrahedron.
 \fort{TETRA\_10} elements have six additional nodes, at the middle
 of each of the six edges.
+The cubic forms of tetrahedral elements, \fort{TETRA\_16} and \fort{TETRA\_20}
+contain two interior nodes along each edge, and four interior face nodes
+in the case of \fort{TETRA\_20}.
+The quartic forms of tetrahedral elements, \fort{TETRA\_22}, \fort{TETRA\_34}, and \fort{TETRA\_35}
+contain three interior nodes along each edge, twelve interior face nodes
+in the case of \fort{TETRA\_34}, and twelve interior face nodes plus one interior volume
+node in the case of \fort{TETRA\_35}.
+
+\underbar{Linear and Quadratic Elements:}
 
 \begin{minipage}[t]{0.5\linewidth}
    \vspace{0pt}
@@ -854,14 +1068,58 @@ of each of the six edges.
    \end{tabular}
 \end{minipage}
 
+\newpage
+\underbar{Cubic Elements:}
+
+TETRA\_16
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/tetra_16}
+\end{figure}
+
 \bigskip
 
+TETRA\_20
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/tetra_20}
+\end{figure}
+
+\begin{minipage}[t]{0.35\linewidth}
+   \vspace{0pt}
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}     & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N5,N6  \\
+      E2  & N2,N3 & N7,N8  \\
+      E3  & N3,N1 & N9,N10  \\
+      E4  & N1,N4 & N11,N12  \\
+      E5  & N2,N4 & N13,N14  \\
+      E6  & N3,N4 & N15,N16
+   \end{tabular}
+\end{minipage}
+
+\begin{minipage}[t]{0.65\linewidth}
+   \vspace{0pt}
+   \begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}l >{\ttfamily}l}
+      \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+      \uline{\textnormal{Face}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-edge nodes}} & \uline{\textnormal{Mid-face node}} & \uline{\textnormal{Oriented edges}} \\[3pt]
+      F1 & N1,N3,N2 & N10,N9,N8,N7,N6,N5     & N17 & -E3,-E2,-E1   \\
+      F2 & N1,N2,N4 & N5,N6,N13,N14,N12,N11  & N18 & \ E1,\ E5,-E4 \\
+      F3 & N2,N3,N4 & N7,N8,N15,N16,N14,N13  & N19 & \ E2,\ E6,-E5 \\
+      F4 & N3,N1,N4 & N9,N10,N11,N12,N16,N15 & N20 & \ E3,\ E4,-E6
+   \end{tabular}
+\end{minipage}
+
+\bigskip
+
+\newpage
 \uline{\textit{Notes}}%
 \begin{Ventryi}{\fort{N1,\ldots,N27}}
-   \item [\fort{N1,\ldots,N10}]
+   \item [\fort{N1,\ldots,N20}]
          Grid point identification number.
-         Integer $\ge 0$ or blank, and \fort{N1} $\ne$ \fort{N2}
-         $\ne$ \ldots $\ne$ \fort{N10}.
+         Integer $\ge 0$ or blank, and no two values may be the same.
          Grid points \fort{N1}\ldots\fort{N3} are in consecutive order about
          one trilateral face.
          The cross product of a vector going from \fort{N1} to \fort{N2},
@@ -879,14 +1137,109 @@ of each of the six edges.
          third node, is oriented outward.
 \end{Ventryi}
 
+\newpage
+\underbar{Quartic Elements:}
+
+TETRA\_22
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Tetra_22}
+\end{figure}
+
+\bigskip
+
+TETRA\_34
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Tetra_34}
+\end{figure}
+
+\newpage
+TETRA\_35
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Tetra_35}
+\end{figure}
+
+\begin{minipage}[t]{0.35\linewidth}
+   \vspace{0pt}
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}     & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N5,N6,N7  \\
+      E2  & N2,N3 & N8,N9,N10  \\
+      E3  & N3,N1 & N11,N12,N13  \\
+      E4  & N1,N4 & N14,N15,N16  \\
+      E5  & N2,N4 & N17,N18,N19  \\
+      E6  & N3,N4 & N20,N21,N22
+   \end{tabular}
+\end{minipage}
+
+\begin{minipage}[t]{0.65\linewidth}
+   \vspace{0pt}
+   \begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}l >{\ttfamily}l}
+      \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+      \uline{\textnormal{Face}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-edge nodes}} & \uline{\textnormal{Mid-face node}} & \uline{\textnormal{Oriented edges}} \\[3pt]
+      F1 & N1,N3,N2 & N13,N12,N11,N10,N9,N8,N7,N6,N5     & N23,N24,N25 & -E3,-E2,-E1   \\
+      F2 & N1,N2,N4 & N5,N6,N7,N17,N18,N19,N16,N15,N14   & N26,N27,N28 & \ E1,\ E5,-E4 \\
+      F3 & N2,N3,N4 & N8,N9,N10,N20,N21,N22,N19,N18,N17  & N29,N30,N31 & \ E2,\ E6,-E5 \\
+      F4 & N3,N1,N4 & N11,N12,N13,N14,N15,N16,N22,N21,N20& N32,N33,N34 & \ E3,\ E4,-E6
+   \end{tabular}
+\end{minipage}
+
+\bigskip
+
+\uline{\textit{Notes}}%
+\begin{Ventryi}{\fort{N1,\ldots,N27}}
+   \item [\fort{N23}]
+         Is located at the centroid of sub-triangle \fort{N1-N12-N6}.
+   \item [\fort{N24}]
+         Is located at the centroid of sub-triangle \fort{N2-N6-N9}.
+   \item [\fort{N25}]
+         Is located at the centroid of sub-triangle \fort{N3-N9-N12}.
+   \item [\fort{N26}]
+         Is located at the centroid of sub-triangle \fort{N1-N6-N15}.
+   \item [\fort{N27}]
+         Is located at the centroid of sub-triangle \fort{N2-N18-N6}.
+   \item [\fort{N28}]
+         Is located at the centroid of sub-triangle \fort{N4-N15-N18}.
+   \item [\fort{N29}]
+         Is located at the centroid of sub-triangle \fort{N2-N9-N18}.
+   \item [\fort{N30}]
+         Is located at the centroid of sub-triangle \fort{N3-N21-N9}.
+   \item [\fort{N31}]
+         Is located at the centroid of sub-triangle \fort{N4-N18-N21}.
+   \item [\fort{N32}]
+         Is located at the centroid of sub-triangle \fort{N3-N12-N21}.
+   \item [\fort{N33}]
+         Is located at the centroid of sub-triangle \fort{N1-N15-N12}.
+   \item [\fort{N34}]
+         Is located at the centroid of sub-triangle \fort{N4-N21-N15}.
+   \item [\fort{N35}]
+         Is located at the centroid of the tetrahedron.
+\end{Ventryi}
+
 \paragraph{Pyramid Elements}
-CGNS supports three types of pyramid elements, \fort{PYRA\_5},
-\texttt{PYRA\_13}, and \texttt{PYRA\_14}.
+CGNS supports nine types of pyramid elements, \fort{PYRA\_5},
+\texttt{PYRA\_13}, \texttt{PYRA\_14}, \texttt{PYRA\_21}, \texttt{PYRA\_29}, \texttt{PYRA\_30},
+\texttt{PYRA\_P4\_29}, \texttt{PYRA\_50}, and \texttt{PYRA\_55}.
 \fort{PYRA\_5} elements are composed of five nodes located at the
 five geometric corners of the pyramid.
 In addition, \texttt{PYRA\_13} and \texttt{PYRA\_14} elements have a node
 at the middle of each of the eight edges; \texttt{PYRA\_14} adds a node
 at the middle of the quadrilateral face.
+The cubic forms of pyramid elements, \fort{PYRA\_21},
+\fort{PYRA\_29}, and \fort{PYRA\_30}
+contain two interior nodes along each edge, eight interior face nodes
+in the case of \fort{PYRA\_29} and \fort{PYRA\_30}, and an additonal
+interior volume node for \fort{PYRA\_30}.
+The quartic forms of pyramid elements, \texttt{PYRA\_P4\_29}, \texttt{PYRA\_50}, and \texttt{PYRA\_55}
+contain three interior nodes along each edge, 21 interior face nodes
+in the case of \texttt{PYRA\_50}, and 21 interior face nodes and five additonal
+interior volume nodes for \texttt{PYRA\_55}.
+
+\underbar{Linear and Quadratic Elements:}
 
 \begin{minipage}[t]{0.5\linewidth}
    \vspace{0pt}
@@ -1025,20 +1378,72 @@ at the middle of the quadrilateral face.
    F5 & N4,N1,N5    & N9,N10,N13       &     & \ E4,\ E5,-E8
 \end{tabular}
 
+\newpage
+\underbar{Cubic Elements:}
+
+PYRA\_21
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/pyramid_21}
+\end{figure}
+
+\bigskip
+
+PYRA\_29
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/pyramid_29}
+\end{figure}
+
+\newpage
+PYRA\_30
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/pyramid_30}
+\end{figure}
+
+\begin{minipage}[t]{0.5\linewidth}
+   \vspace{0pt}
+   \centering
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}        & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N6,N7  \\
+      E2  & N2,N3 & N8,N9  \\
+      E3  & N3,N4 & N10,N11  \\
+      E4  & N4,N1 & N12,N13  \\
+      E5  & N1,N5 & N14,N15 \\
+      E6  & N2,N5 & N16,N17 \\
+      E7  & N3,N5 & N18,N19 \\
+      E8  & N4,N5 & N20,N21
+   \end{tabular}
+\end{minipage}
+
+\medskip
+
+\begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}c >{\ttfamily}l}
+   \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+   \uline{\textnormal{Face}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-edge nodes}} & \uline{\textnormal{Mid-face node}} & \uline{\textnormal{Oriented edges}} \\[3pt]
+   F1 & N1,N4,N3,N2 & N13,N12,N11,N10,N9,N8,N7,N6  & N22,N25,N24,N23 & -E4,-E3,-E2,-E1 \\
+   F2 & N1,N2,N5    & N6,N7,N16,N17,N15,N14        & N26    & \ E1,\ E6,-E5   \\
+   F3 & N2,N3,N5    & N8,N9,N18,N19,N17,N16        & N27    & \ E2,\ E7,-E6   \\
+   F4 & N3,N4,N5    & N10,N11,N20,N21,N19,N18      & N28    & \ E3,\ E8,-E7   \\
+   F5 & N4,N1,N5    & N12,N13,N14,N15,N21,N20      & N29    & \ E4,\ E5,-E8
+\end{tabular}
+
 \bigskip
 
 \uline{\textit{Notes}}%
 \begin{Ventryi}{\fort{N1,\ldots,N27}}
-   \item [\fort{N1,\ldots,N14}]
+   \item [\fort{N1,\ldots,N30}]
          Grid point identification number.
-         Integer $\ge 0$ or blank, and \fort{N1} $\ne$ \fort{N2}
-         $\ne$ \ldots $\ne$ \fort{N14}.
+         Integer $\ge 0$ or blank, and no two values may be the same.
          Grid points \fort{N1}\ldots\fort{N4} are in consecutive order about
          the quadrilateral face.
          The cross product of a vector going from \fort{N1} to \fort{N2},
          with a vector going from \fort{N1} to \fort{N3}, must result in a
          vector oriented from face \fort{F1} toward \fort{N5}.
-         \fort{N14} is located at the center of the quadrilateral face.
    \item [\fort{E1,\ldots,E8}]
          Edge identification number.
          The edges are oriented from the first to the second node.
@@ -1051,14 +1456,127 @@ at the middle of the quadrilateral face.
          third node, is oriented outward.
 \end{Ventryi}
 
+\newpage
+\underbar{Quartic Elements:}
+
+PYRA\_P4\_29
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Pyra_p4_29}
+\end{figure}
+
+\bigskip
+
+PYRA\_50
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Pyra_50}
+\end{figure}
+
+\newpage
+PYRA\_55
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Pyra_55}
+\end{figure}
+
+\begin{minipage}[t]{0.5\linewidth}
+   \vspace{0pt}
+   \centering
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}        & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N6,N7,N8  \\
+      E2  & N2,N3 & N9,N10,N11  \\
+      E3  & N3,N4 & N12,N13,N14  \\
+      E4  & N4,N1 & N15,N16,N17  \\
+      E5  & N1,N5 & N18,N19,N20 \\
+      E6  & N2,N5 & N21,N22,N23 \\
+      E7  & N3,N5 & N24,N25,N26 \\
+      E8  & N4,N5 & N27,N28,N29
+   \end{tabular}
+\end{minipage}
+
+\medskip
+
+\begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}c >{\ttfamily}l}
+   \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+   \uline{\textnormal{Face}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-edge nodes}} & \uline{\textnormal{Mid-face node}} & \uline{\textnormal{Oriented edges}} \\[3pt]
+   F1 & N1,N4,N3,N2 & N17,N16,N15,N14,N13,N12,     & N30,N31,N32,N33,N34, & -E4,-E3,-E2,-E1 \\
+   ~  &     ~       & N11,N10,N9,N8,N7,N6          & N35,N36,N37,N38      & ~\\
+   F2 & N1,N2,N5    & N6,N7,N8,N21,N22,N23,        & N39,N40,N41          & \ E1,\ E6,-E5   \\
+   ~  &     ~       & N20,N19,N18                  &   ~                  & ~\\
+   F3 & N2,N3,N5    & N9,N10,N11,N24,N25,N26,      & N42,N43,N44          & \ E2,\ E7,-E6   \\
+   ~  &     ~       & N23,N22,N21                  &   ~                  & ~\\
+   F4 & N3,N4,N5    & N12,N13,N14,N27,N28,N29,     & N45,N46,N47          & \ E3,\ E8,-E7   \\
+   ~  &     ~       & N26,N25,N24                  &   ~                  & ~\\
+   F5 & N4,N1,N5    & N15,N16,N17,N18,N19,N20,     & N48,N49,N50          & \ E4,\ E5,-E8   \\
+   ~  &     ~       & N29,N28,N27                  
+\end{tabular}
+
+\bigskip
+
+\uline{\textit{Notes}}%
+\begin{Ventryi}{\fort{N1,\ldots,N27}}
+   \item [\fort{N39}]
+         Is located at the centroid of sub-triangle \fort{N1-N7-N19}.
+   \item [\fort{N40}]
+         Is located at the centroid of sub-triangle \fort{N2-N22-N7}.
+   \item [\fort{N41}]
+         Is located at the centroid of sub-triangle \fort{N5-N19-N22}.
+   \item [\fort{N42}]
+         Is located at the centroid of sub-triangle \fort{N2-N10-N22}.
+   \item [\fort{N43}]
+         Is located at the centroid of sub-triangle \fort{N3-N25-N10}.
+   \item [\fort{N44}]
+         Is located at the centroid of sub-triangle \fort{N5-N22-N25}.
+   \item [\fort{N45}]
+         Is located at the centroid of sub-triangle \fort{N3-N13-N25}.
+   \item [\fort{N46}]
+         Is located at the centroid of sub-triangle \fort{N4-N28-N13}.
+   \item [\fort{N47}]
+         Is located at the centroid of sub-triangle \fort{N5-N25-N28}.
+   \item [\fort{N48}]
+         Is located at the centroid of sub-triangle \fort{N4-N16-N28}.
+   \item [\fort{N49}]
+         Is located at the centroid of sub-triangle \fort{N1-N19-N16}.
+   \item [\fort{N50}]
+         Is located at the centroid of sub-triangle \fort{N5-N28-N19}.
+   \item [\fort{N51}]
+         Is located at the intersection of the line \fort{N5-N30} and the face \fort{N18-N21-N24-N27}.
+   \item [\fort{N52}]
+         Is located at the intersection of the line \fort{N5-N32} and the face \fort{N18-N21-N24-N27}.
+   \item [\fort{N53}]
+         Is located at the intersection of the line \fort{N5-N34} and the face \fort{N18-N21-N24-N27}.
+   \item [\fort{N54}]
+         Is located at the intersection of the line \fort{N5-N36} and the face \fort{N18-N21-N24-N27}.
+   \item [\fort{N55}]
+         Is located at the intersection of the line \fort{N5-N38} and the face \fort{N20-N23-N26-N29}.
+\end{Ventryi}
+
 \paragraph{Pentahedral Elements}
-CGNS supports three types of pentahedral elements, \fort{PENTA\_6},
-\fort{PENTA\_15}, and \fort{PENTA\_18}.
+CGNS supports nine types of pentahedral elements, \fort{PENTA\_6},
+\fort{PENTA\_15}, \fort{PENTA\_18}, \fort{PENTA\_24}, \fort{PENTA\_38}, \fort{PENTA\_40},
+\fort{PENTA\_33}, \fort{PENTA\_66}, and \fort{PENTA\_75}.
 \fort{PENTA\_6} elements are composed of six nodes located at the
 six geometric corners of the pentahedron.
 In addition, \fort{PENTA\_15} and \fort{PENTA\_18} elements have a node
 at the middle of each of the nine edges; \fort{PENTA\_18} adds a
 node at the middle of each of the three quadrilateral faces.
+The cubic forms of the pentahedral elements, \fort{PENTA\_24},
+\fort{PENTA\_38}, and \fort{PENTA\_40}
+contain two interior nodes along each edge, fourteen interior face nodes
+in the case of \fort{PENTA\_38} and \fort{PENTA\_40}, and an additonal
+two interior volume nodes for \fort{PENTA\_40}.
+The quartic forms of the pentahedral elements,
+\fort{PENTA\_33}, \fort{PENTA\_66}, and \fort{PENTA\_75}
+contain three interior nodes along each edge, 33 interior face nodes
+in the case of \fort{PENTA\_66}, and 33 interior face nodes and an additonal
+nine interior volume nodes for \fort{PENTA\_75}.
+
+\newpage
+\underbar{Linear and Quadratic Elements:}
 
 \begin{minipage}[t]{0.5\linewidth}
    \vspace{0pt}
@@ -1218,15 +1736,69 @@ node at the middle of each of the three quadrilateral faces.
    F5 & N4,N5,N6    & N13,N14,N15       &     & \ E7,\ E8,\ E9
 \end{tabular}
 
+\newpage
+\underbar{Cubic Elements:}
+
+PENTA\_24
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/prism_24}
+\end{figure}
+
+\bigskip
+
+PENTA\_38
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/prism_38}
+\end{figure}
+
+\newpage
+PENTA\_40
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/prism_40}
+\end{figure}
+
+\begin{minipage}[t]{0.5\linewidth}
+   \vspace{0pt}
+   \centering
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}        & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N7,N8  \\
+      E2  & N2,N3 & N9,N10  \\
+      E3  & N3,N1 & N11,N12  \\
+      E4  & N1,N4 & N13,N14 \\
+      E5  & N2,N5 & N15,N16 \\
+      E6  & N3,N6 & N17,N18 \\
+      E7  & N4,N5 & N19,N20 \\
+      E8  & N5,N6 & N21,N22 \\
+      E9  & N6,N4 & N23,N24
+   \end{tabular}
+\end{minipage}
+
+\medskip
+
+\begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}c >{\ttfamily}l}
+   \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+   \uline{\textnormal{Face}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-edge nodes}} & \uline{\textnormal{Mid-face node}} & \uline{\textnormal{Oriented edges}} \\[3pt]
+   F1 & N1,N2,N5,N4 & N7,N8,N15,N16,N20,N19,N14,N13  & N26,N27,N28,N29 & \ E1,\ E5,-E7,-E4 \\
+   F2 & N2,N3,N6,N5 & N9,N10,N17,N18,N22,N21,N16,N15 & N30,N31,N32,N33 & \ E2,\ E6,-E8,-E5 \\
+   F3 & N3,N1,N4,N6 & N11,N12,N13,N14,N24,N23,N18,N17& N34,N35,N36,N37 & \ E3,\ E4,-E9,-E6 \\
+   F4 & N1,N3,N2    & N12,N11,N10,N9,N8,N7           & N25    & -E3,-E2,-E1       \\
+   F5 & N4,N5,N6    & N19,N20,N21,N22,N23,N24        & N38    & \ E7,\ E8,\ E9
+\end{tabular}
+
 \medskip
 
 \uline{\textit{Notes}}
 
 \begin{Ventryi}{\fort{N1,\ldots,N27}}
-   \item [\fort{N1,\ldots,N18}]
+   \item [\fort{N1,\ldots,N40}]
          Grid point identification number.
-         Integer $\ge 0$ or blank, and \fort{N1} $\ne$ \fort{N2}
-         $\ne$ \ldots $\ne$ \fort{N18}.
+         Integer $\ge 0$ or blank, and no two values may be the same.
          Grid points \fort{N1}\ldots\fort{N3} are in consecutive order about
          one trilateral face.
          Grid points \fort{N4}\ldots\fort{N6} are in order in the same
@@ -1241,16 +1813,132 @@ node at the middle of each of the three quadrilateral faces.
          The faces are oriented so that the cross product of a vector
          from its first to second node, with a vector from its first to
          third node, is oriented outward.
+   \item [\fort{N39}]
+         Is at the centroid of the triangle \fort{N13,N17,N15}.
+   \item [\fort{N40}]
+         Is at the centroid of the triangle \fort{N14,N18,N16}.
+\end{Ventryi}
+
+\newpage
+\underbar{Quartic Elements:}
+
+PENTA\_33
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Penta_33}
+\end{figure}
+
+\bigskip
+
+PENTA\_66
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Penta_66}
+\end{figure}
+
+\newpage
+PENTA\_75
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Penta_75}
+\end{figure}
+
+\begin{minipage}[t]{0.5\linewidth}
+   \vspace{0pt}
+   \centering
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}        & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N7,N8,N9  \\
+      E2  & N2,N3 & N10,N11,N12  \\
+      E3  & N3,N1 & N13,N14,N15  \\
+      E4  & N1,N4 & N16,N17,N18 \\
+      E5  & N2,N5 & N19,N20,N21 \\
+      E6  & N3,N6 & N22,N23,N24 \\
+      E7  & N4,N5 & N25,N26,N27 \\
+      E8  & N5,N6 & N28,N29,N30 \\
+      E9  & N6,N4 & N31,N32,N33
+   \end{tabular}
+\end{minipage}
+
+\medskip
+
+\begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}c >{\ttfamily}l}
+   \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+   \uline{\textnormal{Face}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-edge nodes}} & \uline{\textnormal{Mid-face node}} & \uline{\textnormal{Oriented edges}} \\[3pt]
+   F1 & N1,N2,N5,N4 & N7,N8,N9,N19,N20,N21,          & N37,N38,N39,N40,N41, & \ E1,\ E5,-E7,-E4 \\
+   ~  &     ~       & N27,N26,N25,N18,N17,N16        & N42,N43,N44,N45      & ~ \\
+   F2 & N2,N3,N6,N5 & N10,N11,N12,N22,N23,N24,       & N46,N47,N48,N49,N50, & \ E2,\ E6,-E8,-E5 \\
+   ~  &     ~       & N30,N29,N28,N21,N20,N19        & N51,N52,N53,N54      & ~ \\
+   F3 & N3,N1,N4,N6 & N13,N14,N15,N16,N17,N18,       & N55,N56,N57,N58,N59, & \ E3,\ E4,-E9,-E6 \\
+   ~  &     ~       & N33,N32,N31,N24,N23,N22        & N60,N61,N62,N63      & ~ \\
+   F4 & N1,N3,N2    & N15,N14,N13,N12,N11,N10,       & N34,N35,N36          & -E3,-E2,-E1       \\
+   ~  &     ~       & N9,N8,N7                       &   ~                  & ~ \\
+   F5 & N4,N5,N6    & N25,N26,N27,N28,N29,N30,       & N64,N65,N66          & \ E7,\ E8,\ E9 \\
+   ~  &     ~       & N31,N32,N33
+\end{tabular}
+
+\medskip
+
+\newpage
+\uline{\textit{Notes}}
+
+\begin{Ventryi}{\fort{N1,\ldots,N27}}
+   \item [\fort{N34}]
+         Is located at the centroid of sub-triangle \fort{N1-N14-N8}.
+   \item [\fort{N35}]
+         Is located at the centroid of sub-triangle \fort{N2-N8-N11}.
+   \item [\fort{N36}]
+         Is located at the centroid of sub-triangle \fort{N3-N11-N14}.
+   \item [\fort{N64}]
+         Is located at the centroid of sub-triangle \fort{N4-N26-N32}.
+   \item [\fort{N65}]
+         Is located at the centroid of sub-triangle \fort{N5-N29-N26}.
+   \item [\fort{N66}]
+         Is located at the centroid of sub-triangle \fort{N6-N32-N29}.
+   \item [\fort{N67}]
+         Is located at the centroid of sub-triangle \fort{N16-N38-N56}.
+   \item [\fort{N68}]
+         Is located at the centroid of sub-triangle \fort{N19-N47-N38}.
+   \item [\fort{N69}]
+         Is located at the centroid of sub-triangle \fort{N22-N56-N47}.
+   \item [\fort{N70}]
+         Is located at the centroid of sub-triangle \fort{N17-N45-N63}.
+   \item [\fort{N71}]
+         Is located at the centroid of sub-triangle \fort{N20-N54-N45}.
+   \item [\fort{N72}]
+         Is located at the centroid of sub-triangle \fort{N23-N63-N54}.
+   \item [\fort{N73}]
+         Is located at the centroid of sub-triangle \fort{N18-N42-N60}.
+   \item [\fort{N74}]
+         Is located at the centroid of sub-triangle \fort{N21-N51-N42}.
+   \item [\fort{N75}]
+         Is located at the centroid of sub-triangle \fort{N24-N60-N51}.
 \end{Ventryi}
 
 \paragraph{Hexahedral Elements}
-CGNS supports three types of hexahedral elements, \fort{HEXA\_8},
-\fort{HEXA\_20}, and \fort{HEXA\_27}.
+CGNS supports nine types of hexahedral elements, \fort{HEXA\_8},
+\fort{HEXA\_20}, \fort{HEXA\_27}, \fort{HEXA\_32}, \fort{HEXA\_56}, \fort{HEXA\_64},
+\fort{HEXA\_44}, \fort{HEXA\_98}, and \fort{HEXA\_125}.
 \fort{HEXA\_8} elements are composed of eight nodes located at the
 eight geometric corners of the hexahedron.
 In addition, \fort{HEXA\_20} and \fort{HEXA\_27} elements have a node
 at the middle of each of the twelve edges; \fort{HEXA\_27} adds a
 node at the middle of each of the six faces, and one at the cell center.
+The cubic forms of the hexahedral elements, \fort{HEXA\_32},
+\fort{HEXA\_56}, and \fort{HEXA\_64}
+contain two interior nodes along each edge, 24 interior face nodes
+in the case of \fort{HEXA\_56} and \fort{HEXA\_64}, and an additonal
+eight interior volume nodes for \fort{HEXA\_64}.
+The quartic forms of the hexahedral elements, 
+\fort{HEXA\_44}, \fort{HEXA\_98}, and \fort{HEXA\_125}
+contain three interior nodes along each edge, 54 interior face nodes
+in the case of \fort{HEXA\_98}, and 54 interior face nodes and an additonal
+27 interior volume nodes for \fort{HEXA\_125}.
+
+\newpage
+\underbar{Linear and Quadratic Elements:}
 
 \begin{minipage}[t]{0.5\linewidth}
    \vspace{0pt}
@@ -1464,15 +2152,73 @@ node at the middle of each of the six faces, and one at the cell center.
    F6 & N5,N6,N7,N8 & N17,N18,N19,N20  & N26 & \ E9,\ E10,\ E11,\ E12
 \end{tabular}
 
+\newpage
+\underbar{Cubic Elements:}
+
+HEXA\_32
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/hex_32}
+\end{figure}
+
+\bigskip
+
+HEXA\_56
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/hex_56}
+\end{figure}
+
+\newpage
+HEXA\_64
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Cubic_Element/All_Figures/hex_64}
+\end{figure}
+
+\begin{minipage}[t]{0.5\linewidth}
+   \vspace{0pt}
+   \centering
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}        & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N9,N10  \\
+      E2  & N2,N3 & N11,N12 \\
+      E3  & N3,N4 & N13,N14 \\
+      E4  & N4,N1 & N15,N16 \\
+      E5  & N1,N5 & N17,N18 \\
+      E6  & N2,N6 & N19,N20 \\
+      E7  & N3,N7 & N21,N22 \\
+      E8  & N4,N8 & N23,N24 \\
+      E9  & N5,N6 & N25,N26 \\
+      E10 & N6,N7 & N27,N28 \\
+      E11 & N7,N8 & N29,N30 \\
+      E12 & N8,N5 & N31,N32
+   \end{tabular}
+\end{minipage}
+
+\medskip
+
+\begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}c >{\ttfamily}l}
+   \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+   \uline{\textnormal{Face}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-edge nodes}} & \uline{\textnormal{Mid-face node}} & \uline{\textnormal{Oriented edges}} \\[3pt]
+   F1 & N1,N4,N3,N2 & N16,N15,N14,N13,N12,N11,N10,N9   & N33,N36,N35,N34 & -E4,-E3,\ -E2,\ -E1   \\
+   F2 & N1,N2,N6,N5 & N9,N10,N19,N20,N26,N25,N18,N17   & N37,N38,N39,N40 & \ E1, E6,\ -E9,\ -E5  \\
+   F3 & N2,N3,N7,N6 & N11,N12,N21,N22,N28,N27,N20,N19  & N41,N42,N43,N44 & \ E2,\ E7, -E10,-E6   \\
+   F4 & N3,N4,N8,N7 & N13,N14,N23,N24,N30,N29,N22,N21  & N45,N46,N47,N48 & \ E3,\ E8,\ -E11,-E7  \\
+   F5 & N1,N5,N8,N4 & N17,N18,N32,N31,N24,N23,N15,N16  & N49,N50,N51,N52 & \ E5,-E12,-E8,\ \ E4  \\
+   F6 & N5,N6,N7,N8 & N25,N26,N27,N28,N29,N30,N31,N32  & N53,N54,N55,N56 & \ E9,\ E10,\ E11,\ E12
+\end{tabular}
+
 \medskip
 
 \uline{\textit{Notes}}
 
 \begin{Ventryi}{\fort{N1,\ldots,N27}}
-   \item [\fort{N1,\ldots,N27}]
+   \item [\fort{N1,\ldots,N64}]
          Grid point identification number.
-         Integer $\ge 0$ or blank, and \fort{N1} $\ne$ \fort{N2}
-         $\ne$ \ldots $\ne$ \fort{N27}.
+         Integer $\ge 0$ or blank, and no two values may be the same.
          Grid points \fort{N1}\ldots\fort{N4} are in consecutive order about
          one quadrilateral face.
          Grid points \fort{N5}\ldots\fort{N8} are in order in the same
@@ -1489,14 +2235,80 @@ node at the middle of each of the six faces, and one at the cell center.
          third node, is oriented outward.
 \end{Ventryi}
 
+\newpage
+\underbar{Quartic Elements:}
+
+HEXA\_44
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Hexa_44}
+\end{figure}
+
+\bigskip
+
+HEXA\_98
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Hexa_98}
+\end{figure}
+
+\newpage
+HEXA\_125
+\begin{figure}[!htb]
+%   \centering
+   \includegraphics[width=4in]{conv.figs/TecplotFiles_Quartic_Element/All_Figures/Hexa_125}
+\end{figure}
+
+\begin{minipage}[t]{0.5\linewidth}
+   \vspace{0pt}
+   \centering
+   \begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l >{\ttfamily\color{red}}l}
+      \multicolumn{3}{@{}l}{\uline{\textit{Edge Definition}}} \\[6pt]
+      \textnormal{Oriented}      & \textnormal{Corner}        & \textnormal{Mid-} \\
+      \uline{\textnormal{edges}} & \uline{\textnormal{nodes}} & \uline{\textnormal{node}} \\[3pt]
+      E1  & N1,N2 & N9,N10,N11  \\
+      E2  & N2,N3 & N12,N13,N14 \\
+      E3  & N3,N4 & N15,N16,N17 \\
+      E4  & N4,N1 & N18,N19,N20 \\
+      E5  & N1,N5 & N21,N22,N23 \\
+      E6  & N2,N6 & N24,N25,N26 \\
+      E7  & N3,N7 & N27,N28,N29 \\
+      E8  & N4,N8 & N30,N31,N32 \\
+      E9  & N5,N6 & N33,N34,N35 \\
+      E10 & N6,N7 & N36,N37,N38 \\
+      E11 & N7,N8 & N39,N40,N41 \\
+      E12 & N8,N5 & N42,N43,N44
+   \end{tabular}
+\end{minipage}
+
+\medskip
+
+\begin{tabular}{@{}>{\ttfamily}c >{\ttfamily}l >{\ttfamily\color{red}}l >{\ttfamily\color{blue}}c >{\ttfamily}l}
+   \multicolumn{5}{@{}l}{\uline{\textit{Face Definition}}} \\[6pt]
+   \uline{\textnormal{Face}} & \uline{\textnormal{Corner nodes}} & \uline{\textnormal{Mid-edge nodes}} & \uline{\textnormal{Mid-face node}} & \uline{\textnormal{Oriented edges}} \\[3pt]
+   F1 & N1,N4,N3,N2 & N20,N19,N18,N17,N16,N15,         & N45,N46,N47,N48,N49,  & -E4,-E3,\ -E2,\ -E1   \\
+   ~  &     ~       & N14,N13,N12,N11,N10,N9           & N50,N51,N52,N53       & ~ \\
+   F2 & N1,N2,N6,N5 & N9,N10,N11,N24,N25,N26,          & N54,N55,N56,N57,N58,  & \ E1, E6,\ -E9,\ -E5  \\
+   ~  &     ~       & N35,N34,N33,N23,N22,N21          & N59,N60,N61,N62       & ~ \\
+   F3 & N2,N3,N7,N6 & N12,N13,N14,N27,N28,N29,         & N63,N64,N65,N66,N67,  & \ E2,\ E7, -E10,-E6   \\
+   ~  &     ~       & N38,N37,N36,N26,N25,N24          & N68,N69,N70,N71       & ~ \\
+   F4 & N3,N4,N8,N7 & N15,N16,N17,N30,N31,N32,         & N72,N73,N74,N75,N76,  & \ E3,\ E8,\ -E11,-E7  \\
+   ~  &     ~       & N41,N40,N39,N29,N28,N27          & N77,N78,N79,N80       & ~ \\
+   F5 & N1,N5,N8,N4 & N21,N22,N23,N44,N43,N42,         & N81,N82,N83,N84,N85,  & \ E5,-E12,-E8,\ \ E4  \\
+   ~  &     ~       & N32,N31,N30,N18,N19,N20          & N86,N87,N88,N89       & ~ \\
+   F6 & N5,N6,N7,N8 & N33,N34,N35,N36,N37,N38,         & N90,N91,N92,N93,N94,  & \ E9,\ E10,\ E11,\ E12 \\
+   ~  &     ~       & N39,N40,N41,N42,N43,N44          & N95,N96,N97,N98    
+\end{tabular}
+
 \subsubsection{Unstructured Grid Example}
 \label{s:unst_example}
 
 Consider an unstructured zone in the shape of a cube, with each edge
 of the zone having three nodes.
 The resulting unstructured grid has a total of 27 nodes, as illustrated
-in the exploded figure below.
+in the exploded \autoref{f:exploded}.
 
+\begin{figure}[h]
 \begin{center}
    \begin{picture}(4.0,4.0)(-1.0,-1.0)
 %     Zone outline
@@ -1655,11 +2467,17 @@ in the exploded figure below.
       \put( 3.05, 2.05){\makebox(0,0)[lb]{9}}
    \end{picture}
 \end{center}
+\caption{Example Unstructured Cube (Exploded View)}
+\label{f:exploded}
+\end{figure}
 
 This zone contains eight hexahedral cells, numbered 1 to 8, and the
-cell connectivity is:
+cell connectivity is shown in \autoref{t:explodedconnectivity}.
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption[Cell Connectivity for Example Unstructured Cube]{\textbf{Cell Connectivity for Example Unstructured Cube}}
+\label{t:explodedconnectivity}
 \begin{tabular}{c >{\quad}l}
 \hline\hline \\*[-2ex]
 \bold{Element No.} & \bold{Element Connectivity}
@@ -1674,17 +2492,20 @@ cell connectivity is:
 8 & 14, 15, 18, 17, 23, 24, 27, 26
 \\*[1ex] \hline\hline
 \end{tabular}
-\end{center}
+\end{table}
 
 In addition to the cells, the boundary faces could also be added to the
 element definition of this unstructured zone.
 There are 24 boundary faces in this zone, corresponding to element
 numbers 9 to 32.
 Each boundary face is of type \fort{QUAD\_4}.
-The table below shows the element connectivity of each boundary face,
+\autoref{t:explodedboundary} shows the element connectivity of each boundary face,
 as well as the element number and face number of its parent cell.
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption[Boundary Face Connectivity for Example Unstructured Cube]{\textbf{Boundary Face Connectivity for Example Unstructured Cube}}
+\label{t:explodedboundary}
 \begin{tabular}{l >{\quad}c >{\quad}c >{\quad}c >{\quad}c}
 \\ \hline\hline \\*[-2ex]
                       &                              & \bold{Element}      & \bold{Parent} & \bold{Parent} \\
@@ -1721,7 +2542,7 @@ Front  & 29 & 19, 20, 23, 22 & 5 & 6 \\
        & 32 & 23, 24, 27, 26 & 8 & 6 
 \\*[1ex] \hline\hline
 \end{tabular}
-\end{center}
+\end{table}
 %\end{longtable}
 
 \subsection{Multizone Interfaces}

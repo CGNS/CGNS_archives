@@ -9,7 +9,7 @@ This information includes grids, flow solutions, multizone interface
 connectivity, boundary conditions, reference states and dimensional
 units or normalization associated with data.
 
-\subsubsection*{Implications of CFD Data Sets}
+\subsection{Implications of CFD Data Sets}
 
 The goal is description of the data sets typical of CFD analysis, which
 tend to contain a small number of extremely large data arrays.  This
@@ -40,11 +40,11 @@ foster a more brief syntax.
 
 It is important to note that the description of information by the
 SIDS is independent of physical file formats.  However, it is targeted
-towards implementation using the ADF Core library.  Some of the language
+toward implementation using the ADF Core library.  Some of the language
 components used to define the SIDS are meant to directly map into
 elements of an ADF node.
 
-\subsubsection*{Topologically Based Hierarchical Database}
+\subsection{Topologically Based Hierarchical Database}
 
 An early decision in the CGNS project was that any new CFD I/O standard 
 should include a hierarchical database, such as a tree or directed graph.
@@ -76,7 +76,7 @@ also depicts nodes containing multizone interface connectivity and
 boundary condition information for the first zone; subnodes hanging off
 each of these are not pictured.
 
-\subsubsection*{Additional Design Objectives}
+\subsection{Additional Design Objectives}
 
 The data structures comprising the SIDS are the result of several
 additional design objectives:
