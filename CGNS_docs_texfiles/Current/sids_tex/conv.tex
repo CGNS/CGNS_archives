@@ -441,23 +441,31 @@ number of nodes.
 \centering
 \caption[Element Types in CGNS]{\textbf{Element Types in CGNS}}
 \label{t:elementtypes}
-\begin{tabular}{c >{\quad}l >{\quad}l >{\quad}l >{\quad}l}
+\begin{tabular}{c >{\quad}l >{\quad}l >{\quad}l >{\quad}l >{\quad}l}
 \\ \hline\hline \\*[-2ex]
-\bold{Dimensionality} &                        & \bold{Linear}        & \bold{Quadratic}     & \bold{Cubic}\\
-\bold{of the Element} & \spantwo{\bold{Shape}} & \bold{Interpolation} & \bold{Interpolation} & \bold{Interpolation}
+\bold{Dimens-} &                        & \bold{Linear}        & \bold{Quadratic}     & \bold{Cubic} & \bold{Quartic}\\
+\bold{ionality} & \spantwo{\bold{Shape}} & \bold{Interp-} & \bold{Interp-} & \bold{Interp-} & \bold{Interp-}\\
+\bold{of the} & ~                        & \bold{olation} & \bold{olation} & \bold{olation} & \bold{olation}\\
+\bold{Element} & ~                        & ~                    & ~                    & ~
 \\*[1ex] \hline\hline \\*[-2ex]
-0-D & Point       & \fort{NODE}     & \fort{NODE}                 & \fort{NODE} \\
-1-D & Line        & \fort{BAR\_2}   & \fort{BAR\_3}               & \fort{BAR\_4} \\
-2-D & Triangle    & \fort{TRI\_3}   & \fort{TRI\_6}               & \fort{TRI\_9, TRI\_10} \\
-    & Quadrangle  & \fort{QUAD\_4}  & \fort{QUAD\_8,}             & \fort{QUAD\_12,} \\
-    &             &                 & \fort{QUAD\_9}              & \fort{QUAD\_16} \\
-3-D & Tetrahedron & \fort{TETRA\_4} & \fort{TETRA\_10}            & \fort{TETRA\_16, TETRA\_20} \\
-    & Pyramid     & \fort{PYRA\_5}  & \fort{PYRA\_13,}            & \fort{PYRA\_21, PYRA\_29,} \\
-    &             &                 & \fort{PYRA\_14}             & \fort{PYRA\_30} \\
-    & Pentahedron & \fort{PENTA\_6} & \fort{PENTA\_15,}           & \fort{PENTA\_24, PENTA\_38,} \\
-    &             &                 & \fort{PENTA\_18}            & \fort{PENTA\_40} \\
-    & Hexahedron  & \fort{HEXA\_8}  & \fort{HEXA\_20,}            & \fort{HEXA\_32, HEXA\_56,} \\
-    &             &                 & \fort{HEXA\_27}             & \fort{HEXA\_64}
+0-D & Point       & \fort{NODE}     & \fort{NODE}                 & \fort{NODE}       & \fort{NODE}\\
+1-D & Line        & \fort{BAR\_2}   & \fort{BAR\_3}               & \fort{BAR\_4}     & \fort{BAR\_5}\\
+2-D & Triangle    & \fort{TRI\_3}   & \fort{TRI\_6}               & \fort{TRI\_9,}    & \fort{TRI\_12,}\\
+    &             &                 &                             & \fort{TRI\_10}    & \fort{TRI\_15}\\
+    & Quadrangle  & \fort{QUAD\_4}  & \fort{QUAD\_8,}             & \fort{QUAD\_12,}  & \fort{QUAD\_P4\_16,}\\
+    &             &                 & \fort{QUAD\_9}              & \fort{QUAD\_16}   & \fort{QUAD\_25}\\
+3-D & Tetrahedron & \fort{TETRA\_4} & \fort{TETRA\_10}            & \fort{TETRA\_16,} & \fort{TETRA\_22,}\\
+    &             &                 &                             & \fort{TETRA\_20}  & \fort{TETRA\_34,}\\
+    &             &                 &                             &                   & \fort{TETRA\_35}\\
+    & Pyramid     & \fort{PYRA\_5}  & \fort{PYRA\_13,}            & \fort{PYRA\_21,}  & \fort{PYRA\_P4\_29,}\\
+    &             &                 & \fort{PYRA\_14}             & \fort{PYRA\_29,}  & \fort{PYRA\_50,}\\
+    &             &                 &                             & \fort{PYRA\_30}   & \fort{PYRA\_55}\\
+    & Pentahedron & \fort{PENTA\_6} & \fort{PENTA\_15,}           & \fort{PENTA\_24,} & \fort{PENTA\_33,}\\
+    &             &                 & \fort{PENTA\_18}            & \fort{PENTA\_38,} & \fort{PENTA\_66,}\\
+    &             &                 &                             & \fort{PENTA\_40}  & \fort{PENTA\_75}\\
+    & Hexahedron  & \fort{HEXA\_8}  & \fort{HEXA\_20,}            & \fort{HEXA\_32,}  & \fort{HEXA\_44,}\\
+    &             &                 & \fort{HEXA\_27}             & \fort{HEXA\_56,}  & \fort{HEXA\_98,}\\
+    &             &                 &                             & \fort{HEXA\_64}   & \fort{HEXA\_125} 
 \\*[1ex] \hline\hline
 \end{tabular}
 \end{table}
