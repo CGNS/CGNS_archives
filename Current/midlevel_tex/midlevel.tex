@@ -1,0 +1,444 @@
+%
+% Tex input file for CGNS Mid-Level Library Manual
+%
+% To generate a DVI file, then a PostScript file named midlevel.ps:
+%
+%     latex midlevel.tex
+%     dvips midlevel.dvi -o
+%
+% To generate a PDF file named midlevel.pdf:
+%
+%     pdflatex midlevel.tex
+
+
+\documentclass[twoside,fleqn]{article}
+
+%
+% Packages
+%
+%\usepackage{times}			% use PostScript Times-Roman for text
+\usepackage{indentfirst}		% indent first paragraph in sections
+%\usepackage[first,light]{draftcopy}	% add DRAFT watermark
+\usepackage[tbtags]{amsmath}		% use ams math package
+\usepackage{graphicx}			% for including eps files
+%\usepackage{subfigure}			% for sub-figures
+\usepackage[bf]{caption}		% for more flexible captions
+   \setlength{\captionmargin}{18pt}	% caption margins
+\usepackage{array}			% use new array and table package
+   \setlength{\extrarowheight}{2pt}	% increase row heights in tables
+\usepackage{tabularx}			% use tabularx package
+\usepackage{longtable}			% use longtable package
+\usepackage{alltt}			% verbatim input with font changes
+%\usepackage{lscape}			% for landscape pages
+%\usepackage{mdwtab}			% use mdwtab array and table package
+%\usepackage{tabls}			% access \hline[dimen] feature
+%\usepackage{dcolumn}			% allow table alignment at dec points
+%   \newcolumntype{d}[1]{D{.}{.}{#1}}	% for tables, arg is # decimal places
+\usepackage{natbib}			% for author-year citations
+   \setlength{\bibhang}{0pt}		% don't use hanging indent format
+\usepackage[normalem]{ulem}		% allow underlining
+\usepackage{calc}			% calculation package
+\usepackage{ifthen}			% control structures
+\usepackage{fancyhdr}			% fancy headers and footers
+   \fancyhf{}
+   \renewcommand{\headrulewidth}{0pt}
+   \renewcommand{\footrulewidth}{0pt}
+\usepackage{titling}			% more title page control
+\usepackage{xspace}			% common-sense spacing after text macro
+\usepackage{mdwlist}			% more flexible description lists
+\usepackage{colortbl}			% colored table cells
+\usepackage{color}			% colors and grays
+   \definecolor{subcolor}{rgb}{0.808,0.851,1.0}
+   \definecolor{input}{rgb}{0.200,0.200,1.0}
+   \definecolor{output}{rgb}{0.600,0.0,0.0}
+\usepackage{url}			% typesetting urls
+   \urlstyle{rm}
+%\usepackage[T1]{fontenc}		% for better-looking "_" and tt "{"
+\usepackage{ae}				% used instead of above for PDF output
+\usepackage{hyperref}			% for hypertext links in PDF
+   \hypersetup{letterpaper,plainpages=false,
+               pdftitle={CGNS Mid-Level Library},
+               pdfauthor={CGNS Project Group},
+               colorlinks,
+               linkcolor=blue,citecolor=blue,filecolor=red,pagecolor=blue,
+               urlcolor=red}
+   \renewcommand{\sectionautorefname}{Section}
+   \renewcommand{\subsectionautorefname}{Section}
+   \renewcommand{\subsubsectionautorefname}{Section}
+
+%
+% Page layout
+%
+\normalsize
+\setlength{\oddsidemargin}{0.5in}	% left margins-1.0in for odd/even pages
+\setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{6.0in}		% text width
+%\setlength{\marginparwidth}{0in}	% margin note space parameters
+%\setlength{\marginparsep}{0in}
+%\setlength{\oddsidemargin}{0.25in}	% left margins-1.0in for odd/even pages
+%\setlength{\evensidemargin}{0.75in}
+%\setlength{\textwidth}{5.5in}		% text width
+\setlength{\marginparwidth}{1.1in}	% margin note space parameters
+\setlength{\marginparsep}{0.2in}
+\reversemarginpar
+\setlength{\topmargin}{-0.5in}		% top margin-1.0in
+\setlength{\headheight}{0.25in}		% header space parameters
+\setlength{\headsep}{0.5in}
+\setlength{\textheight}{8.5in}		% text height
+\setlength{\topskip}{\baselineskip}	% dist from top of body to 1st baseline
+\setlength{\footskip}{0.75in}		% dist from bottom of body to footer
+\raggedbottom				% to avoid stretching vertical space
+\pagestyle{fancy}			% using fancyhdr package
+\fancypagestyle{plain}{%		% page # in corner for plain style
+   \fancyhf{}
+   \fancyfoot[LE,RO]{\bfseries \thepage}}
+
+%
+% Misc spacing parameters
+%
+%\setlength{\parskip}{\baselineskip}	% blank space between paragraphs
+\setlength{\parskip}{0.5\baselineskip}	% blank space between paragraphs
+\setlength{\doublerulesep}{0pt}		% for wider \hlines
+\setlength{\fboxsep}{5pt}		% for more margin in boxes
+\newlength{\saveparindent}		% save for use where LaTeX changes them
+\newlength{\saveparskip}		% save for use where LaTeX changes them
+\newlength{\savebaselineskip}
+\setlength{\saveparindent}{\parindent}
+\setlength{\saveparskip}{\parskip}
+\setlength{\savebaselineskip}{\baselineskip}
+\newlength{\tmplength}			% for temp use wherever needed
+\newlength{\Pwidth}			% for use in tables
+\newlength{\Pwidtha}
+
+%
+% User-defined environments
+%
+% "Definition" list with variable-length entries, indented. Requires
+% mdwlist package. (See LaTeX Companion, p 64, and mdwlist documentation.)
+\newenvironment{Ventryi}[1]%
+   {\settowidth{\tmplength}{\hspace{\saveparindent}#1\hspace{1em}}%
+    \begin{basedescript}{%
+           \desclabelwidth{\tmplength}%
+           \desclabelstyle{\nextlinelabel}%
+           \renewcommand{\makelabel}[1]{\hspace{\saveparindent}##1\hfil}}}
+   {\end{basedescript}}
+% Indented definition list with variable-length entries, compact. Requires
+% mdwlist package. (See LaTeX Companion, p 64, and mdwlist documentation.)
+\newenvironment{Ventryic}[1]%
+   {\settowidth{\tmplength}{\hspace{\saveparindent}#1\hspace{1em}}%
+    \begin{basedescript}{%
+           \desclabelwidth{\tmplength}%
+           \desclabelstyle{\nextlinelabel}%
+           \renewcommand{\makelabel}[1]{\hspace{\saveparindent}##1\hfil}
+           \setlength{\topsep}{0in}%
+           \setlength{\parsep}{0in}%
+           \setlength{\itemsep}{0in}}}
+   {\end{basedescript}}
+
+% "changes" environment, to identify changed code by color.  The color is
+% given by the argument, with a default of red.  When the environment is
+% exited, the color is changed to black.
+\newenvironment{changes}[1][red]%
+   {\color{#1}}
+   {\color{black}}
+
+% Adapted from comp.text.tex post by Keith Reckdahl
+% (reckdahl@am-sparc7.Stanford.EDU)
+% Indents text from the left margin by current value of the list
+% length \leftmargin
+%\newenvironment{indleft}%
+%   {\begin{list}{}
+%      {\setlength{\topsep}{0pt}%
+%       \setlength{\listparindent}{0pt}%
+%       \setlength{\itemindent}{0pt}%
+%       \setlength{\parsep}{\parskip}%
+%      }%
+%      \item[]}%
+%   {\end{list}}
+% As above, but surrounding an alltt environment
+\newenvironment{indlefttt}%
+   {\begin{list}{}
+      {\setlength{\topsep}{0pt}%
+       \setlength{\listparindent}{0pt}%
+       \setlength{\itemindent}{0pt}%
+       \setlength{\parsep}{\parskip}%
+      }%
+      \item[]%
+      \begin{alltt}}%
+   {\end{alltt}\end{list}}
+%
+% Framed box for function syntax
+% Works
+%\newlength{\Headwidtha}
+%\newlength{\savearrayrulewidth}
+%\newenvironment{fctbox}
+%   {\noindent
+%    \setlength{\savearrayrulewidth}{\arrayrulewidth}%
+%    \setlength{\arrayrulewidth}{0.6pt}%
+%    \setlength{\Headwidtha}{\textwidth-3\arrayrulewidth-4\tabcolsep-0.45in}%
+%    \setlength{\tmplength}{\tabcolsep+0.3in}%
+%    \begin{flushleft}
+%    \begin{tabular}{|>{\ttfamily\columncolor{subcolor}}p{\Headwidtha} |%
+%	  >{\centering\ttfamily\columncolor{subcolor}[\tabcolsep][\tmplength]}p{0.15in}%
+%	  @{\centering}p{0.15in} @{\centering}p{0.15in} |}%
+%    \hline
+%    \textnormal{\textbf{Functions}} & \textnormal{\textbf{Modes}} & & \\
+%    \hline
+%   }
+%   {\hline
+%    \end{tabular}
+%    \setlength{\arrayrulewidth}{\savearrayrulewidth}%
+%    \end{flushleft}
+%   }
+
+% 
+\newlength{\Headwidtha}
+\newlength{\savearrayrulewidth}
+\newenvironment{fctbox}
+   {\noindent
+    \setlength{\savearrayrulewidth}{\arrayrulewidth}%
+    \setlength{\arrayrulewidth}{0.8pt}%
+    \settowidth{\tmplength}{\textbf{Modes}}
+    \setlength{\Headwidtha}{\textwidth-3\arrayrulewidth-4\tabcolsep-\tmplength}%
+    \begin{flushleft}
+    \begin{tabular}{|>{\ttfamily\columncolor{subcolor}}p{\Headwidtha}%
+                    |>{\ttfamily\columncolor{subcolor}}c |}
+    \hline
+    \textnormal{\textbf{Functions}} & \textnormal{\textbf{Modes}} \\
+    \hline
+   }
+   {\hline
+    \end{tabular}
+    \setlength{\arrayrulewidth}{\savearrayrulewidth}%
+    \end{flushleft}
+   }
+
+% Doesn't work ...
+%\newlength{\Headwidtha}
+%\newlength{\savearrayrulewidth}
+%\newenvironment{fctbox}
+%   {\noindent
+%    \setlength{\savearrayrulewidth}{\arrayrulewidth}%
+%    \setlength{\arrayrulewidth}{0.6pt}%
+%    \setlength{\Headwidtha}{\textwidth-3\arrayrulewidth-4\tabcolsep-0.45in}%
+%    \setlength{\tmplength}{\tabcolsep+0.3in}%
+%    \begin{flushleft}
+%    \begin{tabular}{|>{\ttfamily\columncolor{subcolor}}p{\Headwidtha} |%
+%          >{\centering\ttfamily\columncolor{subcolor}[\tabcolsep][\tmplength]}p{0.45in} |}%
+%    \hline
+%    \textnormal{\textbf{Functions}} & \textnormal{\textbf{Modes}} \\
+%    \hline
+%   }
+%   {\hline
+%    \end{tabular}
+%    \setlength{\arrayrulewidth}{\savearrayrulewidth}%
+%    \end{flushleft}
+%   }
+
+%
+% User-defined commands
+%
+
+% Function name initialization
+\newcommand{\fctname}{}
+
+% Function header
+\newcommand{\fctheader}[3]
+   {\newpage%
+    \hypertarget{fct:#3}{}%
+    \noindent
+    \ital{#1} (\texttt{#2})
+    \smallskip
+    \renewcommand{\fctname}{#1}
+%    \fancyfoot[LE]{\bfseries \thepage}
+%    \fancyfoot[RO]{\bfseries \thepage}
+    \addtocontents{toc}{\protect\contentsline {subsubsection}{\ital{\fctname}\ (\texttt{#2})}{\thepage}{fct:#3}}
+   }
+
+% Function header, no new page
+\newcommand{\fctheadernnp}[3]
+   {\noindent
+    \hypertarget{fct:#3}{}%
+    \ital{#1} (\texttt{#2})
+    \smallskip
+    \renewcommand{\fctname}{\ital{#1}}
+%    \fancyfoot[LE]{\bfseries \thepage}
+%    \fancyfoot[RO]{\bfseries \thepage}
+    \addtocontents{toc}{\protect\contentsline {subsubsection}{\fctname\ (\texttt{#2})}{\thepage}{fct:#3}}
+   }
+
+% Re-def longtable's caption command to use \captionlabelfont from caption pkg
+% (basis lifted from longtable.sty)
+\makeatletter
+\renewcommand{\LT@makecaption}[3]{%
+  \LT@mcol\LT@cols c{\hbox to\z@{\hss\parbox[t]\LTcapwidth{%
+    \sbox\@tempboxa{{\captionlabelfont #1{#2: }}#3}%
+    \ifdim\wd\@tempboxa>\hsize
+      {\captionlabelfont #1{#2: }}#3%
+    \else
+      \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+    \fi
+    \endgraf\vskip\baselineskip}%
+  \hss}}}
+\makeatother
+
+% Make next page odd, with preceding blank page empty (LaTeX Companion, p 93)
+\newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
+
+% Text subscripts, analogous to \textsuperscript command (from comp.text.tex
+% post by rf@cl.cam.ac.uk (Robin Fairbairns))
+\makeatletter
+\DeclareRobustCommand*\tsub[1]{%
+  \@tsub{\selectfont#1}}
+\def\@tsub#1{%
+  {\m@th\ensuremath{_{\mbox{\fontsize\sf@size\z@#1}}}}}
+\makeatother
+
+% Text superscripts, but shorter
+\newcommand{\tsup}[1]{\textsuperscript{#1}}
+
+% Shortcuts for specific fonts
+\newcommand{\bold}[1]{{\normalfont\textbf{#1}}}  % Bold
+\newcommand{\ital}[1]{{\normalfont\textit{#1}}}  % Italic
+\newcommand{\key}[1]{{\normalfont\texttt{#1}}}  % Fixed font for keywords
+
+% Examples
+\newcommand{\Example}[1]{\noindent\uline{\textit{#1}}}
+
+% Use section titles as marks (i.e., in headers) instead of subsection titles
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ \ #1}}
+\renewcommand{\subsectionmark}[1]{}
+
+% "Better" treatment of headings for Appendices  (LaTeX Companion, pp 29,30)
+\renewcommand{\appendix}{%
+   \newcommand{\app}{%
+      \secdef\Appendix\sAppendix}%
+   \newcommand{\subapp}{%
+      \secdef\subAppendix\subsAppendix}%
+   \newcounter{app}%
+   \newcounter{subapp}[app]%
+   \renewcommand{\theapp}{\Alph{app}}%
+   \renewcommand{\thesubapp}{\theapp.\arabic{subapp}}%
+ }
+\newcommand{\Appendix}[2][?]{%   Complex form
+   \refstepcounter{app}%
+   \addcontentsline{toc}{section}%
+      {\protect\bfseries{\appendixname~\theapp.\ \ } #1}%
+   {\noindent\Large\bfseries\appendixname\ \theapp.\ \ #2\par}%
+   \sectionmark{#1}\vspace{\baselineskip}}
+\newcommand{\sAppendix}[1]{%   Starred form
+   \refstepcounter{app}%
+   {\noindent\Large\bfseries\appendixname\ \theapp.\ \ #1\par}%
+   \vspace{\baselineskip}}
+
+\newcommand{\subAppendix}[2][?]{%   Complex form
+   \refstepcounter{subapp}%
+   \addcontentsline{toc}{subsection}%
+       {\thesubapp\ \ #1}%
+   \vspace{\baselineskip}
+   {\noindent\large\bfseries\thesubapp\ \ #2\par}%
+   \vspace{\baselineskip}}
+\newcommand{\subsAppendix}[1]{%   Starred form
+   \refstepcounter{subapp}%
+   \vspace{\baselineskip}
+   {\noindent\large\bfseries\thesubapp\ \ #1\par}%
+   \vspace{\baselineskip}}
+
+\begin{document}
+
+\pagenumbering{roman}
+
+%\fancyhead[LE]{\bfseries Mid-Level Library}
+%\fancyhead[RO]{\bfseries \rightmark}
+\fancyfoot[LE,RO]{\bfseries \thepage}
+
+%\setlength{\droptitle}{1.0in}
+\pretitle{\begin{flushleft}\LARGE%
+          \includegraphics[width=2.0in]{../logo/cgns_bw}\\*[0.25in]}
+\posttitle{\par\end{flushleft}\vskip 1.0em}
+\title{{\bfseries CFD General Notation System\\
+Mid-Level Library}\\*[0.25in]
+{\Large Document Version 3.1.14\\
+CGNS Version 3.1.3}}
+\author{}
+\date{}
+\maketitle
+\thispagestyle{empty}
+
+%\title{{\LARGE \textbf{CGNS}}\\*[0.5in]
+%The CFD General Notation System\\
+%Mid-Level Library\footnote
+%{This is an unnumbered version of this document, created \today.
+%It was derived from the HTML version of the document, originally
+%written by Diane Poirier of ICEM CFD Engineering.}}
+%\author{CGNS Project Group}
+%\date{}
+%\maketitle
+%\thispagestyle{empty}
+
+\clearemptydoublepage
+\setlength{\parskip}{0ex}		% remove blank space between paragraphs
+\thispagestyle{plain}
+\tableofcontents
+\setlength{\parskip}{\saveparskip}	% put it back
+
+\clearemptydoublepage
+\pagenumbering{arabic}
+
+\fancyhead[LE]{\bfseries Mid-Level Library}
+\fancyhead[RO]{\bfseries \rightmark}
+
+\include{intro}
+
+\clearemptydoublepage
+\include{general}
+
+\clearemptydoublepage
+\include{fileops}
+
+\clearemptydoublepage
+\include{navigating}
+
+\clearemptydoublepage
+\include{error}
+
+\clearemptydoublepage
+\include{structural}
+
+\clearemptydoublepage
+\include{descriptor}
+
+\clearemptydoublepage
+\include{physical}
+
+\clearemptydoublepage
+\include{location}
+
+\clearemptydoublepage
+\include{auxiliary}
+
+\clearemptydoublepage
+\include{grid}
+
+\clearemptydoublepage
+\include{solution}
+
+\clearemptydoublepage
+\include{connectivity}
+
+\clearemptydoublepage
+\include{bc}
+
+\clearemptydoublepage
+\include{equation}
+
+\clearemptydoublepage
+\include{families}
+
+\clearemptydoublepage
+\include{timedep}
+
+\clearemptydoublepage
+\include{links}
+
+\end{document}

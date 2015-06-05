@@ -1,0 +1,1259 @@
+\section{Governing Flow Equations}
+\label{s:floweqn}
+\thispagestyle{plain}
+
+This section provides structure type definitions for describing the
+governing flow-equation set associated with the database.
+The description includes the general class of governing equations, the
+turbulent closure equations, the gas and chemistry models, the
+viscosity and thermal-conductivity models, and the electromagnetics
+models.
+Included with each equation description are associated constants.
+The structure definitions attempt to balance the opposing requirements
+for future growth and extensibility with initial ease of implementation.
+Included in the final section (\autoref{s:flowexample}) are examples of
+flow-equation sets.
+
+The intended use of these structures initially is primarily for archival
+purposes and to provide additional documentation of the flow solution.
+If successful in this role, it is foreseeable that these flow-equation
+structures may eventually be also used as inputs for grid generators,
+flow solvers, and post-processors.
+
+\subsection{Flow Equation Set Structure Definition: \texttt{FlowEquationSet\_t}}
+\label{s:FlowEquationSet}
+
+|FlowEquationSet_t| is a general description of the governing flow
+equations.
+It includes the dimensionality of the governing equations, and the
+collection of specific equation-set descriptions covered in subsequent
+sections.
+It can be a child node of either \fort{CGNSBase\_t} or \fort{Zone\_t}
+(or both).
+\begin{alltt}
+  FlowEquationSet\_t< int CellDimension > :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    int EquationDimension ;                                                 (o)  
+    
+    GoverningEquations\_t<CellDimension> GoverningEquations ;                (o)
+
+    GasModel\_t GasModel ;                                                   (o)
+
+    ViscosityModel\_t ViscosityModel ;                                       (o)
+
+    ThermalConductivityModel\_t ThermalConductivityModel ;                   (o)
+
+    TurbulenceClosure\_t TurbulenceClosure ;                                 (o)
+
+    TurbulenceModel\_t<CellDimension> TurbulenceModel ;                      (o)
+
+    ThermalRelaxationModel\_t ThermalRelaxationModel ;                       (o)
+
+    ChemicalKineticsModel\_t ChemicalKineticsModel ;                         (o)
+
+    EMElectricFieldModel\_t EMElectricFieldModel ;                           (o)
+
+    EMMagneticFieldModel\_t EMMagneticFieldModel ;                           (o)
+
+    EMConductivityModel\_t EMConductivityModel ;                             (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t} and
+      \fort{UserDefinedData\_t} lists are as shown; users may choose
+      other legitimate names.
+      Legitimate names must be unique within a given instance of
+      \fort{FlowEquationSet\_t} and shall not include the names
+      \fort{EMConductivityModel}, \fort{EMElectricFieldModel},
+      \fort{EMMagneticFieldModel}, \fort{EquationDimension},
+      \fort{GoverningEquations}, \fort{GasModel}, \fort{ViscosityModel},
+      \fort{ThermalConductivityModel}, \fort{TurbulenceClosure},
+      \fort{TurbulenceModel}, \fort{ThermalRelaxationModel},
+      \fort{ChemicalKineticsModel}, \fort{DataClass}, or
+      \fort{Di\-men\-sion\-al\-Units}.
+\item There are no required elements for \fort{FlowEquationSet\_t}.
+\end{notes}
+
+|FlowEquationSet_t| requires a single structure parameter,
+\fort{CellDimension}, to identify the dimensionality of index arrays for
+structured grids.
+This parameter is passed onto several substructures.
+
+\fort{EquationDimension} is the dimensionality of the governing
+equations; it is the number of spatial variables describing the flow.
+\fort{GoverningEquations} describes the general class of flow equations.
+\fort{GasModel} describes the equation of state, and
+\fort{ViscosityModel} and \fort{ThermalConductivityModel} describe the
+auxiliary relations for molecular viscosity and the thermal conductivity
+coefficient.
+\fort{TurbulenceClosure} and \fort{TurbulenceModel} describe the
+turbulent closure for the Reynolds-aver\-aged Navier-Stokes equations.
+\fort{ThermalRelaxationModel} and \fort{ChemicalKineticsModel} describe
+the equations used to model thermal relaxation and chemical kinetics.
+\fort{EMElectricFieldModel}, \fort{EMMagneticFieldModel}, and
+\fort{EMConductivityModel} describe the equations used to model
+electromagnetics.
+
+\fort{DataClass} defines the default for the class of data contained in
+the flow-equation set.
+For any data that is dimensional, \fort{DimensionalUnits} may be used to
+describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Governing Equations Structure Definition: \texttt{GoverningEquations\_t}}
+\label{s:GoverningEquations}
+
+|GoverningEquations_t| describes the class of governing flow equations
+associated with the solution.  
+\begin{alltt}
+  GoverningEquationsType\_t := Enumeration(
+    Null,
+    FullPotential,
+    Euler,                     
+    NSLaminar,
+    NSTurbulent,
+    NSLaminarIncompressible,
+    NSTurbulentIncompressible,
+    UserDefined ) ;
+
+  GoverningEquations\_t< int CellDimension > :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    GoverningEquationsType\_t GoverningEquationsType ;                       (r)
+    
+    int[CellDimension*(CellDimension + 1)/2] DiffusionModel ;               (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t} and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{GoverningEquations\_t} and shall not include the name
+ \fort{DiffusionModel}.
+\item
+ |GoverningEquationsType| is the only required element.
+\item
+ The length of the |DiffusionModel| array is as follows: in 1-D it is
+ |int[1]|; in 2-D it is |int[3]|; and in 3-D it is |int[6]|.
+ For unstructured zones, \fort{DiffusionModel} is not supported, and
+ should not be used.
+\end{notes}
+
+|GoverningEquations_t| requires a single structure parameter,
+\fort{CellDimension}.
+It is used to define the length of the array |DiffusionModel|.
+
+|DiffusionModel| describes the viscous diffusion terms modeled in the flow
+equations, and is applicable only to the Navier-Stokes equations
+with structured grids.
+Typically, thin-layer approximations include only the diffusion terms in
+one or two computational-coordinate directions.
+\fort{DiffusionModel} encodes the coordinate directions that include
+second-derivative and cross-derivative diffusion terms.
+The first \fort{CellDimension} elements are second-derivative terms and
+the remainder elements are cross-derivative terms.
+Allowed values for individual elements in the array |DiffusionModel| are
+0 and 1; a value of 1 indicates the diffusion term is modeled, and 0
+indicates that they are not modeled.
+In 3-D, the encoding of |DiffusionModel| is as follows:
+\begin{center}
+\begin{tabular}{c >{\quad}l}
+\hline\hline \\*[-2ex]
+\bold{Element} & \bold{Modeled Terms}
+\\*[1ex] \hline\hline \\*[-2ex]
+$n = 1$ & Diffusion terms in $i$ ($\partial^2/\partial \xi^2$) \\
+$n = 2$ & Diffusion terms in $j$ ($\partial^2/\partial \eta^2$) \\
+$n = 3$ & Diffusion terms in $k$ ($\partial^2/\partial \zeta^2$) \\
+$n = 4$ & Cross-diffusion terms in $i$-$j$ 
+          ($\partial^2/\partial \xi \partial \eta$ and
+           $\partial^2/\partial \eta \partial \xi$) \\
+$n = 5$ & Cross-diffusion terms in $j$-$k$ 
+          ($\partial^2/\partial \eta \partial \zeta$ and
+           $\partial^2/\partial \zeta \partial \eta$) \\
+$n = 6$ & Cross-diffusion terms in $k$-$i$ 
+          ($\partial^2/\partial \zeta \partial \xi$ and
+           $\partial^2/\partial \xi \partial \zeta$)
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{center}
+where derivatives in the $i$, $j$ and $k$ computational-coordinates are
+$\xi$, $\eta$ and $\zeta$, respectively.
+The full Navier-Stokes equations in 3-D are indicated by
+|DiffusionModel = [1,1,1,1,1,1]|, and the thin-layer equations
+including only diffusion in the $j$-direction are |[0,1,0,0,0,0]|. 
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Thermodynamic Gas Model Structure Definition: \
+\texttt{GasModel\_t}}
+\label{s:GasModel}
+
+\fort{GasModel\_t} describes the equation of state model used in the
+governing equations to relate pressure, temperature and density.
+\begin{alltt}
+  GasModelType\_t := Enumeration(
+    Null,
+    Ideal,
+    VanderWaals,
+    CaloricallyPerfect,
+    ThermallyPerfect,
+    ConstantDensity,
+    RedlichKwong,
+    UserDefined ) ;
+\end{alltt}
+
+\begin{alltt}
+  GasModel_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    GasModelType\_t GasModelType ;                                           (r)
+    
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{GasModel\_t} and shall not include the names \fort{DataClass} or
+ \fort{Di\-men\-sion\-al\-Units}.
+\item
+ \fort{GasModelType} is the only required element.
+\item
+ The \fort{GasModelType} enumeration name \fort{Ideal} implies
+ a calorically perfect single-component gas, but the more descriptive
+ name \fort{CaloricallyPerfect} is generally preferred.
+\end{notes}
+
+For a perfect gas (\fort{GasModelType = CaloricallyPerfect}), the
+pressure, temperature and density are related by,
+$$
+ p = \rho R T,
+$$
+where $R$ is the ideal gas constant.  Related quantities are the specific
+heat at constant pressure ($c_p$), specific heat at constant volume ($c_v$)
+and specific heat ratio ($\gamma = c_p/c_v$).  The gas constant and specific
+heats are related by $R = c_p - c_v$.  Data-name identifiers associated with
+the perfect gas law are listed in \autoref{t:id_perfect}.
+
+\begin{table}[htbp]
+\centering
+\caption[Data-Name Identifiers for Perfect Gas]{\textbf{Data-Name Identifiers for Perfect Gas}}
+\label{t:id_perfect}
+\begin{tabular}{>{\ttfamily}l >{\quad}l >{\quad}c}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+IdealGasConstant     & Ideal gas constant ($R$)                     &
+   $\L^2/(\T^2 \TH)$ \\
+SpecificHeatRatio    & Ratio of specific heats ($\gamma = c_p/c_v$) &
+   - \\
+SpecificHeatVolume   & Specific heat at constant volume ($c_v$)     &
+   $\L^2/(\T^2 \TH)$ \\
+SpecificHeatPressure & Specific heat at constant pressure ($c_p$)   &
+   $\L^2/(\T^2 \TH)$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+If it is desired to specify any of these identifiers in a CGNS database,
+they should be defined as \fort{DataArray}s under \fort{GasModel\_t}.
+
+The dimensional units are defined as follows: $\M$ is mass, $\L$ is length,
+$\T$ is time and $\TH$ is temperature.  These are further
+described in \hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
+
+|DataClass| defines the default for the class of data contained in the
+thermodynamic gas model.  For any data that is dimensional,
+|DimensionalUnits| may be used to describe the system of dimensional units
+employed.  If present, these two entities take precedence of all
+corresponding entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Molecular Viscosity Model Structure Definition: \texttt{ViscosityModel\_t}} 
+
+|ViscosityModel_t| describes the model for relating molecular
+viscosity ($\mu$) to temperature.
+\begin{alltt}
+  ViscosityModelType\_t := Enumeration(
+    Null,
+    Constant,
+    PowerLaw,
+    SutherlandLaw,
+    UserDefined ) ;
+
+  ViscosityModel\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    ViscosityModelType\_t ViscosityModelType ;                               (r)
+    
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{ViscosityModel\_t} and shall not include the names
+ \fort{DataClass} or \fort{DimensionalUnits}.
+\item
+ |ViscosityModelType| is the only required element.
+\end{notes}
+
+The molecular viscosity models are as follows: |Constant| states that
+molecular viscosity is constant throughout the field and is equal to some
+reference value ($\mu = \mu_{\rm ref}$); |PowerLaw| states that molecular
+viscosity follows a power-law relation,
+$$
+ \mu = \mu_{\rm ref} \left( T \over T_{\rm ref} \right)^n
+$$
+and |SutherlandLaw| is Sutherland's Law for molecular viscosity,
+$$
+ \mu = \mu_{\rm ref} \left( T \over T_{\rm ref} \right)^{3/2} 
+  {T_{\rm ref} + T_s \over T + T_s},
+$$
+where $T_s$ is the Sutherland's Law constant, and $\mu_{\rm ref}$ and
+$T_{\rm ref}$ are the reference viscosity and temperature, respectively.
+For air\footnote{White, F. M., {\it Viscous Fluid Flow}, McGraw-Hill, 1974,
+p.~28-29}, the power-law exponent is $n = 0.666$, Sutherland's law constant
+($T_s$) is 110.6 K, the reference temperature ($T_{\rm ref}$) is 273.15 K,
+and the reference viscosity ($\mu_{\rm ref}$) is 
+$1.716 \!\times\! 10^{-5}$ kg/(m-s).
+The data-name identifiers for molecular viscosity models are defined in
+\autoref{t:id_viscosity}.
+
+\settowidth{\tmplengtha}{\fort{ViscosityModelType}}
+\settowidth{\tmplengthb}{\fort{ViscosityMolecularReference}}
+\settowidth{\tmplengthc}{$\M/(\L \T)$}
+\setlength{\Pwidth}{\linewidth-8\tabcolsep-\tmplengtha-\tmplengthb-\tmplengthc}
+\begin{table}[htbp]
+\centering
+\caption[Data-Name Identifiers for Molecular Viscosity Models]{\textbf{Data-Name Identifiers for Molecular Viscosity Models}}
+\label{t:id_viscosity}
+\begin{tabular}{>{\ttfamily}l >{\ttfamily}l >{\raggedright\arraybackslash}p{\Pwidth} c}
+\\ \hline\hline \\*[-2ex]
+ViscosityModelType & \bold{Data-Name Identifer} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+PowerLaw      & PowerLawExponent
+   & Power-law exponent ($n$) & - \\
+SutherlandLaw & SutherlandLawConstant
+   & Sutherland's Law constant ($T_s$)     & $\TH$ \\
+\ital{All}    & TemperatureReference
+   & Reference temperature ($T_{\rm ref}$) & $\TH$ \\
+\ital{All}    & ViscosityMolecularReference
+   & Reference viscosity ($\mu_{\rm ref}$) & $\M/(\L\T)$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+If it is desired to specify any of these identifiers in a CGNS
+database, they should be defined as \fort{DataArray}s under
+\fort{ViscosityModel\_t}.
+
+|DataClass| defines the default for the class of data contained in the
+molecular viscosity model.
+For any data that is dimensional, |DimensionalUnits| may be used to
+describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Thermal Conductivity Model Structure Definition: \texttt{ThermalConductivityModel\_t}} 
+
+|ThermalConductivityModel_t| describes the model for relating the
+thermal-conductivity coefficient ($k$) to temperature.
+\begin{alltt}
+  ThermalConductivityModelType\_t := Enumeration(
+    Null,
+    ConstantPrandtl,
+    PowerLaw,
+    SutherlandLaw,
+    UserDefined ) ;
+
+  ThermalConductivityModel\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    ThermalConductivityModelType\_t ThermalConductivityModelType ;           (r)
+    
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t} and \fort{DataArray\_t}
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{ThermalConductivityModel\_t} and shall not include the names
+ \fort{DataClass} or \fort{DimensionalUnits}.
+\item
+ \fort{ThermalConductivityModelType} is the only required element.
+\end{notes}
+
+The thermal-conductivity models parallel the molecular viscosity models.
+|ConstantPrandtl| states that the Prandtl number ($Pr = \mu c_p/k$) is
+constant and equal to some reference value.
+|PowerLaw| relates $k$ to temperature via a power-law relation,
+$$
+ k = k_{\rm ref} \left( T \over T_{\rm ref} \right)^n.
+$$
+|SutherlandLaw| states the Sutherland's Law for thermal conductivity,
+$$
+ k = k_{\rm ref} \left( T \over T_{\rm ref} \right)^{3/2} 
+  {T_{\rm ref} + T_s \over T + T_s},
+$$
+where $k_{\rm ref}$ is the reference thermal conductivity, $T_{\rm ref}$
+is the reference temperature, and $T_s$ is the Sutherland's law constant.
+For air\footnote{White, F. M., {\it Viscous Fluid Flow}, McGraw-Hill, 1974,
+p.~32-33}, the Prandtl number is $Pr = 0.72$, the power-law exponent is
+$n = 0.81$, Sutherland's law constant ($T_s$) is 194.4 K, the reference
+temperature ($T_{\rm ref}$) is 273.15 K, and the reference thermal
+conductivity ($k_{\rm ref}$) is $2.414 \!\times\! 10^{-2}$ kg-m/(s\tsup{3}-K).  
+Data-name identifiers for thermal conductivity models are listed in
+\autoref{t:id_thermal}.
+
+\settowidth{\tmplengtha}{\fort{tivityModelType}}
+\settowidth{\tmplengthb}{\fort{ThermalConductivityReference}}
+\settowidth{\tmplengthc}{$\M \L/(\T^3 \TH)$}
+\setlength{\Pwidth}{\linewidth-8\tabcolsep-\tmplengtha-\tmplengthb-\tmplengthc}
+\begin{table}[htbp]
+\centering
+\caption[Data-Name Identifiers for Thermal Conductivity Models]{\textbf{Data-Name Identifiers for Thermal Conductivity Models}}
+\label{t:id_thermal}
+\begin{tabular}{>{\ttfamily}l >{\ttfamily}l >{\raggedright\arraybackslash}p{\Pwidth} c}
+\\ \hline\hline \\*[-2ex]
+ThermalConduc\textnormal{-} \\
+tivityModelType & \spantwo{\bold{Data-Name Identifer}} &
+   \spantwo{\bold{Description}} & \spantwo{\bold{Units}}
+\\*[1ex] \hline\hline \\*[-2ex]
+ConstantPrandtl & Prandtl &
+   Prandtl number ($Pr$)                          & - \\
+PowerLaw        & PowerLawExponent &
+   Power-law exponent ($n$)                       & - \\
+SutherlandLaw   & SutherlandLawConstant &
+   Sutherland's Law constant ($T_s$)              & $\TH$ \\
+\ital{All}      & TemperatureReference &
+   Reference temperature ($T_{\rm ref}$)          & $\TH$ \\
+\ital{All}      & ThermalConductivityReference &
+   Reference thermal conductivity ($k_{\rm ref}$) & $\M \L/(\T^3 \TH)$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+If it is desired to specify any of these identifiers in a CGNS
+database, they should be defined as \fort{DataArray}s under
+\fort{ThermalConductivityModel\_t}.
+
+|DataClass| defines the default for the class of data contained in the
+thermal conductivity model.
+For any data that is dimensional, |DimensionalUnits| may be used to
+describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Turbulence Structure Definitions}
+
+This section presents structure definitions for describing the form of
+closure used in the Reynolds-averaged (or Favre-averaged) Navier-Stokes
+equations for determining the Reynolds stress terms.  Here ``turbulence
+closure'' refers to eddy viscosity or other approximations for the
+Reynolds stress terms, and ``turbulence model'' refers to the actual
+algebraic or turbulence-transport equation models used.  To an extent
+these are independent choices (e.g., using either an eddy viscosity
+closure or an algebraic Reynolds-stress closure with a two-equation
+model).
+
+\subsubsection{Turbulence Closure Structure Definition: \texttt{TurbulenceClosure\_t}}
+
+|TurbulenceClosure_t| describes the turbulence closure for the Reynolds
+stress terms of the Navier-Stokes equations.
+
+\begin{alltt}
+  TurbulenceClosureType\_t := Enumeration(
+    Null,
+    EddyViscosity,
+    ReynoldsStress,                     
+    ReynoldsStressAlgebraic,
+    UserDefined ) ;
+
+  TurbulenceClosure\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    TurbulenceClosureType\_t TurbulenceClosureType ;                         (r)
+    
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{TurbulenceClosure\_t} and shall not include the names
+ \fort{DataClass} or \fort{DimensionalUnits}.
+\item
+ \fort{TurbulenceClosureType} is the only required element.
+\end{notes}
+
+The different types of turbulent closure are as follows: |EddyViscosity| is
+the Boussinesq eddy-viscosity closure, where the Reynolds stresses are
+approximated as the product of an eddy viscosity ($\nu_t$) and the mean
+strain tensor.
+Using indicial notation, the relation is,
+$$
+  - \overline{u'_i u'_j} = \nu_t \left( \pdf{u_i}{x_j} + \pdf{u_j}{x_i} \right),
+$$
+where $- \overline{u'_i u'_j}$ are the Reynolds stresses; the notation is
+further discussed in
+\hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}.
+\texttt{Rey\-nolds\-Stress} is no approximation of the Reynolds stresses.
+\texttt{ReynoldsStressAlgebraic} is an algebraic approximation for the
+Reynolds stresses based on some intermediate transport quantities.
+
+Associated with the turbulent closure is a list of constants, where each
+constant is described by a separate |DataArray_t| entity.
+Constants associated with the eddy-viscosity closure are listed in
+\autoref{t:id_closure}.
+
+\begin{table}[htbp]
+\centering
+\caption[Data-Name Identifiers for Turbulence Closure]{\textbf{Data-Name Identifiers for Turbulence Closure}}
+\label{t:id_closure}
+\begin{tabular}{>{\ttfamily}l >{\quad}l >{\quad}c}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+PrandtlTurbulent     & Turbulent Prandtl number ($\rho \nu_t c_p/k_t$) & -
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+If it is desired to specify any of these identifiers in a CGNS
+database, they should be defined as \fort{DataArray}s under
+\fort{TurbulenceClosure\_t}.
+
+|DataClass| defines the default for the class of data contained in the
+turbulence closure.
+For any data that is dimensional, |DimensionalUnits| may be used to
+describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsubsection{Turbulence Model Structure Definition: \texttt{TurbulenceModel\_t}}
+
+|TurbulenceModel_t| describes the equation set used to model the
+turbulence quantities.
+\begin{alltt}
+  TurbulenceModelType\_t := Enumeration(
+    Null,
+    Algebraic\_BaldwinLomax,
+    Algebraic\_CebeciSmith,
+    HalfEquation\_JohnsonKing,
+    OneEquation\_BaldwinBarth,
+    OneEquation\_SpalartAllmaras,
+    TwoEquation\_JonesLaunder,
+    TwoEquation\_MenterSST,
+    TwoEquation\_Wilcox,
+    UserDefined ) ;
+
+  TurbulenceModel\_t< int CellDimension > :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    TurbulenceModelType\_t TurbulenceModelType ;                             (r)
+    
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    int[CellDimension*(CellDimension + 1)/2] DiffusionModel ;               (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t} and \fort{DataArray\_t}
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{TurbulenceModel\_t} and shall not include the names
+ \fort{DiffusionModel}, \fort{DataClass}, or \fort{DimensionalUnits}.
+\item
+ \fort{TurbulenceModelType} is the only required element.
+\item
+ The length of the |DiffusionModel| array is as follows: in 1-D it is
+ |int[1]|; in 2-D it is |int[3]|; and in 3-D it is |int[6]|.
+ For unstructured zones, \fort{DiffusionModel} is not supported, and
+ should not be used.
+\end{notes}
+
+|TurbulenceModel_t| requires a single structure parameter,
+\fort{CellDimension}.
+It is used to define the length of the array |DiffusionModel|.
+|DiffusionModel| describes the viscous diffusion terms included in the
+turbulent transport model equations; the encoding of |DiffusionModel| is
+described in \autoref{s:GoverningEquations}.
+
+Associated with each choice of turbulence model may be a list of constants,
+where each constant is described by a separate |DataArray_t| entity.
+If used, the Data-Name Identifier of each constant should include the
+turbulence model name, as well as the constant name (e.g.,
+\fort{TurbulentSACb1}, \fort{TurbulentSSTCmu}, \fort{TurbulentKESigmak},
+etc.).
+However, no attempt is made here to formalize the names for all possible
+turbulence models.
+
+\fort{DataClass} defines the default for the class of data contained in the
+turbulence model equation set.
+For any data that is dimensional, \fort{DimensionalUnits} may be used to
+describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\begin{example}{Spalart-Allmaras Turbulence Model}
+
+Description for the eddy-viscosity closure and Spalart-Allmaras
+turbulence model, including associated constants.
+\begin{alltt}
+  TurbulenceClosure\_t TurbulenceClosure =
+    \{\{
+    TurbulenceClosureType\_t TurbulenceClosureType = EddyViscosity ;
+
+    DataArray\_t<real, 1, 1> PrandtlTurbulent = \{\{ 0.90 \}\} ;
+    \}\} ;
+
+  TurbulenceModel\_t TurbulenceModel = 
+    \{\{
+    TurbulenceModelType\_t TurbulenceModelType = OneEquation\_SpalartAllmaras ;
+
+    DataArray\_t<real, 1, 1> TurbulentSACb1   = \{\{ 0.1355 \}\} ;
+    DataArray\_t<real, 1, 1> TurbulentSACb2   = \{\{ 0.622 \}\} ;
+    DataArray\_t<real, 1, 1> TurbulentSASigma = \{\{ 2/3 \}\} ;
+    DataArray\_t<real, 1, 1> TurbulentSAKappa = \{\{ 0.41 \}\} ;
+    DataArray\_t<real, 1, 1> TurbulentSACw1   = \{\{ 3.2391 \}\} ;
+    DataArray\_t<real, 1, 1> TurbulentSACw2   = \{\{ 0.3 \}\} ;
+    DataArray\_t<real, 1, 1> TurbulentSACw3   = \{\{ 2 \}\} ;
+    DataArray\_t<real, 1, 1> TurbulentSACv1   = \{\{ 7.1 \}\} ;
+    DataArray\_t<real, 1, 1> TurbulentSACt1   = \{\{ 1 \}\} ;
+    DataArray\_t<real, 1, 1> TurbulentSACt2   = \{\{ 2 \}\} ;
+    DataArray\_t<real, 1, 1> TurbulentSACt3   = \{\{ 1.2 \}\} ;
+    DataArray\_t<real, 1, 1> TurbulentSACt4   = \{\{ 0.5 \}\} ;
+    \}\} ;
+\end{alltt}
+Note that each |DataArray_t| entity is abbreviated.
+\end{example}
+
+\subsection{Thermal Relaxation Model Structure Definition: \
+\texttt{ThermalRelaxationModelType\_t}}
+\label{s:ThermalRelaxationModel}
+
+\fort{ThermalRelaxationModel\_t} describes the equation set used to model
+thermal relaxation quantities.
+\begin{alltt}
+  ThermalRelaxationModelType\_t := Enumeration(
+    Null,
+    Frozen,
+    ThermalEquilib,
+    ThermalNonequilib,
+    UserDefined ) ;
+\end{alltt}
+
+\begin{alltt}
+  ThermalRelaxationModel\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    ThermalRelaxationModelType\_t ThermalRelaxationModelType ;               (r)
+    
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{ThermalRelaxationModel\_t} and shall not include the names
+ \fort{DataClass} or \fort{DimensionalUnits}.
+\item
+ \fort{ThermalRelaxationModelType} is the only required element.
+\end{notes}
+
+\fort{ThermalRelaxationModelType\_t} is an enumeration type describing
+the type of thermal relaxation model.
+
+\fort{DataArray\_t} data structures may be used to store data associated
+with the thermal relaxation model.
+\fort{DataClass} defines the default for the class of data being used.
+For any data that is dimensional, \fort{DimensionalUnits} may be used to
+describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+Additional information, if needed, may be stored using
+\fort{Descriptor\_t} data structures.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Chemical Kinetics Structure Definition: \texttt{ChemicalKineticsModel\_t}}
+\label{s:ChemicalKineticsModel}
+
+\fort{ChemicalKineticsModel\_t} describes the equation set used to model
+chemical kinetics quantities.
+\begin{alltt}
+  ChemicalKineticsModelType\_t := Enumeration(
+    Null,
+    Frozen,
+    ChemicalEquilibCurveFit,
+    ChemicalEquilibMinimization,
+    ChemicalNonequilib,
+    UserDefined ) ;
+\end{alltt}
+
+\begin{alltt}
+  ChemicalKineticsModel\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    ChemicalKineticsModelType\_t ChemicalKineticsModelType ;                 (r)
+    
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{ChemicalKineticsModel\_t} and shall not include the names
+ \fort{DataClass} or \fort{DimensionalUnits}.
+\item
+ \fort{ChemicalKineticsModelType} is the only required element.
+\end{notes}
+
+\fort{ChemicalKineticsModelType\_t} is an enumeration type describing
+the type of chemical kinetics model.
+
+\fort{DataArray\_t} data structures may be used to store data associated
+with the chemical kinetics model.
+Recommended data-name identifiers are listed in the following table.
+
+\begin{table}[htbp]
+\centering
+\caption[Data-Name Identifiers for Chemical Kinetics Models]{\textbf{Data-Name Identifiers for Chemical Kinetics Models}}
+\label{t:id_chemicalkinetics}
+\begin{tabular}{>{\ttfamily}l >{\quad}l >{\quad}c}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+MolecularWeight\textit{Symbol} & Molecular weight for species \textit{Symbol} &
+   - \\
+HeatOfFormation\textit{Symbol} & Heat of formation per unit mass for species \textit{Symbol} &
+   $\L^2/\T^2$ \\
+FuelAirRatio                   & Fuel/air mass ratio &
+   - \\
+ReferenceTemperatureHOF        & Reference temperature for the heat of formation &
+   $\TH$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+The dimensional units are defined as follows: $\L$ is length, $\T$ is
+time and $\TH$ is temperature.
+These are further described in
+\hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
+
+The variable string \textit{Symbol} in the above data-name identifiers 
+represents the chemical symbol for the desired species.
+For example, \fort{H} represents hydrogen atoms, \fort{O} represents
+oxygen atoms, \fort{H2} represents hydrogen molecules, \fort{H2O}
+represents water molecules, and \fort{C3H5O3(NO2)3} represents
+nitroglycerin molecules.
+Any symbols off the periodic table of the elements can be used.
+For charged molecules or particles, the word ``\fort{plus}'' or
+``\fort{minus}'' should be spelled out in lower case.
+For example, a CNO$+$ molecule should be denoted as \fort{CNOplus}.  
+
+Other commonly used mixtures, that are usually not referred to by their
+chemical symbols, are defined in the following table.
+Individual users may define new names, but these may not be recognized
+by other CGNS applications.
+For consistency, additional names should be proposed as SIDS extensions.
+
+\begin{table}[htbp]
+\centering
+\caption[Defined Names (Symbols) for Commonly Used Mixtures]{\textbf{Defined Names (Symbols) for Commonly Used Mixtures}}
+\label{t:id_chemicalkineticssymbols}
+\begin{tabular}{>{\ttfamily}l >{\quad}l}
+\\ \hline\hline \\*[-2ex]
+\bold{Symbol} & \bold{Mixture}
+\\*[1ex] \hline\hline \\*[-2ex]
+Air     & Generic air model \\
+eminus  & Electrons\\
+Fuel    & Generic fuel model \\
+FuelAir & Generic fuel/air mixture \\
+JP5     & JP5 jet fuel \\
+JP7     & JP7 jet fuel \\
+JP10    & JP10 jet fuel \\
+Product & Generic fuel/air product of combustion \\
+RP1     & RP1 rocket fuel
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+\fort{DataClass} defines the default for the class of data being used.
+For any data that is dimensional, \fort{DimensionalUnits} may be used to
+describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy,
+following the standard precedence rules.
+
+Additional information, if needed, may be stored using
+\fort{Descriptor\_t} data structures.
+For example, if CHEMKIN is used, it is recommended that a
+\fort{Descriptor\_t} data structure be used to indicate this.
+Reaction equations could also be specified using \fort{Descriptor\_t}
+data structures.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Electromagnetics Structure Definitions}
+\label{s:EM}
+
+This section presents structure definitions for describing the electric
+field, magnetic field, and conductivity models used for electromagnetic
+flows.
+
+\subsubsection{Electromagnetics Electric Field Model Structure Definition: \texttt{EMElectricFieldModel\_t}}
+
+\fort{EMElectricFieldModel\_t} describes the electric field model used
+for electromagnetic flows.
+\begin{alltt}
+  EMElectricFieldModelType\_t := Enumeration(
+    Null,
+    Constant,
+    Frozen,
+    Interpolated,
+    Voltage,
+    UserDefined ) ;
+\end{alltt}
+
+\begin{alltt}
+  EMElectricFieldModel\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    EMElectricFieldModelType\_t EMElectricFieldModelType ;                   (r)
+    
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+      \fort{UserDefinedData\_t}
+      lists are as shown; users may choose other legitimate names.
+      Legitimate names must be unique within a given instance of
+      \fort{EMElectricFieldModel\_t} and shall not include the names
+      \fort{DataClass} or \fort{DimensionalUnits}.
+\item \fort{EMElectricFieldModelType} is the only required element.
+\end{notes}
+
+\fort{EMElectricFieldModelType\_t} is an enumeration type describing
+the type of electric field model.
+
+\fort{DataArray\_t} data structures may be used to store data associated
+with the electric field model.
+Recommended data-name identifiers are listed in \autoref{t:id_EM}.
+
+\fort{DataClass} defines the default for the class of data contained in
+the electric field model.
+For any data that is dimensional, \fort{DimensionalUnits} may be used to
+describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy, following the standard
+precedence rules.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsubsection{Electromagnetics Magnetic Field Model Structure Definition: \texttt{EMMagneticFieldModel\_t}}
+
+\fort{EMMagneticFieldModel\_t} describes the magnetic field model used
+for electromagnetic flows.
+\begin{alltt}
+  EMMagneticFieldModelType\_t := Enumeration(
+    Null,
+    Constant,
+    Frozen,
+    Interpolated,
+    UserDefined ) ;
+\end{alltt}
+
+\begin{alltt}
+  EMMagneticFieldModel\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    EMMagneticFieldModelType\_t EMMagneticFieldModelType ;                   (r)
+    
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+      \fort{UserDefinedData\_t}
+      lists are as shown; users may choose other legitimate names.
+      Legitimate names must be unique within a given instance of
+      \fort{EMMagneticFieldModel\_t} and shall not include the names
+      \fort{DataClass} or \fort{DimensionalUnits}.
+\item \fort{EMMagneticFieldModelType} is the only required element.
+\end{notes}
+
+\fort{EMMagneticFieldModelType\_t} is an enumeration type describing
+the type of magnetic field model.
+
+\fort{DataArray\_t} data structures may be used to store data associated
+with the magnetic field model.
+Recommended data-name identifiers are listed in \autoref{t:id_EM}.
+
+\fort{DataClass} defines the default for the class of data contained in
+the electric field model.
+For any data that is dimensional, \fort{DimensionalUnits} may be used to
+describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy, following the standard
+precedence rules.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsubsection{Electromagnetics Conductivity Model Structure Definition: \texttt{EMConductivityModel\_t}}
+
+\fort{EMConductivityModel\_t} describes the conductivity model used
+for electromagnetic flows.
+\begin{alltt}
+  EMConductivityModelType\_t := Enumeration(
+    Null,
+    Constant,
+    Frozen,
+    Equilibrium\_LinRessler,
+    Chemistry\_LinRessler,
+    UserDefined ) ;
+\end{alltt}
+
+\begin{alltt}
+  EMConductivityModel\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    EMConductivityModelType\_t EMConductivityModelType ;                     (r)
+    
+    List( DataArray\_t<DataType, 1, 1> DataArray1 ... DataArrayN ) ;         (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+      \fort{UserDefinedData\_t}
+      lists are as shown; users may choose other legitimate names.
+      Legitimate names must be unique within a given instance of
+      \fort{EMConductivityModel\_t} and shall not include the names
+      \fort{DataClass} or \fort{DimensionalUnits}.
+\item \fort{EMConductivityModelType} is the only required element.
+\end{notes}
+
+\fort{EMConductivityModelType\_t} is an enumeration type describing
+the type of conductivity model.
+
+\fort{DataArray\_t} data structures may be used to store data associated
+with the conductivity model.
+Recommended data-name identifiers are listed in \autoref{t:id_EM}.
+
+\begin{table}[htbp]
+\centering
+\caption[Data-Name Identifiers for Electromagnetics Models]{\textbf{Data-Name Identifiers for Electromagnetics Models}}
+\label{t:id_EM}
+\begin{tabular}{>{\ttfamily}l >{\quad}l >{\quad}c}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+Voltage              & Voltage                                 & $\M \L^2/\T \I$ \\
+ElectricFieldX       & $x$-component of electric field vector  & $\M \L/\T \I$ \\
+ElectricFieldY       & $y$-component of electric field vector  & $\M \L/\T \I$ \\
+ElectricFieldZ       & $z$-component of electric field vector  & $\M \L/\T \I$ \\
+MagneticFieldX       & $x$-component of magnetic field vector  & $\I/\L$ \\
+MagneticFieldY       & $y$-component of magnetic field vector  & $\I/\L$ \\
+MagneticFieldZ       & $z$-component of magnetic field vector  & $\I/\L$ \\
+CurrentDensityX      & $x$-component of current density vector & $\I/\L^2$ \\
+CurrentDensityY      & $y$-component of current density vector & $\I/\L^2$ \\
+CurrentDensityZ      & $z$-component of current density vector & $\I/\L^2$ \\
+ElectricConductivity & Electrical conductivity                 & $\M \L/\T^3 \I^2$ \\
+LorentzForceX        & $x$-component of Lorentz force vector   & $\M \L/\T^2$ \\
+LorentzForceY        & $y$-component of Lorentz force vector   & $\M \L/\T^2$ \\
+LorentzForceZ        & $z$-component of Lorentz force vector   & $\M \L/\T^2 $ \\
+JouleHeating         & Joule heating                           & $\M \L^2/\T^2$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+The dimensional units are defined as follows: $\M$ is mass, $\L$ is
+length, $\T$ is time, and $\I$ is electric current.
+These are further described in
+\hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
+
+\fort{DataClass} defines the default for the class of data contained in
+the conductivity model.
+For any data that is dimensional, \fort{DimensionalUnits} may be used to
+describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy, following the standard
+precedence rules.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Flow Equation Examples}
+\label{s:flowexample}
+
+This section presents two examples of flow-equation sets.  The first is
+an inviscid case and the second is a turbulent case with a one-equation
+turbulence model.
+
+\begin{example}{3-D Compressible Euler}
+\label{e:eqn_Euler}
+
+3-D compressible Euler with a perfect gas assumption for a monatomic gas:
+\begin{alltt}
+  FlowEquationSet\_t<3> EulerEquations = 
+    \{\{
+    int EquationDimension = 3 ;
+    
+    GoverningEquations\_t<3> GoverningEquations =
+      \{\{
+      GoverningEquationsType\_t GoverningEquationsType = Euler ;
+      \}\} ;
+      
+    GasModel\_t GasModel =
+      \{\{
+      GasModelType\_t GasModelType = CaloricallyPerfect ;
+      
+      DataArray\_t<real, 1, 1> SpecificHeatRatio =
+        \{\{
+        Data(real, 1, 1) = 1.667 ;
+
+        DataClass\_t DataClass = NondimensionalParameter ;
+        \}\} ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+\end{example}
+
+\begin{example}{3-D Compressible Navier-Stokes}
+\label{e:eqn_NS}
+
+3-D compressible Navier-Stokes for a structured grid, with the S-A
+turbulence model, a perfect gas assumption, Sutherland's law for the
+molecular viscosity, a constant Prandtl-number assumption, and
+inclusion of the full Navier-Stokes diffusion terms; all models assume
+air:
+\begin{alltt}
+  FlowEquationSet\_t<3> NSEquations = 
+    \{\{
+    int EquationDimension = 3 ;
+    
+    GoverningEquations\_t<3> GoverningEquations =
+      \{\{
+      GoverningEquationsType\_t GoverningEquationsType = NSTurbulent ;
+      
+      int[6] DiffusionModel = [1,1,1,1,1,1] ;
+      \}\} ;
+      
+    GasModel\_t GasModel =
+      \{\{
+      GasModelType\_t GasModelType = CaloricallyPerfect ;
+      
+      DataArray\_t<real, 1, 1> SpecificHeatRatio = \{\{ 1.4 \}\} ;
+      \}\} ;
+
+    ViscosityModel\_t ViscosityModel =
+      \{\{
+      ViscosityModelType\_t ViscosityModelType = SutherlandLaw ;
+      
+      DataArray\_t<real, 1, 1> SutherlandLawConstant = 
+        \{\{ 
+        Data(real, 1, 1) = 110.6 \}\} ;
+      
+        DataClass\_t DataClass = Dimensional ;
+        DimensionalUnits\_t DimensionalUnits = \{\{ TemperatureUnits = Kelvin \}\} ;
+        \}\} ;
+      \}\} ;
+
+    ThermalConductivityModel\_t ThermalConductivityModel =
+      \{\{
+      ThermalConductivityModelType\_t ThermalConductivityModelType =
+         ConstantPrandtl ;
+      
+      DataArray\_t<real, 1, 1> Prandtl = \{\{ 0.72 \}\} ;
+      \}\} ;
+
+    TurbulenceClosure\_t<3> TurbulenceClosure =
+      \{\{
+      TurbulenceClosureType\_t TurbulenceClosureType = EddyViscosity ;
+      
+      DataArray\_t<real, 1, 1> PrandtlTurbulent = \{\{ 0.90 \}\} ;
+      \}\} ;
+      
+    TurbulenceModel\_t<3> TurbulenceModel =
+      \{\{
+      TurbulenceModelType\_t TurbulenceModelType = OneEquation\_SpalartAllmaras ;
+      
+      int[6] DiffusionModel = [1,1,1,1,1,1] ;
+      \}\} ;      
+    \}\} ;
+\end{alltt}
+Note that all \fort{DataArray\_t} entities are abbreviated except
+\fort{SutherlandLawConstant}.
+\end{example}

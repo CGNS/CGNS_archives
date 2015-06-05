@@ -1,0 +1,206 @@
+\section{Families}
+\label{s:families}
+\thispagestyle{plain}
+
+\subsection{Family Definition}
+\label{s:family}
+
+\noindent
+\textit{Node}: \texttt{Family\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_family\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{char *FamilyName}, \textcolor{output}{\textit{int *Fam}}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_nfamilies(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{output}{\textit{int *nfamilies}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_family\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Fam}, \textcolor{output}{\textit{char *FamilyName}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{int *nFamBC}}, \textcolor{output}{\textit{int *nGeo}}); & \\
+\hline
+call cg\_family\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{FamilyName}, \textcolor{output}{\textit{Fam}}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_nfamilies\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{output}{\textit{nfamilies}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_family\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Fam}, \textcolor{output}{\textit{FamilyName}}, \textcolor{output}{\textit{nFamBC}}, \textcolor{output}{\textit{nGeo}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{FamilyName}}\raggedright
+\item [\texttt{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\texttt{B}]
+      Base index number, where $1 \leq \text{\texttt{B}} \leq \text{\texttt{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{nfamilies}]
+      Number of families in base \texttt{B}.
+      (\textcolor{output}{\textit{Output}})
+\item [\texttt{Fam}]
+      Family index number, where $1 \leq \text{\texttt{Fam}} \leq \text{\texttt{nfamilies}}$.
+      (\textcolor{input}{Input} for \texttt{cg\_family\_read};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_family\_write})
+\item [\texttt{FamilyName}]
+      Name of the family.
+      (\textcolor{input}{Input} for \texttt{cg\_family\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_family\_read})
+\item [\texttt{nFamBC}]
+      Number of boundary conditions for this family.
+      This should be either 0 or 1.
+      (\textcolor{output}{\textit{Output}})
+\item [\texttt{nGeo}]
+      Number of geometry references for this family.
+      (\textcolor{output}{\textit{Output}})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+\newpage
+\subsection{Geometry Reference}
+\label{s:geometry}
+
+\noindent
+\textit{Node}: \texttt{GeometryReference\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_geo\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Fam}, \textcolor{input}{char *GeoName}, & - w m \\
+~~~~~~\textcolor{input}{char *FileName}, \textcolor{input}{char *CADSystem}, \textcolor{output}{\textit{int *G}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_geo\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Fam}, \textcolor{input}{int G}, \textcolor{output}{\textit{char *GeoName}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{char **FileName}}, \textcolor{output}{\textit{char *CADSystem}}, \textcolor{output}{\textit{int *nparts}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_part\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Fam}, \textcolor{input}{int G}, \textcolor{input}{char *PartName}, & - w m \\
+~~~~~~\textcolor{output}{\textit{int *P}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_part\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Fam}, \textcolor{input}{int G}, \textcolor{input}{int P}, & r - m \\
+~~~~~~\textcolor{output}{\textit{char *PartName}}); & \\
+\hline
+call cg\_geo\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Fam}, \textcolor{input}{GeoName}, \textcolor{input}{FileName}, \textcolor{input}{CADSystem}, \textcolor{output}{\textit{G}}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_geo\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Fam}, \textcolor{input}{G}, \textcolor{output}{\textit{GeoName}}, \textcolor{output}{\textit{FileName}}, \textcolor{output}{\textit{CADSystem}}, & r - m \\
+~~~~~\textcolor{output}{\textit{nparts}}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_part\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Fam}, \textcolor{input}{G}, \textcolor{input}{PartName}, \textcolor{output}{\textit{P}}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_part\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Fam}, \textcolor{input}{G}, \textcolor{input}{P}, \textcolor{output}{\textit{PartName}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{CADSystem}}\raggedright
+\item [\texttt{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\texttt{B}]
+      Base index number, where $1 \leq \text{\texttt{B}} \leq \text{\texttt{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{Fam}]
+      Family index number, where $1 \leq \text{\texttt{Fam}} \leq \text{\texttt{nfamilies}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{G}]
+      Geometry reference index number, where $1 \leq \text{\texttt{G}} \leq \text{\texttt{nGeo}}$.
+      (\textcolor{input}{Input} for \texttt{cg\_geo\_read},
+      \texttt{cg\_part\_write}, \texttt{cg\_part\_read};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_geo\_write})
+\item [\texttt{P}]
+      Geometry entity index number, where $1 \leq \text{\texttt{P}} \leq \text{\texttt{nparts}}$.
+      (\textcolor{input}{Input} for \texttt{cg\_part\_read};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_part\_write})
+\item [\texttt{GeoName}]
+      Name of \texttt{GeometryReference\_t} node.
+      (\textcolor{input}{Input} for \texttt{cg\_geo\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_geo\_read})
+\item [\texttt{FileName}]
+      Name of geometry file.
+      (\textcolor{input}{Input} for \texttt{cg\_geo\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_geo\_read})
+\item [\texttt{CADSystem}]
+      Geometry format.
+      (\textcolor{input}{Input} for \texttt{cg\_geo\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_geo\_read})
+\item [\texttt{nparts}]
+      Number of geometry entities.
+      (\textcolor{output}{\textit{Output}})
+\item [\texttt{PartName}]
+      Name of a geometry entity in the file \texttt{FileName}.
+      (\textcolor{input}{Input} for \texttt{cg\_part\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_part\_read})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+Note that with \texttt{cg\_geo\_read} the memory for the filename
+character string, \texttt{FileName}, will be allocated by the Mid-Level
+Library.
+The application code is responsible for releasing this memory when it is
+no longer needed by calling \texttt{cg\_free(FileName)}, described in
+\autoref{s:free}.
+
+\newpage
+\subsection{Family Boundary Condition}
+\label{s:familybc}
+
+\noindent
+\textit{Node}: \texttt{FamilyBC\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_fambc\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Fam}, \textcolor{input}{char *FamBCName}, & - w m \\
+~~~~~~\textcolor{input}{BCType\_t BCType}, \textcolor{output}{\textit{int *BC}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_fambc\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Fam}, \textcolor{input}{int BC}, \textcolor{output}{\textit{char *FamBCName}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{BCType\_t *BCType}}); & \\
+\hline
+call cg\_fambc\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Fam}, \textcolor{input}{FamBCName}, \textcolor{input}{BCType}, \textcolor{output}{\textit{BC}}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_fambc\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Fam}, \textcolor{input}{BC}, \textcolor{output}{\textit{FamBCName}}, \textcolor{output}{\textit{BCType}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{FamBCName}}\raggedright
+\item [\texttt{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\texttt{B}]
+      Base index number, where $1 \leq \text{\texttt{B}} \leq \text{\texttt{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{Fam}]
+      Family index number, where $1 \leq \text{\texttt{Fam}} \leq \text{\texttt{nfamilies}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{BC}]
+      Family boundary condition index number.
+      This must be equal to 1.
+      (\textcolor{input}{Input} for \texttt{cg\_fambc\_read};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_fambc\_write})
+\item [\texttt{FamBCName}]
+      Name of the \texttt{FamilyBC\_t} node.
+      (\textcolor{input}{Input} for \texttt{cg\_fambc\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_fambc\_read})
+\item [\texttt{BCType}]
+      Boundary condition type for the family.
+      See the eligible types for \texttt{BCType\_t} in \autoref{s:typedefs}.
+      (\textcolor{input}{Input} for \texttt{cg\_fambc\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_fambc\_read})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+\subsection{Family Name}
+\label{s:familyname}
+
+\noindent
+\textit{Node}: \texttt{FamilyName\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_famname\_write(\textcolor{input}{char *FamilyName}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_famname\_read(\textcolor{output}{\textit{char *FamilyName}}); & r - m \\
+\hline
+call cg\_famname\_write\_f(\textcolor{input}{FamilyName}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_famname\_read\_f(\textcolor{output}{\textit{FamilyName}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{ptset\_type}}\raggedright
+\item [\texttt{FamilyName}]
+      Family name.
+      (\textcolor{input}{Input} for \texttt{cg\_famname\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_famname\_read})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}

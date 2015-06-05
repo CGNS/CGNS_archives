@@ -1,0 +1,61 @@
+\section{Purpose and Scope}
+\label{s:purpose}
+\thispagestyle{plain}
+
+The general purpose of CGNS is to provide a standard for recording and
+recovering computer data associated with the numerical solution of the
+equations of fluid dynamics.
+
+CGNS consists of a collection of conventions, and software implementing
+those conventions, for the storage and retrieval of CFD (Computational
+Fluid Dynamics) data.
+The system consists of two parts: (1) a standard format for recording
+the data, and (2) software that reads, writes, and modifies data in that
+format.
+The format is a conceptual entity established by the documentation, and
+is intended to be general, portable, expandable, and durable.
+The software is a physical product supplied to enable developers to
+access and produce data recorded in that format.
+All CGNS software is completely free and open to anyone. 
+
+The CGNS standard, applied through the use of the supplied software, is
+intended to:
+
+\begin{itemize*}
+   \item facilitate the exchange of CFD data
+   \begin{itemize*}
+      \item between sites
+      \item between applications codes
+      \item across computing platforms
+   \end{itemize*}
+   \item stabilize the archiving of CFD data
+\end{itemize*}
+
+The principal target of CGNS is data normally associated with
+compressible viscous flow (i.e., the Navier-Stokes equations), but the
+standard is also applicable to subclasses such as Euler and potential
+flows.
+The CGNS standard addresses the following types of data.
+
+\begin{itemize*}
+\item Structured, unstructured, and hybrid grids
+\item Flow solution data, which may be nodal, cell-centered,
+      face-centered, or edge-centered
+\item Multizone interface connectivity, both abutting and overset
+\item Boundary conditions
+\item Flow equation descriptions, including the equation of state,
+      viscosity and thermal conductivity models, turbulence models,
+      and multi-species chemistry models
+\item Time-dependent flow, including moving and deforming grids
+\item Dimensional units and nondimensionalization information
+\item Reference states
+\item Convergence history
+\item Association to CAD geometry definitions
+\end{itemize*}
+
+Much of the standard and the software is applicable to computational
+field physics in general.
+Disciplines other than fluid dynamics would need to augment the data
+definitions and storage conventions, but the fundamental database
+software, which provides platform independence, is not specific to fluid
+dynamics.

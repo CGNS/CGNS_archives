@@ -1,0 +1,70 @@
+- To create filename.pic from filename.flo, do
+
+     f filename
+
+- "Example Hierarchy" (Figure 1 in LaTeX/PDF document) created by
+  first creating the .pic file from the .flo file:
+
+     f example_hierarchy
+ 
+  then editing the file example_hierarchy.pic to change the total width
+  of the picture from 71 to the correct value of 64, naming the result
+  example_hierarchy_cet.pic.  (Is there a bug in flow?)
+
+- The version of the "Example Hierarchy" figure used in the HTML
+  document was created as follows:
+
+     - Create a PostScript file
+
+          latex example_hierarchy.tex
+          dvips -T 20.0in,11.0in example_hierarchy.dvi -o
+
+     - Edit resulting PostScript file, changing "/hsize 8.5" to
+       "/hsize 20.0", to keep figure from being cropped at 8.5 inches.
+
+     - Create the .gif file (lifted from ps2gif, with addition of
+       -sPAPERSIZE=ledger, since gs defaults to 8.5x11.
+
+          cat example_hierarchy.ps | gs -q -dNOPAUSE -r95 \
+              -sPAPERSIZE=ledger -sDEVICE=ppm -sOutputFile=- - \
+              | pnmcrop | cat | ppmtogif -interlace -transparent #ffffff \
+              > example_hierarchy.gif
+
+- "Example Node Structure" (Figure 2 in LaTeX/PDF document) created
+  by first creating the .pic file from the .flo file:
+
+     f example_node
+ 
+  then editing the file example_node.pic to add the dashed lines,
+  naming the result example_node_cet.pic.
+
+- The version of the "Example Node Structure" figure used in the HTML
+  document was created as follows:
+
+     - Create a .pic file
+
+          f example_node_html
+
+       (example_node_html.flo is the same as example_node.flo, except
+       without the lines joining the nodes, and with different wording
+       in the "Parent node" box.)
+
+     - Edit the file example_node_html.pic to add the dashed lines,
+       naming the result example_node_html_cet.pic.
+
+     - Create a PostScript file
+
+          latex example_node.tex
+          dvips example_node.dvi -o
+
+     - Edit the PostScript file, adding code to color the background of
+       the various boxes.
+
+     - Create the .gif file
+
+          ps2gif example_node.ps
+
+- The "flow" package apparently has an input line length limitation.
+  For the UserDefinedData figure, after creating the .pic file, you'll
+  need to manually edit it to collapse the referenced figures, in the
+  box at the top of the figure, to one line.

@@ -1,0 +1,37 @@
+\section{Default Values and Sizes and Limits of Dimensions and Arrays}
+\label{s:defaults}
+\thispagestyle{plain}
+
+The following default values, sizes, and limits are defined in the
+header file \textit{ADF.h}.
+
+\begin{table}[htbp]
+\centering
+\caption[Default Values and Sizes]{\textbf{Default Values and Sizes}}
+\label{t:defaults}
+\begin{tabular}{l >{\quad}l}
+\\ \hline\hline \\*[-2ex]
+\bold{Attribute} & \bold{Limit, Size, or Value}
+\\*[1ex] \hline\hline \\*[-2ex]
+Data type length               & 32-byte character field \\
+Date length                    & 32-byte character field \\
+File name length               & 1024-byte character field \\
+Format length                  & 20-byte character field \\
+Label length                   & 32-byte character field \\
+Maximum link depth             & 100 \\
+Maximum dimension              & 12 \\
+Maximum length of error string & 80 characters \\
+Maximum link data size         & 4096 \\
+Name length                    & 32-byte character field \\
+Length of status               & 32-byte character field \\
+Version length                 & 32-byte character field \\
+Maximum children               & None \\
+Pointer size                   & 48-bit pointer is used for a block
+                                 size of 4096 \\
+                               & 32-bit pointer is used for blocks
+                                 less than 4096 \\
+                               & 16-bit pointer is used for blocks
+                                 within blocks
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}

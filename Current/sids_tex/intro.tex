@@ -1,0 +1,354 @@
+\section{Introduction}
+\thispagestyle{plain}
+
+CGNS (CFD General Notation System) is a collection of conventions,
+along with software implementing those conventions, for the storage and
+retrieval of CFD (computational fluid dynamics) data.
+The CGNS system is designed to facilitate the exchange of data between
+sites and applications, as well as to help stabilize the archiving of
+fluid dynamic data.
+In today's environment, it is important in many technical arenas to
+maintain detailed records of scientific computations.
+CGNS was designed to help promote a long-lasting and extensible standard
+for this purpose.
+Many companies and institutions choose to adopt the CGNS standard in
+order to increase productivity by (1) reducing the time required to
+translate between data created and used by different applications, and
+(2) increasing the quality, longevity, and re-usability of archived
+data.
+
+The CGNS standard is a conceptual entity established by the
+documentation.
+The CGNS software is a physical product supplied to enable writing and
+reading data according to this standard.
+All CGNS software is completely free and open to anyone.
+By using the supplied software, it is relatively easy for users to
+adhere to most of the standard described in detail in this document.
+
+The CGNS project originated during 1994
+through a series of meetings that addressed improved transfer of NASA
+technology to industry. A principal impediment in this process was
+the disparity in I/O formats employed by various flow codes, grid
+generators, and other utilities, and CGNS was conceived as a means to
+promote ``plug-and-play'' CFD.  An agreement was reached to develop CGNS
+at Boeing, under NASA Contract NAS1-20267, with active participation
+by a team of CFD researchers from NASA's Langley, Lewis (now Glenn),
+and Ames Research Centers, McDonnell Douglas Corporation (now part of
+Boeing), and Boeing Commercial Airplane Group.  This team, which was
+joined by ICEM CFD Engineering Corporation of Berkeley, California in
+1997, undertook the core of the development. However, in the spirit of
+creating a completely open and broadly accepted standard, all interested
+parties were encouraged to participate; the US Air Force and Arnold
+Engineering Development Center were notably present. From the beginning,
+the purpose was to develop a system that could be distributed freely,
+including all documentation, software and source code. This goal has now
+been fully realized; further, control of CGNS has
+been completely transferred to a public forum known as the CGNS Steering
+Committee.
+
+The principal target is the data normally associated with compressible
+viscous flow (i.e., the Navier-Stokes equations), but the standard is
+also applicable to subclasses such as Euler and potential flows. The
+initial release addressed multi-zone grids, flow fields, boundary
+conditions, and zone-to-zone connection information, as well as a number
+of auxiliary items, such as non-dimensionalization, reference states,
+and equation set specifications. Extensions incorporated since then
+include unstructured mesh, connections to geometry definition,
+time-dependent flow, and support for multiple species and chemistry.
+
+It is worth noting that extensibility is a fundamental design
+characteristic of the system, which in principal could be used for
+other disciplines of computational field physics, such as acoustics or
+electromagnetics, given the willingness of the cognizant scientific
+community to define the conventions.
+
+The standard format, or paper convention, part of CGNS consists of
+two fundamental pieces. The first, known as the Standard Interface
+Data Structures (SIDS), describes in detail the intellectual content
+of the information to be stored. It defines, for example, the precise
+meaning of a ``boundary condition''.
+The second, known as the SIDS File Mapping, defines
+the exact location in a CGNS file where the data is to be stored.
+
+The implementation, or software, part of CGNS likewise consists of two
+separate entities.
+CGNS files are read and written by a stand-alone database manager,
+either ADF (Advanced Data Format) or HDF (Hierarchical Data Format).
+The database manager implements a tree-like data structure, as a
+binary file.
+Since the format of this file is completely controlled by the database
+manager, and since ADF and HDF are both written in ANSI C (Fortran
+wrappers are provided), these files and the database manager itself are
+portable to any environment that supports ANSI C.
+Both ADF and HDF are available separately and constitute useful tools
+for the storage of large quantities of scientific data.
+
+The underlying database manager, however, implements no knowledge of
+CFD or of the File Mapping.
+To simplify access to CGNS files, a second layer of software known as
+the Mid-Level Library is provided.
+This layer is in effect an API, or Application Programming Interface for
+CFD.
+The API incorporates knowledge of the CFD data structures, their meaning
+and their location in the file, enabling applications such as flow codes
+and grid generators to access the data in familiar terms.
+The API is therefore the piece of the CGNS system most visible to
+applications developers.
+Like the ADF and HDF database managers, the Mid-Level Library is written
+in ANSI C; all public API routines have Fortran counterparts.
+
+This document presents the formal definition of the Standard Interface
+Data Structures (SIDS). \autoref{s:design} presents the major design
+philosophies used to develop the CGNS database and the encoding of
+this database into the SIDS; this section also provides an overview
+of the database hierarchy. \autoref{s:conv} describes the C-like
+nomenclature conventions used to define the SIDS.  This section also
+gives the conventions for structured grid indexing and unstructured
+element numbering, and the nomenclature for multizone interfaces.
+Low-level building-block structures are defined in \autoref{s:build};
+these structures are used to define all higher-level structures.
+Structures for defining data arrays, including dimensional-units and
+nondimensional information, are presented in \autoref{s:data}.  The
+top levels of the CGNS hierarchy are next defined in \autoref{s:topo}.
+The following sections then fill out the remainder of the hierarchy:
+\autoref{s:gridflow} defines the grid-coordinate, elements, and
+flow-solution structures; \autoref{s:connectivity} defines the
+multizone interface connectivity structures; \autoref{s:BC} defines
+boundary-condition structures; \autoref{s:floweqn} defines structures
+for describing governing flow equations; \autoref{s:timedep} defines
+structures related to time-dependent flows; and \autoref{s:misc}
+contains miscellaneous structures.  Two appendices complete the
+document. \hyperref[s:dataname]{Appendix~\ref*{s:dataname}} provides
+naming conventions for data contained within the CGNS database, and
+\hyperref[s:twozone]{Appendix~\ref*{s:twozone}} contains a complete SIDS
+description of a structured-grid two-zone test case.
+
+\subsection{Major Differences from Previous CGNS Versions}
+\label{s:differences}
+The following items represent noteworthy alterations and additions to
+the SIDS in reverse chronological order.
+References to CPEX in the following
+refer to CGNS Proposals for Extension.\footnote{CPEX descriptions can be found
+at http://cgns.sourceforge.net/Proposals.html; last accessed 7/26/2013.}
+
+\subsubsection{Version 3.2}
+The following changes were made for Version 3.2
+
+\begin{itemize}
+\item Added AdditionalFamilyName\_t under BC\_t (\autoref{s:BCdefn}), 
+      Zone\_t (\autoref{s:Zone}), ZoneSubRegion\_t (\autoref{s:ZoneSubRegion}), 
+      and UserDefinedData\_t (\autoref{s:UserDefinedData}); and added
+      FamilyName\_t under Family\_t (\autoref{s:Family}) (a hierarchy of families 
+      is now possible); according to CPEX 0033 and 0034.
+\item Added new cubic elements in \autoref{s:unstructgrid}, according to CPEX 0036.
+\item Added new quartic elements in \autoref{s:unstructgrid}, according to CPEX 0038.
+\end{itemize}
+
+\subsubsection{Version 3.1}
+The following changes were made for Version 3.1
+
+\begin{itemize}
+\item Added a \texttt{PYRA\_13} element in the description of the unstructured grid
+      element numbering conventions for pyramid elements
+      (\autoref{s:unstructgrid_3d}).
+\item Modified the description of the \texttt{Elements\_t} structure to incorporate
+      the new definition of the \texttt{NGON\_n} element type, and added the
+      \texttt{NFACE\_n} element type. Also added examples illustrating their use,
+      including for polyhedral elements
+      (\autoref{s:Elements}).
+\item References to \texttt{Null} were changed to \texttt{xxxxNull}, and references to
+      \texttt{UserDefined} were changed to \texttt{xxxxUserDefined}, as appropriate.
+      Also made sure that the \texttt{xxxxNull} is listed first, and the
+      \texttt{xxxxUserDefined} is listed second.
+\item Added section Model Type Structure Definition
+      (\autoref{s:ModelType}).
+\item Added \texttt{ZoneSubRegion\_t} (CPEX 0030) (\autoref{s:ZoneSubRegion}).
+      Made changes associated with CPEX
+      0031: (1) added CellDimension to several places in \texttt{Zone\_t}, (2) added
+      new ParentElements and ParentElementsPosition in \texttt{Elements\_t},
+      (3) added CellDimension and revamped usage of PointList and PointRange in
+      \texttt{FlowSolution\_t}, (4) added CellDimension to several places in
+      \texttt{ZoneBC\_t}, (5) added CellDimension and revamped usage of PointList
+      and PointRange in \texttt{BC\_t}, (6) changes in \texttt{BCDataSet\_t},
+      (7) added CellDimension and revamped usage of PointList and PointRange in
+      \texttt{DiscreteData\_t}, (8) changes in \texttt{FamilyBC\_t}, (9) creation
+      of new \texttt{FamilyBCDataSet\_t}, (10) changes in Zone Grid Connectivities,
+      and (11) addition of \texttt{ZoneGridConnectivityPointers} and
+      \texttt{ZoneSubRegionPointers} in \texttt{ZoneIterativeData\_t}.
+      A note regarding CPEX 0031:  The use of ElementList and ElementRange has been
+      deprecated in favor of PointList and PointRange, as described in CPEX 0031 and
+      in relevant sections of this document.
+\item Added clarity that if rotating about more than one axis, then it is done in a
+      particular order in \texttt{Periodic\_t} and in Data-Name Identifiers for
+      Rigid Grid Motion.
+      (\autoref{t:id_rigidgrid})
+\item Modified table in \autoref{s:BCdefn} to include CellCenter GridLocation.
+\end{itemize}
+
+\subsubsection{Version 2.5}
+No changes were made to the data structures for Version 2.5.
+
+\subsubsection{Version 2.4}
+The following changes were made for Version 2.4.
+
+\begin{itemize}
+\item \texttt{GridLocation\_t}, \texttt{PointRange}, and \texttt{PointList}
+      have been added to the \texttt{BCDataSet\_t} data structure,
+      allowing boundary conditions to be specified at locations
+      different from those used to defined the BC patch.
+      (E.g., a BC patch may be defined using vertices, with boundary
+      conditions applied at face centers.)
+      (\autoref{s:BCDataSet}).
+\item Data structures have been added to \texttt{FlowEquationSet\_t} for
+      describing the electric field, magnetic field, and conductivity
+      models used for electromagnetic flows.
+      Corresponding recommended data-name identifiers have also been
+      added.
+      (\autoref{s:FlowEquationSet} and \autoref{s:EM}).
+\item \texttt{RotatingCoordinates\_t} has been added to the
+      \texttt{Family\_t} data structure.
+      (\autoref{s:Family}).
+\item A \texttt{BCDataSet\_t} list has been added to the
+      \texttt{FamilyBC\_t} data structure, allowing specification of
+      boundary condition data arrays for CFD families.
+      (\autoref{s:FamilyBC}).
+\item \texttt{GridLocation\_t}, \texttt{PointRange}, \texttt{PointList},
+      \texttt{FamilyName\_t}, \texttt{UserDefinedData\_t}, and
+      \texttt{Ordinal} have been added to the \texttt{UserDefinedData\_t}
+      data structure.
+      (\autoref{s:UserDefinedData}).
+\item The \texttt{DimensionalUnits\_t} and \texttt{DimensionalExponents\_t}
+      structures have been expanded to include units for electric
+      current, substance amount, and luminous intensity.
+      (\autoref{s:DimensionalUnits}).
+\item The capability to include rind data with unstructured grids
+      has been added, and \texttt{Rind\_t} has been added to the
+      \texttt{Elements\_t} structure, allowing specification of
+      connectivity information for rind elements.
+      (\autoref{s:Rind}).
+\end{itemize}
+
+\subsubsection{Version 2.3}
+The following changes were made for Version 2.3.
+
+\begin{itemize}
+\item \texttt{ElementRange} and \texttt{ElementList} have been added to the
+      \texttt{BC\_t} data structure.
+      \texttt{ElementRange} or \texttt{ElementList} may now be used
+      to define a boundary condition patch by specifying face indices,
+      instead of using \texttt{PointRange} or \texttt{PointList} with
+      \texttt{GridLocation} set to \texttt{FaceCenter}.
+      The use of \texttt{PointRange} or \texttt{PointList} to define a
+      boundary condition patch hasn't changed.
+      They may be used to define a boundary condition patch by specifying
+      either vertex or face indices.
+
+      When \texttt{PointRange} or \texttt{PointList} is used, the choice
+      between vertex or face indices is determined by the value of
+      \texttt{GridLocation\_t}.
+      When \texttt{ElementRange} or \texttt{ElementList} is used,
+      \texttt{GridLocation\_t} is ignored
+      (\autoref{s:BCdefn}).
+\end{itemize}
+
+\subsubsection{Version 2.2, Beta 1}
+The following changes were made for Version 2.2, Beta 1.
+
+\begin{itemize}
+\item \texttt{Axisymmetry\_t} and \texttt{RotatingCoordinates\_t}
+      nodes have been added, allowing the recording of data relevant
+      to axisymmetric flows and rotating coordinates
+      (\autoref{s:Axisymmetry} and \autoref{s:RotatingCoordinates}).
+\item A \texttt{Gravity\_t} node has been added for storage of the
+      gravitational vector (\autoref{s:Gravity}).
+\item A \texttt{GridConnectivityProperty\_t} node has been added, allowing
+      the recording of special properties associated with particular
+      connectivity patches, such as periodic interfaces, or interfaces
+      where the data is to be averaged in some way prior to passing it
+      to a neighboring interface (\autoref{s:GridConnectivityProperty}).
+\item A \texttt{BCProperty\_t} node has been added, allowing the recording
+      of special properties associated with particular boundary
+      condition patches, such as wall function or bleed regions
+      (\autoref{s:BCProperty}).
+\item Additional flow solution data-name identifiers are included
+      for variables in rotating coordinate systems
+      (\hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
+\end{itemize}
+
+\subsubsection{Version 2.1, Beta 1}
+The following changes were made for Version 2.1, Beta 1.
+
+\begin{itemize}
+\item A node type
+      \texttt{UserDefinedData\_t} (\autoref{s:UserDefinedData})
+      is added for the storage of arbitrary user defined data in
+      \texttt{Descriptor\_t} and \texttt{DataArray\_t} children without the
+      restrictions or implicit meanings imposed on these node types at
+      other node locations.
+\item Support for multi-species flows and chemistry has been added.
+      New gas models have been added to the \texttt{GasModelType\_t}
+      enumeration (\autoref{s:GasModel}), and
+      \texttt{ThermalRelaxationModel\_t} and \texttt{ChemicalKineticsModel\_t}
+      data structures have been added for describing the
+      thermal relaxation and chemical kinetics models
+      (\autoref{s:ThermalRelaxationModel} and
+      \autoref{s:ChemicalKineticsModel}).
+      Additional flow solution data-name identifiers are included
+      (\hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
+\end{itemize}
+
+\subsubsection{Version 2.0, Beta 2}
+The following changes were made for Version 2.0, Beta 2.
+
+\begin{itemize}
+\item The following data structures related to time-dependent flow
+      have been added:
+      \texttt{BaseIterativeData\_t} (\autoref{s:BaseIterativeData}),
+      \texttt{ZoneIterativeData\_t} (\autoref{s:ZoneIterativeData}),
+      \texttt{RigidGridMotion\_t} (\autoref{s:RigidGridMotion}),
+      \texttt{ArbitraryGridMotion\_t} (\autoref{s:ArbitraryGridMotion}).
+\end{itemize}
+
+\subsubsection{Version 2.0, Beta 1}
+The following changes were made for Version 2.0, Beta 1.
+
+\begin{itemize}
+\item The capability for recording unstructured zones has been
+      added to the SIDS.
+      (These changes occur throughout the document, although some
+      specific items are listed below.)
+\item The values \texttt{UserDefined} and \texttt{Null} are now allowed for
+      all enumeration types (throughout document).
+\item The following nodes are now defined (some of these also
+      include additional new children sub-nodes): \texttt{Family\_t}
+      (\autoref{s:Family}), \texttt{Elements\_t} (\autoref{s:Elements}),
+      \texttt{ZoneType\_t} (\autoref{s:Zone}), \texttt{FamilyName\_t}
+      (\autoref{s:Zone}), \texttt{GeometryReference\_t}
+      (\autoref{s:GeometryReference}), \texttt{FamilyBC\_t}
+      (\autoref{s:FamilyBC}).
+\item Under \texttt{CGNSBase\_t}, the \texttt{IndexDimension} is no longer
+      recorded; it has been replaced by \texttt{CellDimension} and
+      \texttt{PhysicalDimension} (\autoref{s:CGNSBase}).
+\item Under \texttt{Zone\_t}, the optional parameter
+      \texttt{VertexSizeBoundary} has been added for unstructured zones
+      (\autoref{s:Zone}).
+\item The method for general connectivity (\texttt{GridConnectivity\_t})
+      has been altered.
+      It now requires the use of either (a) \texttt{PointListDonor} (an
+      integer, for \texttt{Abutting1to1} only) or (b) \texttt{CellListDonor}
+      (an integer) plus \texttt{InterpolantsDonor} (a real)
+      (\autoref{s:GridConnectivity}).
+\item The \texttt{GridLocation\_t} parameter has been moved up one level
+      (from \texttt{BCDataSet\_t} to \texttt{BC\_t}).
+      Thus, for example, if the boundary conditions are defined at
+      vertices (the default), then any associated dataset information
+      must also be specified at vertices (\autoref{s:BCdefn} and
+      \autoref{s:BCDataSet}).
+\item The data-name identifier \texttt{LengthReference}
+      has been added (\autoref{s:ReferenceState} and
+      \hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
+\item The $\nu_t$ parameter has been renamed
+      \texttt{ViscosityEddyKinematic}, and a new parameter
+      \texttt{ViscosityEddy}, representing $\mu_t$, has been defined
+      (\hyperref[s:dataname_flow]{Appendix~\ref*{s:dataname_flow}}).
+\end{itemize}

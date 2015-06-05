@@ -1,0 +1,972 @@
+\section{Grid Coordinates, Elements, and Flow Solutions}
+\label{s:gridflow}
+\thispagestyle{plain}
+
+This section defines structure types for describing the grid
+coordinates, element data, and flow solution data pertaining to a zone.
+Entities of each of the structure types defined in this section are
+contained in the |Zone_t| structure (see \autoref{s:Zone}).
+
+\subsection{Grid Coordinates Structure Definition: \texttt{GridCoordinates\_t}}
+\label{s:Grid}
+
+The physical coordinates of the grid vertices are described by the 
+|GridCoordinates_t| structure.  This structure contains a list for the 
+data arrays of the individual components of the position vector.  It also
+provides a mechanism for identifying rind-point data included within the
+position-vector arrays.
+
+\begin{alltt}
+  GridCoordinates\_t< int IndexDimension, int VertexSize[IndexDimension] > :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+ 
+    Rind\_t<IndexDimension> Rind ;                                           (o/d)
+
+    List( DataArray\_t<DataType, IndexDimension, DataSize[]> 
+          DataArray1 ... DataArrayN ) ;                                     (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+    
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \texttt{Descriptor\_t},
+      \texttt{DataArray\_t}, and \texttt{UserDefinedData\_t} lists are
+      as shown; users may choose other legitimate names.
+      Legitimate names must be unique within a given instance of
+      \texttt{GridCoordinates\_t} and shall not include the names
+      \texttt{DataClass}, \texttt{DimensionalUnits}, or \texttt{Rind}.
+\item There are no required fields for \texttt{GridCoordinates\_t}.
+      \texttt{Rind} has a default if absent; the default is equivalent
+      to having a \texttt{Rind} structure whose \texttt{RindPlanes}
+      array contains all zeros (see \autoref{s:Rind}).
+\item The structure parameter \texttt{DataType} must be consistent with
+      the data stored in the \texttt{DataArray\_t} substructures (see
+      \autoref{s:DataArray}).
+\end{notes}
+
+\texttt{GridCoordinates\_t} requires two structure parameters:
+\texttt{IndexDimension} identifies the dimensionality of the grid-size
+arrays, and \texttt{VertexSize} is the number of vertices in each index
+direction excluding rind points.
+For unstructured zones, \texttt{IndexDimension} is always 1 and
+\texttt{VertexSize} is the total number of vertices, excluding rind
+points.
+
+The grid-coordinates data is stored in the list of |DataArray_t| entities;
+each |DataArray_t| structure entity may contain a single component of
+the position vector (e.g., three separate |DataArray_t| entities are used
+for $x$, $y$, and $z$).  
+Standardized data-name identifiers for the grid coordinates are described
+in \hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
+
+\texttt{Rind} is an optional field that indicates the number of
+rind planes (for structured grids) or rind points or elements (for
+unstructured grids) included in the grid-coordinates data.
+If \texttt{Rind} is absent, then the \texttt{DataArray\_t} structure
+entities contain only ``core'' vertices of a zone; core refers to all
+interior and bounding vertices of a zone --- \texttt{VertexSize} is the
+number of core vertices.
+Core vertices in a zone are assumed to begin at |[1,1,1]|
+(for a structured zone in 3-D) and end at \texttt{VertexSize}.
+If \texttt{Rind} is present, it will provide information on the number
+of ``rind'' points in addition to the core points that are contained in
+the \texttt{DataArray\_t} structures.
+
+|DataClass| defines the default class for data contained in the
+|DataArray_t| entities.
+For dimensional grid coordinates, |DimensionalUnits| may be used to
+describe the system of units employed.
+If present, these two entities take precedence over the corresponding
+entities at higher levels of the CGNS hierarchy.
+The rules for determining precedence of entities of this type are
+discussed in \autoref{s:precedence}.
+An example that uses these grid-coordinate defaults is shown in
+\autoref{s:grid_example}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\enlargethispage{\baselineskip}
+%\noindent {\bf FUNCTION} |DataSize[]|:
+\subsubsection*{FUNCTION \texttt{DataSize[]}:}
+
+\noindent return value: one-dimensional |int| array of length
+                        |IndexDimension| \\
+\noindent dependencies: |IndexDimension|, |VertexSize[]|, |Rind|
+
+|GridCoordinates_t| requires a single structure function, named |DataSize|,
+to identify the array sizes of the grid-coordinates data.  A function is 
+required for the following reasons:
+\begin{myitemize}
+\item
+ the entire grid, including both core and rind points, is stored in 
+ the |DataArray_t| entities;
+\item
+ the |DataArray_t| structure is simple in that it doesn't know anything
+ about core versus rind data; it just knows that it contains data 
+ of some given size;
+\item
+ to make all the |DataArray_t| entities syntactically consistent in
+ their size (i.e., by syntax entities containing $x$, $y$ and $z$ must
+ have the same dimensionality and dimension sizes), the size of the
+ array is passed onto the |DataArray_t| structure as a parameter.
+\end{myitemize}
+
+\begin{alltt}
+  if (Rind is absent) then
+    \{
+    DataSize[] = VertexSize[] ;
+    \}
+  else if (Rind is present) then
+    \{ 
+    DataSize[] = VertexSize[] + [a + b,...] ;
+    \}
+\end{alltt}
+where |RindPlanes = [a,b,...]| (see \autoref{s:Rind} 
+for the definition of |RindPlanes|). 
+
+\subsection{Grid Coordinates Examples}
+\label{s:grid_example}
+
+This section contains examples of grid coordinates.  These examples
+show the storage of the grid-coordinate data arrays, as well as different
+mechanisms for describing the class of data and the system of units or
+normalization.
+
+\begin{example}{Cartesian Coordinates for a 2-D Structured Grid}
+\label{ex:grid1}
+
+Cartesian coordinates for a 2-D grid of size $17\times33$; the data
+arrays include only core vertices, and the coordinates are in units of feet.
+\begin{alltt}
+  !  IndexDimension = 2
+  !  VertexSize = [17,33]
+  GridCoordinates\_t<2, [17,33]> GridCoordinates =
+    \{\{
+    DataArray\_t<real, 2, [17,33]> CoordinateX =
+      \{\{
+      Data(real, 2, [17,33]) = ((x(i,j), i=1,17), j=1,33) ;
+
+      DataClass\_t DataClass = Dimensional ;
+      
+      DimensionalUnits\_t DimensionalUnits = 
+        \{\{ 
+        MassUnits        = Null ;
+        LengthUnits      = Foot ;
+        TimeUnits        = Null ;
+        TemperatureUnits = Null ;
+        AngleUnits       = Null ;
+        \}\} ;
+      \}\} ;
+
+    DataArray\_t<real, 2, [17,33]> CoordinateY =
+      \{\{
+      Data(real, 2, [17,33]) = ((y(i,j), i=1,17), j=1,33) ;
+
+      DataClass\_t DataClass = Dimensional ;
+      
+      DimensionalUnits\_t DimensionalUnits = 
+        \{\{ 
+        MassUnits        = Null ;
+        LengthUnits      = Foot ;
+        TimeUnits        = Null ;
+        TemperatureUnits = Null ;
+        AngleUnits       = Null ;
+        \}\} ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+From \hyperref[s:dataname]{Appendix~\ref*{s:dataname}}, the identifiers
+for $x$ and $y$ are |CoordinateX| and |CoordinateY|, respectively, and
+both have a data type of |real|.
+The value of |DataClass| in |CoordinateX| and |CoordinateY| indicate
+the data is dimensional, and |DimensionalUnits| specifies the appropriate
+units are feet.
+The |DimensionalExponents| entity is absent from both |CoordinateX| and
+|CoordinateY|; the information that $x$ and $y$ are lengths can be
+inferred from the data-name identifier conventions in
+\autoref{s:dataname_grid}.
+
+Note that FORTRAN multidimensional array indexing is used to store
+the data; this is reflected in the FORTRAN-like implied do-loops for
+|x(i,j)| and |y(i,j)|.
+
+Since the dimensional units for both $x$ and $y$ are the same, an
+alternate approach is to set the data class and system of units using
+|DataClass| and |DimensionalUnits| at the |GridCoordinates_t| level, and
+eliminate this information from each instance of |DataArray_t|.
+\begin{alltt}
+  GridCoordinates\_t<2, [17,33]> GridCoordinates =
+    \{\{
+    DataClass\_t DataClass = Dimensional ;
+    
+    DimensionalUnits\_t DimensionalUnits = 
+      \{\{ 
+      MassUnits        = Null ;
+      LengthUnits      = Foot ;
+      TimeUnits        = Null ;
+      TemperatureUnits = Null ;
+      AngleUnits       = Null ;
+      \}\} ;
+
+    DataArray\_t<real, 2, [17,33]> CoordinateX =
+      \{\{
+      Data(real, 2, [17,33]) = ((x(i,j), i=1,17), j=1,33) ;
+      \}\} ;
+
+    DataArray\_t<real, 2, [17,33]> CoordinateY =
+      \{\{
+      Data(real, 2, [17,33]) = ((y(i,j), i=1,17), j=1,33) ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+Since the \fort{DataClass} and \fort{DimensionalUnits} entities are not
+present in \fort{CoordinateX} and \fort{CoordinateY}, the rules
+established in \autoref{s:data_dim} dictate that \fort{DataClass}
+and \fort{DimensionalUnits} specified at the \fort{GridCoordinates\_t}
+level be used to retrieve the information.
+\end{example}
+
+\newpage
+\begin{example}{Cylindrical Coordinates for a 3-D Structured Grid}
+\label{ex:grid2}
+
+Cylindrical coordinates for a 3-D grid whose core size is
+$17\times33\times9$.
+The grid contains a single plane of rind on the minimum and maximum $k$
+faces.
+The coordinates are nondimensional.
+\begin{alltt}
+  !  IndexDimension = 3
+  !  VertexSize = [17,33,9]
+  GridCoordinates\_t<3, [17,33,9]> GridCoordinates =
+    \{\{
+    Rind\_t<3> Rind =
+      \{\{
+      int[6] RindPlanes = [0,0,0,0,1,1] ;
+      \}\} ;
+
+    ! DataType = real
+    ! IndexDimension = 3
+    ! DataSize = VertexSize + [0,0,2] = [17,33,11]
+    DataArray\_t<real, 3, [17,33,11]> CoordinateRadius =
+      \{\{
+      Data(real, 3, [17,33,11]) = (((r(i,j,k), i=1,17), j=1,33), k=0,10) ;
+
+      DataClass\_t DataClass = NormalizedByUnknownDimensional ;
+      \}\} ;
+
+    DataArray\_t<real, 3, [17,33,11]> CoordinateZ     = \{\{ \}\} ;
+    DataArray\_t<real, 3, [17,33,11]> CoordinateTheta = \{\{ \}\} ;
+    \}\} ;
+\end{alltt}
+The value of |RindPlanes| specifies two rind planes on the minimum and
+maximum $k$ faces.
+These rind planes are reflected in the structure function |DataSize|
+which is equal to the number of core vertices plus two in the  $k$ dimension.
+The value of |DataSize| is passed to the |DataArray_t| entities.
+The value of |DataClass| indicates the data is nondimensional.
+Note that if \fort{DataClass} is set as \fort{NormalizedByUnknownDimensional}
+at a  higher level (\fort{CGNSBase\_t} or \fort{Zone\_t}), then it is not
+needed here.
+
+Note that the entities |CoordinateZ| and |CoordinateTheta| are abbreviated.
+\end{example}
+
+\begin{example}{Cartesian Coordinates for a 3-D Unstructured Grid}
+\label{ex:grid3}
+
+Cartesian grid coordinates for a 3-D unstructured zone where
+\fort{VertexSize} is 15.
+\begin{alltt}
+  GridCoordinates\_t<1, 15> GridCoordinates =
+    \{\{
+
+    ! DataType = real
+    ! IndexDimension = 1
+    ! DataSize = VertexSize = 15
+    DataArray\_t<real, 1, 15> CoordinateX =
+      \{\{
+      Data(real, 1, 15) = (x(i), i=1,15) ;
+      \}\} ;
+
+    DataArray\_t<real, 1, 15> CoordinateY =
+      \{\{
+      Data(real, 1, 15) = (y(i), i=1,15) ;
+      \}\} ;
+
+    DataArray\_t<real, 1, 15> CoordinateZ =
+      \{\{
+      Data(real, 1, 15) = (z(i), i=1,15) ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+\end{example}
+
+\subsection{Elements Structure Definition: \texttt{Elements\_t}}
+\label{s:Elements}
+
+The \fort{Elements\_t} data structure is required for unstructured
+zones, and contains the element connectivity data, the element type,
+the element range, the parent elements data, and the number of boundary
+elements.
+
+\begin{alltt}
+  Elements\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+ 
+    Rind\_t<IndexDimension> Rind ;                                           (o/d)
+
+    IndexRange\_t ElementRange ;                                             (r)
+
+    int ElementSizeBoundary ;                                               (o/d)
+
+    ElementType\_t ElementType ;                                             (r)
+
+    DataArray\_t<int, 1, ElementDataSize> ElementConnectivity ;              (r)
+
+    DataArray\_t<int, 2, [ElementSize, 4]> ParentData;                       (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \texttt{Descriptor\_t} and
+      \texttt{UserDefinedData\_t} lists are as shown; users may choose
+      other legitimate names.
+      Legitimate names must be unique within a given instance
+      of \texttt{Elements\_t} and shall not include the names
+      \texttt{ElementConnectivity}, \texttt{ElementRange},
+      \texttt{ParentData}, or \texttt{Rind}.
+\item \texttt{IndexRange\_t}, \texttt{ElementType\_t}, and
+      \texttt{ElementConnectivity\_t} are the required fields within the
+      \texttt{Elements\_t} structure.
+      \texttt{Rind} has a default if absent; the default is equivalent
+      to having a \texttt{Rind} structure whose \texttt{RindPlanes}
+      array contains all zeros (see \autoref{s:Rind}).
+\end{notes}
+
+\texttt{Rind} is an optional field that indicates the number of rind
+elements included in the elements data.
+If \texttt{Rind} is absent, then the \texttt{DataArray\_t} structure
+entities contain only core elements of a zone.
+If \texttt{Rind} is present, it will provide information on the number
+of rind elements, in addition to the core elements, that are contained
+in the \texttt{DataArray\_t} structures.
+
+Note that the usage of rind data with respect to the size of the
+\texttt{DataArray\_t} structures is different under \texttt{Elements\_t}
+than elsewhere.
+For example, when rind coordinate data is stored under
+\texttt{GridCoordinates\_t}, the parameter \texttt{VertexSize} accounts
+for the core data only.
+The size of the \texttt{DataArray\_t} structures containing the grid
+coordinates is determined by the \texttt{DataSize} function, which adds
+the number of rind planes or points to \texttt{VertexSize}.
+But for the element connectivity, the size of the \texttt{DataArray\_t}
+structures containing the connectivity data is just
+\texttt{ElementDataSize}, which depends on \texttt{ElementSize}, and
+includes both the core and rind elements.
+
+\fort{ElementRange} contains the index of the first and last elements defined
+in \fort{ElementConnectivity}.
+The elements are indexed with a global numbering system, starting at 1,
+for all element sections under a given \fort{Zone\_t} data structure.
+The global numbering insures that each element, whether it's a cell,
+a face, or an edge, is uniquely identified by its number.
+They are also listed as a continuous list of element numbers within
+any single element section.
+Therefore the number of elements in a section is:
+
+\begin{alltt}
+  ElementSize = ElementRange.end - ElementRange.start + 1
+\end{alltt}
+
+The element indices are used for the boundary condition and zone
+connectivity definition.
+
+\fort{ElementSizeBoundary} indicates if the elements are sorted, and
+how many boundary elements are recorded.
+By default, \fort{ElementSizeBoundary} is set to zero, indicating that
+the elements are not sorted.
+If the elements are sorted, \fort{ElementSizeBoundary} is set to the
+number of elements at the boundary.
+Consequently:
+
+\begin{alltt}
+  ElementSizeInterior = ElementSize - ElementSizeBoundary
+\end{alltt}
+
+\fort{ElementType\_t} is an enumeration of the supported element types:
+
+\begin{alltt}
+  ElementType\_t := Enumeration(
+     Null, NODE, BAR\_2, BAR\_3,
+     TRI\_3, TRI\_6, QUAD\_4, QUAD\_8, QUAD\_9,
+     TETRA\_4, TETRA\_10, PYRA\_5, PYRA\_14,
+     PENTA\_6, PENTA\_15, PENTA\_18, 
+     HEXA\_8, HEXA\_20, HEXA\_27, MIXED, NGON\_n, UserDefined );
+\end{alltt}
+\autoref{s:unstructgrid} illustrates the convention for element numbering.
+
+For all element types except type \fort{MIXED}, \fort{ElementConnectivity}
+contains the list of nodes for each element.
+If the elements are sorted, then it must first list the connectivity of
+the boundary elements, then that of the interior elements.
+
+\begin{alltt}
+  ElementConnectivity = Node1\tsub{1}, Node2\tsub{1}, ... NodeN\tsub{1},
+                        Node1\tsub{2}, Node2\tsub{2}, ... NodeN\tsub{2},
+                        ...
+                        Node1\tsub{M}, Node2\tsub{M}, ... NodeN\tsub{M}
+\end{alltt}
+
+When the section \fort{ElementType} is \fort{MIXED}, the data array
+\fort{ElementConnectivity} contains one extra integer per element,
+to hold each individual element type:
+
+\begin{alltt}
+  ElementConnectivity = Etype\tsub{1}, Node1\tsub{1}, Node2\tsub{1}, ... NodeN\tsub{1},
+                        Etype\tsub{2}, Node1\tsub{2}, Node2\tsub{2}, ... NodeN\tsub{2},
+                        ...
+                        Etype\tsub{M}, Node1\tsub{M}, Node2\tsub{M}, ... NodeN\tsub{M}
+\end{alltt}
+
+\fort{ElementDataSize} indicates the size (number of integers) of the array
+\fort{ElementConnectivity}.
+For all element types except type \fort{MIXED}, the \fort{ElementDataSize}
+is given by:
+
+\begin{alltt}
+  ElementDataSize = ElementSize * NPE[ElementType]
+\end{alltt}
+
+In the case of \fort{MIXED} element section, \fort{ElementDataSize} is
+given by:
+
+\begin{alltt}
+  ElementDataSize = \(\displaystyle\sum\sb{n=\mbox{\scriptsize\ital{start}}}\sp{\mbox{\scriptsize\ital{end}}} (\mbox{NPE[ElementType}\sb{n}\mbox{] + 1})\)
+\end{alltt}
+
+\fort{NPE[ElementType]} is a function returning the number of nodes for the
+given \fort{ElementType}.
+For example, \fort{NPE[HEXA\_8]=8}.
+
+For face elements in 3D, or bar element in 2D, four more data may be
+saved for each element --- the corresponding parents' element number,
+and the face position within these parent elements.
+At the boundaries, the second parent is set to zero.
+
+\fort{NGON\_n} is used to express a polygon of $n$ nodes.
+In order to record the number of nodes of any ngons, the \fort{ElementType}
+must be set to \fort{NGON\_n + Nnodes}.
+For example, for an element type \fort{NGON\_n} composed of 25
+nodes, one would set the \fort{ElementType} to \fort{NGON\_n + 25}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Elements Examples}
+\label{s:element_example}
+
+This section contains two examples of elements definition in CGNS.
+In both cases, the unstructured zone contains 15 tetrahedral and 10
+hexahedral elements.
+
+\begin{example}{Unstructured Elements, Separate Element Types}
+\label{ex:elements1}
+
+In this first example, the elements are written in two separate sections,
+one for the tetrahedral elements and one for the hexahedral elements.
+\begin{alltt}
+  Zone\_t UnstructuredZone =
+    \{\{
+    Elements\_t TetraElements =
+      \{\{
+      IndexRange\_t ElementRange = [1,15] ;
+
+      int ElementSizeBoundary = 10 ;
+
+      ElementType\_t ElementType = TETRA\_4 ;
+
+      DataArray\_t<int, 1, NPE[TETRA\_4]\(\times\)15> ElementConnectivity =
+        \{\{
+        Data(int, 1, NPE[TETRA\_4]\(\times\)15) = (node(i,j), i=1,NPE[TETRA\_4], j=1,15) ;
+        \}\} ;
+      \}\} ;
+    Elements\_t HexaElements =
+      \{\{
+      IndexRange\_t ElementRange = [16,25] ;
+
+      int ElementSizeBoundary = 0 ;
+
+      ElementType\_t ElementType = HEXA\_8 ;
+
+      DataArray\_t<int, 1, NPE[HEXA\_8]\(\times\)10> ElementConnectivity =
+        \{\{
+        Data(int, 1, NPE[HEXA\_8]\(\times\)10) = (node(i,j), i=1,NPE[HEXA\_8], j=1,10) ;
+        \}\} ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+\end{example}
+
+\begin{example}{Unstructured Elements, Element Type \texttt{MIXED}}
+\label{ex:elements2}
+
+In this second example, the same unstructured zone described in 
+\hyperref[ex:elements1]{Example~\ref*{ex:elements1}} is written in a
+single element section of type \fort{MIXED} (i.e., an unstructured grid
+composed of mixed elements).
+\begin{alltt}
+  Zone\_t UnstructuredZone =
+    \{\{
+    Elements\_t MixedElementsSection =
+      \{\{
+      IndexRange\_t ElementRange = [1,25] ;
+
+      ElementType\_t ElementType = MIXED ;
+
+      DataArray\_t<int, 1, ElementDataSize> ElementConnectivity =
+        \{\{
+        Data(int, 1, ElementDataSize) = (etype(j),(node(i,j),
+             i=1,NPE[etype(j)]), j=1,25) ;
+        \}\} ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+\end{example}
+
+\subsection{Axisymmetry Structure Definition: \texttt{Axisymmetry\_t}}
+\label{s:Axisymmetry}
+
+The \fort{Axisymmetry\_t} data structure allows recording the axis of
+rotation and the angle of rotation around this axis for a two-dimensional
+dataset that represents an axisymmetric database.
+
+\begin{alltt}
+  Axisymmetry\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    DataArray\_t<real,1,2> AxisymmetryReferencePoint ;                       (r)
+    DataArray\_t<real,1,2> AxisymmetryAxisVector ;                           (r)
+    DataArray\_t<real,1,1> AxisymmetryAngle ;                                (o)
+    DataArray\_t<char,2,[32,2]> CoordinateNames ;                            (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t} and
+      \fort{UserDefinedData\_t} lists are as shown; users may choose
+      other legitimate names.
+      Legitimate names must be unique within a given instance
+      of \fort{Axisymmetry\_t} and shall not include the names
+      \fort{AxisymmetryAngle}, \fort{AxisymmetryAxisVector},
+      \fort{AxisymmetryReferencePoint}, \fort{CoordinateNames},
+      \fort{DataClass}, or \fort{DimensionalUnits}.
+\item \fort{AxisymmetryReferencePoint} and \fort{AxisymmetryAxisVector}
+      are the required fields within the \fort{Axisymmetry\_t} structure.
+\end{notes}
+
+\fort{AxisymmetryReferencePoint} specifies the origin used for
+defining the axis of rotation.
+
+\fort{AxisymmetryAxisVector} contains the direction cosines of the
+axis of rotation, through the \fort{AxisymmetryReferencePoint}.
+For example, for a 2-D dataset defined in the $(x,y)$ plane,
+if \fort{AxisymmetryReferencePoint} contains $(0,0)$ and
+\fort{AxisymmetryAxisVector} contains $(1,0)$, the $x$-axis is the
+axis of rotation.
+
+\fort{AxisymmetryAngle} allows specification of the circumferential
+extent about the axis of rotation.
+If this angle is undefined, it is assumed to be 360\degree.
+
+\fort{CoordinateNames} may be used to specify the first and second
+coordinates used in the definition of \fort{AxisymmetryReferencePoint}
+and \fort{AxisymmetryAxisVector}.
+If not found, it is assumed that the first coordinate is
+\fort{CoordinateX} and the second is \fort{CoordinateY}.
+The coordinates given under \fort{CoordinateNames}, or implied by
+using the default, must correspond to those found under
+\fort{GridCoordinates\_t}.
+
+\fort{DataClass} defines the default class for numerical data contained
+in the \fort{DataArray\_t} entities.
+For dimensional data, \fort{DimensionalUnits} may be used to describe
+the system of units employed.
+If present, these two entities take precedence over the corresponding
+entities at higher levels of the CGNS hierarchy, following the standard
+precedence rules.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Rotating Coordinates Structure Definition: \texttt{RotatingCoordinates\_t}}
+\label{s:RotatingCoordinates}
+
+The \fort{RotatingCoordinates\_t} data structure is used to record
+the rotation center and rotation rate vector of a rotating coordinate
+system.
+
+\begin{alltt}
+  RotatingCoordinates\_t :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    DataArray\_t<real,1,PhysicalDimension> RotationCenter ;                  (r)
+    DataArray\_t<real,1,PhysicalDimension> RotationRateVector ;              (r)
+
+    DataClass\_t DataClass ;                                                 (o)
+
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t} and
+      \fort{UserDefinedData\_t} lists are as shown; users may choose
+      other legitimate names.
+      Legitimate names must be unique within a given instance
+      of \fort{RotatingCoordinates\_t} and shall not include the names
+      \fort{DataClass}, \fort{DimensionalUnits}, \fort{RotationCenter},
+      or \fort{RotationRateVector}.
+\item \fort{RotationCenter} and \fort{RotationRateVector}
+      are the required fields within the \fort{RotatingCoordinates\_t}
+      structure.
+\end{notes}
+
+\texttt{RotationCenter} specifies the coordinates of the center of
+rotation, and \texttt{RotationRateVector} specifies the components of
+the angular velocity of the grid about the center of rotation.
+Together, they define the angular velocity vector.
+The direction of the angular velocity vector specifies the axis of
+rotation, and its magnitude specifies the rate of rotation.
+
+For example, for the common situation of rotation about the $x$-axis,
+\texttt{RotationCenter} would be specified as any point on the $x$-axis,
+like $(0,0,0)$.
+\texttt{RotationRateVector} would then be specified as ($\omega$,0,0),
+where $\omega$ is the rotation rate.
+Using the right-hand rule, $\omega$ would be positive for clockwise
+rotation (looking in the $+x$ direction), and negative for
+counter-clockwise rotation.
+
+Note that for a rotating coordinate system, the axis of rotation is
+defined in the inertial frame of reference, while the grid coordinates
+stored using the \fort{GridCoordinates\_t} data structure are
+relative to the rotating frame of reference.
+
+\fort{DataClass} defines the default class for data contained in the
+\fort{DataArray\_t} entities.
+For dimensional data, \fort{DimensionalUnits} may be used to describe
+the system of units employed.
+If present, these two entities take precedence over the corresponding
+entities at higher levels of the CGNS hierarchy, following the standard
+precedence rules.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+If rotating coordinates are used, it is useful to store variables
+relative to the rotating frame.
+Standardized data-name identifiers should be used for these variables,
+as defined for flow-solution quantities in
+\hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
+
+\subsection{Flow Solution Structure Definition: \texttt{FlowSolution\_t}} 
+\label{s:FlowSolution}
+
+The flow solution within a given zone is described by the |FlowSolution_t|
+structure.  This structure contains a list for the data arrays of the
+individual flow-solution variables, as well as identifying the grid location
+of the solution.  It also provides a mechanism for identifying rind-point
+data included within the data arrays.
+
+\begin{alltt}
+  FlowSolution\_t< int IndexDimension, int VertexSize[IndexDimension], 
+                  int CellSize[IndexDimension] > :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    GridLocation\_t GridLocation ;                                           (o/d)
+
+    Rind\_t<IndexDimension> Rind ;                                           (o/d)
+
+    List( DataArray\_t<DataType, IndexDimension, DataSize[]> 
+          DataArray1 ... DataArrayN ) ;                                     (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+    
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \texttt{Descriptor\_t},
+      \texttt{DataArray\_t}, and \texttt{UserDefinedData\_t} lists are
+      as shown; users may choose other legitimate names.
+      Legitimate names must be unique within a given instance
+      of \texttt{FlowSolution\_t} and shall not include the
+      names \texttt{DataClass}, \texttt{DimensionalUnits},
+      \texttt{GridLocation}, or \texttt{Rind}.
+\item There are no required fields for \texttt{FlowSolution\_t}.
+      \texttt{GridLocation} has a default of \texttt{Vertex} if
+      absent. \texttt{Rind} also has a default if absent; the
+      default is equivalent to having an instance of \texttt{Rind}
+      whose \texttt{RindPlanes} array contains all zeros (see
+      \autoref{s:Rind}).
+\item The structure parameter \texttt{DataType} must be consistent
+      with the data stored in the \texttt{DataArray\_t} structure
+      entities (see \autoref{s:DataArray}); \texttt{DataType} is
+      \texttt{real} for all flow-solution identifiers defined in
+      \hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
+\item For unstructured zones \texttt{GridLocation} options are limited
+      to \texttt{Vertex} or \texttt{CellCenter}, meaning that solution
+      data may only be expressed at these locations.
+      The data arrays must follow the node ordering
+      if \texttt{GridLocation = Vertex}, and the element ordering if
+      \texttt{GridLocation = CellCenter}.
+\end{notes}
+
+|FlowSolution_t| requires three structure parameters; |IndexDimension|
+identifies the dimensionality of the grid-size arrays, and |VertexSize|
+and |CellSize| are the number of core vertices and cells, respectively,
+in each index direction.
+For unstructured zones, \fort{IndexDimension} is always 1.
+
+The flow solution data is stored in the list of |DataArray_t| entities;
+each |DataArray_t| structure entity may contain a single component of
+the solution vector.
+Standardized data-name identifiers for the flow-solution quantities are
+described in \hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
+The field |GridLocation| specifies the location of the solution data
+with respect to the grid; if absent, the data is assumed to coincide
+with grid vertices (i.e., |GridLocation| |=| |Vertex|).
+All data within a given instance of |FlowSolution_t| must reside at the
+same grid location.
+
+\texttt{Rind} is an optional field that indicates
+the number of rind planes (for structured grids) or rind points or
+elements (for unstructured grids) included in the data.
+Its purpose and function are identical to those described in
+\autoref{s:Grid}.
+Note, however, that the \texttt{Rind} in this structure is independent
+of the \texttt{Rind} contained in \texttt{GridCoordinates\_t}.
+They are not required to contain the same number of rind planes or
+elements.
+Also, the location of any flow-solution rind points is assumed to be
+consistent with the location of the core flow solution points (e.g.,
+if \texttt{GridLocation = CellCenter}, rind points are assumed to be
+located at fictitious cell centers).
+
+|DataClass| defines the default class for data contained in the
+|DataArray_t| entities.  For dimensional flow solution data,
+|DimensionalUnits| may be used to describe the system of units employed.
+If present these two entities take precedence over the corresponding entities
+at higher levels of the CGNS hierarchy.  The rules for determining precedence
+of entities of this type are discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+%\noindent {\bf FUNCTION} |DataSize[]|:
+\subsubsection*{FUNCTION \texttt{DataSize[]}:}
+
+\noindent return value: one-dimensional |int| array of length
+                        |IndexDimension| \\
+\noindent dependencies: |IndexDimension|, |VertexSize[]|, |CellSize[]|,
+                        |GridLocation|, |Rind|
+
+The function |DataSize[]| is the size of flow solution data arrays.
+If |Rind| is absent then |DataSize| represents only the core points;
+it will be the same as |VertexSize| or |CellSize| depending on
+|GridLocation|.
+The definition of the function |DataSize[]| is as follows:
+
+\begin{alltt}
+  if (Rind is absent) then
+    \{
+    if (GridLocation = Vertex) or (GridLocation is absent)
+      \{
+      DataSize[] = VertexSize[] ;
+      \}
+    else if (GridLocation = CellCenter) then
+      \{
+      DataSize[] = CellSize[] ;
+      \}
+    \}
+  else if (Rind is present) then
+    \{
+    if (GridLocation = Vertex) or (GridLocation is absent) then
+      \{
+      DataSize[] = VertexSize[] + [a + b,...] ;
+      \}
+    else if (GridLocation = CellCenter)
+      \{
+      DataSize[] = CellSize[] + [a + b,...] ;
+      \}
+    \}
+\end{alltt}
+where |RindPlanes = [a,b,...]| (see \autoref{s:Rind} 
+for the definition of |RindPlanes|). 
+
+\subsection{Flow Solution Example}
+\label{s:flow_example}
+
+This section contains an example of the flow solution entity, including
+the designation of grid location and rind planes and data-normalization
+mechanisms.
+
+\begin{example}{Flow Solution}
+\label{ex:flow}
+
+Conservation-equation variables ($\rho$, $\rho u$, $\rho v$ and
+$\rho e_0$) for a 2-D grid of size $11\times5$.
+The flowfield is cell-centered with two planes of rind data.
+The density, momentum and stagnation energy ($\rho e_0$) data is
+nondimensionalized with respect to a freestream reference state whose
+quantities are dimensional.
+The freestream density and pressure are used for normalization; these
+values are 1.226 kg/m\tsup{3} and $1.0132 \!\times\! 10^{5}$ N/m\tsup{2}
+(standard atmosphere conditions).
+The data-name identifier conventions for the conservation-equation
+variables are \texttt{Density}, \texttt{MomentumX}, \texttt{MomentumY} and
+\texttt{EnergyStagnationDensity}.
+\begin{alltt}
+  !  IndexDimension = 2
+  !  VertexSize = [11,5]
+  !  CellSize = [10,4]
+  FlowSolution\_t<2, [11,5], [10,4]> FlowExample =
+    \{\{
+    GridLocation\_t GridLocation = CellCenter ;
+
+    Rind\_t<2> Rind =
+      \{\{
+      int[4] RindPlanes = [2,2,2,2] ;
+      \}\} ;
+
+    DataClass\_t DataClass = NormalizedByDimensional ;
+    
+    DimensionalUnits\_t DimensionalUnits = 
+      \{\{ 
+      MassUnits        = Kilogram ;
+      LengthUnits      = Meter ;
+      TimeUnits        = Second ;
+      TemperatureUnits = Null ;
+      AngleUnits       = Null ;
+      \}\} ;
+
+    !  DataType = real
+    !  Dimension = 2
+    !  DataSize = CellSize + [4,4] = [14,8]
+    DataArray\_t<real, 2, [14,8]> Density =
+      \{\{
+      Data(real, 2, [14,8]) = ((rho(i,j), i=-1,12), j=-1,6) ;
+
+      DataConversion\_t DataConversion =
+        \{\{
+        ConversionScale  = 1.226 ;
+        ConversionOffset = 0 ;
+        \}\} ;
+
+      DimensionalExponents\_t DimensionalExponents =
+        \{\{
+        MassExponent        = +1 ;
+        LengthExponent      = -3 ;
+        TimeExponent        =  0 ;
+        TemperatureExponent =  0 ;
+        AngleExponent       =  0 ;
+        \}\} ;
+      \}\} ;
+
+    DataArray\_t<real, 2, [14,8]> MomentumX =
+      \{\{
+      Data(real, 2, [14,8]) = ((rho\_u(i,j), i=-1,12), j=-1,6) ;
+
+      DataConversion\_t DataConversion =
+        \{\{
+        ConversionScale  = 352.446 ;
+        ConversionOffset = 0 ;
+        \}\} ;
+      \}\} ;
+
+    DataArray\_t<real, 2, [14,8]> MomentumY =
+      \{\{
+      Data(real, 2, [14,8]) = ((rho\_v(i,j), i=-1,12), j=-1,6) ;
+
+      DataConversion\_t DataConversion =
+        \{\{
+        ConversionScale  = 352.446 ;
+        ConversionOffset = 0 ;
+        \}\} ;
+      \}\} ;
+
+    DataArray\_t<real, 2, [14,8]> EnergyStagnationDensity =
+      \{\{
+      Data(real, 2, [14,8]) = ((rho\_e0(i,j), i=-1,12), j=-1,6) ;
+
+      DataConversion\_t DataConversion =
+        \{\{
+        ConversionScale  = 1.0132e+05 ;
+        ConversionOffset = 0 ;
+        \}\} ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+The value of |GridLocation| indicates the data is at cell centers, and the
+value of |RindPlanes| specifies two rind planes on each face of the zone.
+The resulting value of the structure function |DataSize| is the number of
+cells plus four in each coordinate direction; this value is passed to each
+of the |DataArray_t| entities.
+
+Since the data are all nondimensional and normalized by dimensional
+reference quantities, this information is stated in |DataClass| and 
+|DimensionalUnits| at the |FlowSolution_t| level rather than attaching
+the appropriate |DataClass| and |DimensionalUnits| to each |DataArray_t|
+entity.
+It could possibly be at even higher levels in the heirarchy.
+The contents of |DataConversion| are in each case the denominator of the
+normalization; this is $\rho_\infty$ for density,
+$\sqrt{p_\infty \rho_\infty}$ for momentum, and $p_\infty$ for
+stagnation energy.
+The dimensional exponents are specified for density.
+For all the other data, the dimensional exponents are to be inferred from
+the data-name identifiers.
+
+Note that no information is provided to identify the actual reference
+state or indicate that it is freestream.  This information is not needed
+for data manipulations involving renormalization or changing the units
+of the converted raw data.
+\end{example}
+
+

@@ -1,0 +1,41 @@
+\pdfbookmark[1]{Overview}{overview}
+\addtocontents{toc}{\protect\contentsline {section}{Overview}{\thepage}{overview}}
+\hypertarget{overview}{}
+\section*{Overview}
+\thispagestyle{plain}
+
+This document contains the Standard Interface Data Structures (SIDS)
+definitions for the CFD General Notation System (CGNS) project; this
+project was originally a NASA-funded contract under the AST program, but
+control has now been completely transferred to a public forum known as
+the CGNS Steering Committee.
+
+The purpose of this document is to scope the information that should be
+communicated between various CFD application codes; the target is 3--D
+multizone, compressible Navier-Stokes analysis.
+Attention in this document is not focussed on I/O routines or formats,
+but on the precise description of data that should be present in the I/O
+of a CFD code or in a CFD database.
+
+This document therefore contains a precise definition of information
+pertinent to a CGNS database.
+Specifically, the following information is addressed:
+\begin{itemize}
+\item grid coordinates and elements
+\item flow solution data, including nondimensional parameters
+\item multizone interface connectivity, including abutting and overset
+\item boundary conditions
+\item flow equation descriptions
+\item time-dependent flow
+\item reference states
+\item dimensional units and nondimensionalization information associated
+      with data
+\item convergence history
+\item association to geometry definition
+\item topologically based hierarchical structures
+\end{itemize}
+Information is encoded into C-like data structures.
+
+This document replaces (in whole) earlier versions. Major changes made to the
+document since its last release are outlined in \autoref{s:differences}.
+

@@ -1,0 +1,261 @@
+\section{Auxiliary Data}
+\label{s:auxiliary}
+\thispagestyle{plain}
+
+\subsection{Reference State}
+\label{s:refstate}
+
+\noindent
+\textit{Node}: \fort{ReferenceState\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_state\_write(\textcolor{input}{char *StateDescription}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_state\_read(\textcolor{output}{\textit{char **StateDescription}}); & r - m \\
+\hline
+call cg\_state\_write\_f(\textcolor{input}{StateDescription}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_state\_size\_f(\textcolor{output}{\textit{Size}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_state\_read\_f(\textcolor{output}{\textit{StateDescription}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{StateDescription}}\raggedright
+\item [\fort{StateDescription}]
+      Text description of reference state.
+      (\textcolor{input}{Input} for \fort{cg\_state\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_state\_read})
+\item [\fort{Size}]
+      Number of characters in the \fort{StateDescription} string
+      (Fortran interface only).
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+The function \fort{cg\_state\_write} creates the
+\fort{ReferenceState\_t} node and must be called even if
+\fort{StateDescription} is undefined (i.e., a blank string).
+The descriptors, data arrays, data class, and dimensional units
+characterizing the \fort{ReferenceState\_t} data structure may be added
+to this data structure after its creation.
+
+The function \fort{cg\_state\_read} reads the \fort{StateDescription}
+of the local \fort{ReferenceState\_t} node.
+If \fort{StateDescription} is undefined in the CGNS database, this
+function returns a null string.
+If \texttt{StateDescription} exists, the library will allocate the space
+to store the description string, and return the description string to
+the application.
+It is the responsibility of the application to free this space when it
+is no longer needed by a call to \texttt{cg\_free(StateDescription)},
+described in \autoref{s:free}.
+
+\subsection{Gravity}
+\label{s:gravity}
+
+\noindent
+\textit{Node}: \fort{Gravity\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_gravity\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{float *GravityVector}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_gravity\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{output}{\textit{float *GravityVector}}); & r - m \\
+\hline
+call cg\_gravity\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{GravityVector}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_gravity\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{output}{\textit{GravityVector}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{GravityVector}}\raggedright
+\item [\fort{fn}]
+      CGNS file index number.
+      (\textcolor{input}{\textit{Input}})
+\item [\fort{B}]
+      Base index number, where $1 \leq \text{\fort{B}} \leq \text{\fort{nbases}}$.
+      (\textcolor{input}{\textit{Input}})
+\item [\fort{GravityVector}]
+      Description of the convergence information recorded in the data arrays.
+      (\textcolor{input}{Input} for \fort{cg\_gravity\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_gravity\_read})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+\subsection{Convergence History}
+\label{s:convergence}
+
+\noindent
+\textit{Node}: \fort{ConvergenceHistory\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_convergence\_write(\textcolor{input}{int niterations}, \textcolor{input}{char *NormDefinitions}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_convergence\_read(\textcolor{output}{\textit{int *niterations}}, \textcolor{output}{\textit{char **NormDefinitions}}); & r - m \\
+\hline
+call cg\_convergence\_write\_f(\textcolor{input}{niterations}, \textcolor{input}{NormDefinitions}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_convergence\_read\_f(\textcolor{output}{\textit{niterations}}, \textcolor{output}{\textit{NormDefinitions}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{NormDefinitions}}\raggedright
+\item [\fort{niterations}]
+      Number of iterations for which convergence information is recorded.
+      (\textcolor{input}{Input} for \fort{cg\_convergence\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_convergence\_read})
+\item [\fort{NormDefinitions}]
+      Description of the convergence information recorded in the data arrays.
+      (\textcolor{input}{Input} for \fort{cg\_convergence\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_convergence\_read})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+The function \fort{cg\_convergence\_write} creates a
+\fort{ConvergenceHistory\_t} node.
+It must be the first one called when recording convergence history data.
+The \fort{NormDefinitions} may be left undefined (i.e., a blank string).
+After creation of this node, the descriptors, data arrays, data class,
+and dimensional units characterizing the \fort{ConvergenceHistory\_t}
+data structure may be added.
+
+The function \fort{cg\_convergence\_read} reads a
+\fort{ConvergenceHistory\_t} node.
+If \fort{NormDefinitions} is not defined in the CGNS database, this
+function returns a null string.
+If \texttt{NormDefinitions} exists, the library will allocate the space
+to store the description string, and return the description string to
+the application.
+It is the responsibility of the application to free this space when it
+is no longer needed by a call to \texttt{cg\_free(NormDefinitions)},
+described in \autoref{s:free}.
+
+\subsection{Integral Data}
+\label{s:integral}
+
+\noindent
+\textit{Node}: \fort{IntegralData\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_integral\_write(\textcolor{input}{char *Name}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_nintegrals(\textcolor{output}{\textit{int *nintegrals}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_integral\_read(\textcolor{input}{int Index}, \textcolor{output}{\textit{char *Name}}); & r - m \\
+\hline
+call cg\_integral\_write\_f(\textcolor{input}{Name}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_nintegrals\_f(\textcolor{output}{\textit{nintegrals}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_integral\_read\_f(\textcolor{input}{Index}, \textcolor{output}{\textit{Name}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{nintegrals}}\raggedright
+\item [\fort{Name}]
+      Name of the \fort{IntegralData\_t} data structure.
+      (\textcolor{input}{Input} for \fort{cg\_integral\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_integral\_read})
+\item [\fort{nintegrals}]
+      Number of \fort{IntegralData\_t} nodes under current node.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{Index}]
+      Integral data index number, where $1 \leq \text{\fort{Index}} \leq \text{\fort{nintegrals}}$.
+      (\textcolor{input}{Input})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+\subsection{User-Defined Data}
+\label{s:userdefined}
+
+\noindent
+\textit{Node}: \fort{UserDefinedData\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_user\_data\_write(\textcolor{input}{char *Name}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_nuser\_data(\textcolor{output}{\textit{int *nuserdata}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_user\_data\_read(\textcolor{input}{int Index}, \textcolor{output}{\textit{char *Name}}); & r - m \\
+\hline
+call cg\_user\_data\_write\_f(\textcolor{input}{Name}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_nuser\_data\_f(\textcolor{output}{\textit{nuserdata}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_user\_data\_read\_f(\textcolor{input}{Index}, \textcolor{output}{\textit{Name}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{nintegrals}}\raggedright
+\item [\fort{nuserdata}]
+      Number of \fort{UserDefinedData\_t} nodes under current node.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{Name}]
+      Name of the \fort{UserDefinedData\_t} node.
+      (\textcolor{input}{Input} for \fort{cg\_user\_data\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_user\_data\_read})
+\item [\fort{Index}]
+      User-defined data index number, where $1 \leq \text{\fort{Index}} \leq \text{\fort{nuserdata}}$.
+      (\textcolor{input}{Input})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+After accessing a particular \fort{UserDefinedData\_t} node using
+\fort{cg\_goto}, the Point Set functions described in \autoref{s:ptset}
+may be used to read or write point set information for the node.
+The function \fort{cg\_gridlocation\_write} may also be used to specify
+the location of the data with respect to the grid (e.g., \fort{Vertex}
+or \fort{FaceCenter}).
+
+Multiple levels of \fort{UserDefinedData\_t} nodes may be written and
+retrieved by positioning via \fort{cg\_goto}.
+E.g.,
+\begin{alltt}
+   ier = cg\_goto(fn, B, "Zone\_t", Z, "UserDefinedData\_t", ud1, 
+                 "UserDefinedData\_t", ud2, "UserDefinedData\_t", ud3, "end");
+\end{alltt}
+
+\subsection{Freeing Memory}
+\label{s:free}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_free(\textcolor{input}{char *data}); & r w m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{nintegrals}}\raggedright
+\item [\fort{data}]
+      Character data allocated by the Mid-Level Library.
+      (\textcolor{input}{\textit{Input}})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+This function does not affect the structure of a CGNS file; it is
+provided as a convenience to free memory allocated by the Mid-Level
+Library when using C.
+This isn't necessary in Fortran, and thus an equivalent Fortran function
+is not provided.
+
+The functions that are used to allocate memory for return values are
+\texttt{cg\_descriptor\_read}, \texttt{cg\_convergence\_read},
+\texttt{cg\_geo\_read}, \texttt{cg\_link\_read}, and
+\texttt{cg\_state\_read}.
+Each of these may allocate space to contain the character data returned
+to the application.
+It is the responsibility of the application to free this data when it is
+no longer needed.
+Calling \texttt{cg\_free} is identical to calling the standard C function
+\texttt{free}, however it is probably safer in that the memory is
+freed in the same module in which it is created, particularly when the
+Mid-Level Library is a shared library or DLL.
+The routine checks for NULL data and will return \texttt{CG\_ERROR} in
+this case, otherwise it returns \texttt{CG\_OK}.
