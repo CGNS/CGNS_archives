@@ -1,0 +1,992 @@
+\section{Conventions for Data-Name Identifiers} 
+\label{s:dataname}
+\thispagestyle{plain}
+
+Identifiers or names can be attached to |DataArray_t| entities to
+identify and describe the quantity being stored.  To facilitate
+communication between different application codes, we propose to
+establish a set of standardized data-name identifiers with fairly
+precise definitions.  For any identifier in this set, the associated
+data should be unambiguously understood.  In essence, this section
+proposes standardized terminology for labeling CFD-related data,
+including grid coordinates, flow solution, turbulence model quantities,
+nondimensional governing parameters, boundary condition quantities, and
+forces and moments.
+
+We use the convention that all standardized identifiers denote
+scalar quantities; this is consistent with the intended use of the
+|DataArray_t| structure type to describe an array of scalars.  For
+quantities that are vectors, such as velocity, their components are
+listed.
+
+Included with the lists of standard data-name identifiers are the
+fundamental units of dimensions associated with that quantity.
+The following notation is used for the fundamental units: $\M$ is mass,
+$\L$ is length, $\T$ is time, $\TH$ is temperature, $\A$ is angle, and
+$\I$ is electric current.
+These fundamental units are directly associated with the elements of the
+\fort{DimensionalExponents\_t} structure.
+For example, a quantity that has dimensions $\M\L/\T$ corresponds to
+\texttt{MassExponent = +1},
+\texttt{LengthExponent = +1}, and
+\texttt{TimeExponent = -1}.
+
+Unless otherwise noted, all
+quantities in the following sections denote floating-point data
+types, and the appropriate |DataType| structure parameter for
+|DataArray_t| is |real|.
+
+\subsection{Coordinate Systems}
+\label{s:dataname_grid}
+
+Coordinate systems for identifying physical location are shown in \autoref{t:coordsystems}.
+
+\renewcommand{\thetable}{\thesection.1}
+\begin{table}[htbp]
+\centering
+\caption[Coordinate Systems]{\textbf{Coordinate Systems}}
+\label{t:coordsystems}
+\begin{tabular}{l @{\qquad}c @{\qquad}c}
+\hline\hline \\*[-2ex]
+\bold{System} & \bold{3-D} & \bold{2-D}
+\\*[1ex] \hline\hline \\*[-2ex]
+Cartesian   & $(x,y,z)$          & $(x,y)$ or $(x,z)$ or $(y,z)$    \\
+Cylindrical & $(r,\theta,z)$     & $(r,\theta)$                     \\
+Spherical   & $(r,\theta,\phi)$                                     \\
+Auxiliary   & $(\xi,\eta,\zeta)$ & $(\xi,\eta)$ or $(\xi,\zeta)$ or
+                                   $(\eta,\zeta)$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+Associated with these coordinate systems are the following unit vector 
+conventions:
+\begin{center}
+\begin{tabular}{l c @{\qquad\qquad}l c @{\qquad\qquad}l c}
+$x$-direction & $\i$ & $r$-direction      & $\er$   & $\xi$-direction   & $\exi$ \\
+$y$-direction & $\j$ & $\theta$-direction & $\eth$  & $\eta$-direction  & $\eeta$ \\
+$z$-direction & $\k$ & $\phi$-direction   & $\ephi$ & $\zeta$-direction & $\ezeta$ \\
+\end{tabular}
+\end{center}
+Note that $\er$, $\eth$ and $\ephi$ are functions of position.
+
+We envision that one of the ``standard'' coordinate systems (Cartesian,
+cylindrical or spherical) will be used within a zone (or perhaps
+the entire database) to define grid coordinates and other related
+data.  The auxiliary coordinates will be used for special quantities,
+including forces and moments, which may not be defined in the same
+coordinate system as the rest of the data.  When auxiliary coordinates
+are used, a transformation must also be provided to uniquely define
+them.  For example, the transform from Cartesian to orthogonal auxiliary
+coordinates is,
+$$
+ \pmatrix{ \exi \cr \eeta \cr \ezeta } =
+ {\bf T} \pmatrix{ \i \cr \j \cr \noalign{\smallskip} \k },
+$$
+where ${\bf T}$ is an orthonormal matrix ($2\cross2$ in 2-D and $3\cross3$
+in 3-D).
+
+In addition, normal and tangential coordinates are often used to define
+boundary conditions and data related to surfaces.  The normal coordinate
+is identified as $n$ with the unit vector $\en$.
+
+The data-name identifiers defined for coordinate systems are listed in
+\autoref{t:id_coords}.
+All represent real \fort{DataType}s, except for \fort{ElementConnectivity}
+and \fort{ParentData}, which are integer.
+
+\renewcommand{\thetable}{\thesection.2}
+\begin{table}[htbp]
+\centering
+\caption[Data-Name Identifiers for Coordinate Systems]{\textbf{Data-Name Identifiers for Coordinate Systems}}
+\label{t:id_coords}
+\begin{tabular}{>{\ttfamily}l >{\quad}l >{\quad}c}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+CoordinateX          & $x$                               & $\L$ \\
+CoordinateY          & $y$                               & $\L$ \\
+CoordinateZ          & $z$                               & $\L$ \\
+CoordinateR          & $r$                               & $\L$ \\
+CoordinateTheta      & $\theta$                          & $\A$ \\
+CoordinatePhi        & $\phi$                            & $\A$ \\
+\\
+CoordinateNormal     & Coordinate in direction of $\en$  & $\L$ \\
+CoordinateTangential & Tangential coordinate (2-D only)  & $\L$ \\ 
+\\
+CoordinateXi         & $\xi$                             & $\L$ \\
+CoordinateEta        & $\eta$                            & $\L$ \\
+CoordinateZeta       & $\zeta$                           & $\L$ \\
+\\
+CoordinateTransform  & Transformation matrix (${\bf T}$) & -    \\
+\\
+InterpolantsDonor    & Interpolation factors             & -    \\
+\\
+ElementConnectivity  & Nodes making up an element        & -    \\
+ParentData           & Element parent identification     & -
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+\subsection{Flowfield Solution}
+\label{s:dataname_flow}
+
+This section describes data-name identifiers for typical Navier-Stokes
+solution variables.  The list is obviously incomplete, but should
+suffice for initial implementation of the CGNS system.  The variables
+listed in this section are dimensional or raw quantities; nondimensional
+parameters and coefficients based on these variables are discussed in
+\autoref{s:dataname_nondim}.
+
+We use fairly universal notation for state variables.  Static quantities
+are measured with the fluid at speed: static density ($\rho$), static
+pressure ($p$), static temperature ($T$), static internal energy per
+unit mass ($e$), static enthalpy per unit mass ($h$), entropy ($s$),
+and static speed of sound ($c$).  We also approximate the true entropy
+by the function $\tilde{s} = p/\rho^\gamma$ (this assumes an ideal
+gas).  The velocity is $\v{q} = u \i + v \j + w \k$, with magnitude
+$q = \sqrt{ \v{q}\dot\v{q} }$. Stagnation quantities are obtained
+by bringing the fluid isentropically to rest; these are identified
+by a subscript ``${}_0$''.  The term ``total'' is also used to refer to
+stagnation quantities.
+
+Conservation variables are density, momentum
+($\rho \v{q} = \rho u \i + \rho v \j + \rho w \k$), and stagnation
+energy per unit volume ($\rho e_0$).
+
+For rotating coordinate systems, $u$, $v$, and $w$ are the $x$, $y$,
+and $z$ components of the velocity vector in the inertial frame;
+$\vec{\omega}$ is the rotation rate vector; $\vec{R}$ is a vector from
+the center of rotation to the point of interest; and $\vec{w}_r =
+\vec{\omega} \times \vec{R}$ is the rotational velocity vector of the
+rotating frame of reference, with components $w_{rx}$, $w_{ry}$, and
+$w_{rz}$.
+
+Molecular diffusion and heat transfer introduce the molecular viscosity
+($\mu$), kinematic viscosity ($\nu$) and thermal conductivity coefficient
+($k$).  These are obtained from the state variables through auxiliary
+correlations.  For a perfect gas, $\mu$ and $k$ are functions of static
+temperature only.
+
+The Navier-Stokes equations involve the strain tensor ($\bar{\bar{S}}$) and
+the shear-stress tensor ($\bar{\bar{\tau}}$).  Using indicial notation, the
+3-D Cartesian components of the strain tensor are,
+$$
+ \bar{\bar{S}}_{i,j} = \left( \pdf{u_i}{x_j} + \pdf{u_j}{x_i} \right),
+$$
+and the stress tensor is, 
+$$
+ \bar{\bar{\tau}}_{i,j} = \mu \left( \pdf{u_i}{x_j} + \pdf{u_j}{x_i} \right)
+ + \lambda \pdf{u_k}{x_k},
+$$
+where $(x_1,x_2,x_3) = (x,y,z)$ and $(u_1,u_2,u_3) = (u,v,w)$.  The bulk
+viscosity is usually approximated as $\lambda = -2/3 \mu$.  
+
+Reynolds averaging of the Navier-Stokes equations introduce Reynolds
+stresses ($- \rho \overline{u' v'}$, etc.) and turbulent heat flux terms
+($- \rho \overline{u' e'}$, etc.), where primed quantities are
+instantaneous fluctuations and the bar is an averaging operator.
+These quantities are obtained from auxiliary turbulence closure models.
+Reynolds-stress models formulate transport equations for the Reynolds
+stresses directly; whereas, eddy-viscosity models correlate the Reynolds
+stresses with the mean strain rate,
+$$
+ - \overline{u' v'} = \nu_t \left( \pdf{u}{y} + \pdf{v}{x} \right),
+$$
+where $\nu_t$ is the kinematic eddy viscosity.
+The eddy viscosity is either correlated to mean flow quantities by
+algebraic models or by auxiliary transport models.
+An example two-equation turbulence transport model is the $k$-$\epsilon$
+model, where transport equations are formulated for the turbulent kinetic
+energy ($k = {1\over2}(\overline{u'u'} + \overline{v'v'} + \overline{w'w'})$)
+and turbulent dissipation ($\epsilon$).
+
+Skin friction evaluated at a surface is the dot product of the shear
+stress tensor with the surface normal:
+$$
+ \v{\tau} = \bar{\bar{\tau}} \dot \h{n},
+$$
+Note that skin friction is a vector.
+
+The data-name identifiers defined for flow solution quantities are listed
+in \autoref{t:id_flow}.
+
+Note that for some vector quantities, like momentum, the table only
+explicitly lists data-name identifiers for the $x$, $y$, and $z$
+components, and for the magnitude.
+It should be understood, however, that for any vector quantity with a
+standardized data name ``\fort{Vector}'', the following standardized data
+names are also defined:
+
+\begin{Ventryic}{\fort{VectorTangential}}
+   \item [\fort{VectorX}]
+         $x$-component of vector
+   \item [\fort{VectorY}]
+         $y$-component of vector
+   \item [\fort{VectorZ}]
+         $z$-component of vector
+   \item [\fort{VectorR}]
+         Radial component of vector
+   \item [\fort{VectorTheta}]
+         $\theta$-component of vector
+   \item [\fort{VectorPhi}]
+         $\phi$-component of vector
+   \item [\fort{VectorMagnitude}]
+         Magnitude of vector
+   \item [\fort{VectorNormal}]
+         Normal component of vector
+   \item [\fort{VectorTangential}]
+         Tangential component of vector (2-D only)
+\end{Ventryic}
+
+Also note that some data-name identifiers used with multi-species flows
+include the variable string \textit{Symbol}, which represents either the
+chemical symbol for a species, or a defined name for a mixture.
+See \autoref{s:ChemicalKineticsModel} for examples, and
+\autoref{t:id_chemicalkineticssymbols} on
+p.~\pageref*{t:id_chemicalkineticssymbols} for a list of defined names.
+
+\renewcommand{\thetable}{\thesection.3}
+\settowidth{\tmplengtha}{\fort{RotatingEnergyStagnationDensity}}
+\settowidth{\tmplengthb}{$\L^{3\gamma - 1}/(\M^{\gamma - 1} \T^2)$}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\setlength{\Pwidth}{\linewidth-6\tabcolsep-\tmplengtha-\tmplengthb}
+\begin{longtable}{>{\ttfamily}l >{\raggedright\arraybackslash}p{\Pwidth} c}
+\caption[Data-Name Identifiers for Flow Solution Quantities]{\textbf{Data-Name Identifiers for Flow Solution Quantities}}
+\label{t:id_flow}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endfirsthead
+
+\multicolumn{3}{l}{{\bfseries \autoref{t:id_flow}: Data-Name Identifiers for Flow Solution Quantities} (\emph{Continued})}
+\\*[1ex] \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endhead
+
+\\*[-2ex]\hline
+\multicolumn{3}{r}{\emph{Continued on next page}} \\
+\endfoot
+\\*[-2ex] \hline\hline
+\endlastfoot
+Potential               & Potential: $\nabla\phi = \v{q}$ &
+   $\L^2/\T$ \\
+StreamFunction          & Stream function (2-D): $\nabla\cross\psi = \v{q}$ &
+   $\L^2/\T$ \\
+\\
+Density                 & Static density ($\rho$)         &
+   $\M/\L^3$ \\
+Pressure                & Static pressure ($p$)           &
+   $\M/(\L \T^2)$ \\
+Temperature             & Static temperature ($T$)        &
+   $\TH$ \\
+EnergyInternal          & Static internal energy per unit mass ($e$) &
+   $\L^2/\T^2$ \\
+Enthalpy                & Static enthalpy per unit mass ($h$) &
+   $\L^2/\T^2$ \\
+Entropy                 & Entropy ($s$) &
+   $\M \L^2/(\T^2 \TH)$ \\
+EntropyApprox           & Approximate entropy ($\tilde{s} = p/\rho^\gamma$) &
+   $\L^{3\gamma - 1}/(\M^{\gamma - 1} \T^2)$ \\
+\\
+DensityStagnation       & Stagnation density ($\rho_0$) &
+   $\M/\L^3$ \\
+PressureStagnation      & Stagnation pressure ($p_0$) &
+   $\M/(\L \T^2)$ \\
+TemperatureStagnation   & Stagnation temperature ($T_0$) &
+   $\TH$ \\
+EnergyStagnation        & Stagnation energy per unit mass ($e_0$) &
+   $\L^2/\T^2$ \\
+EnthalpyStagnation      & Stagnation enthalpy per unit mass ($h_0$) &
+   $\L^2/\T^2$ \\
+EnergyStagnationDensity & Stagnation energy per unit volume ($\rho e_0$) &
+   $\M/(\L \T^2)$ \\
+\\
+VelocityX               & $x$-component of velocity ($u = \v{q}\dot\i$) &
+   $\L/\T$ \\
+VelocityY               & $y$-component of velocity ($v = \v{q}\dot\j$) &
+   $\L/\T$ \\
+VelocityZ               & $z$-component of velocity ($w = \v{q}\dot\k$) &
+   $\L/\T$ \\
+VelocityR               & Radial velocity component ($\v{q}\dot\er$) &
+   $\L/\T$ \\
+VelocityTheta           & Velocity component in $\theta$ direction ($\v{q}\dot\eth$) &
+   $\L/\T$ \\
+VelocityPhi             & Velocity component in $\phi$ direction ($\v{q}\dot\ephi$) &
+   $\L/\T$ \\
+VelocityMagnitude       & Velocity magnitude ($q= \sqrt{ \v{q}\dot\v{q} }$) &
+   $\L/\T$ \\
+VelocityNormal          & Normal velocity component ($\v{q}\dot\h{n}$) &
+   $\L/\T$ \\
+VelocityTangential      & Tangential velocity component (2-D) &
+   $\L/\T$ \\
+VelocitySound           & Static speed of sound &
+   $\L/\T$ \\      
+VelocitySoundStagnation & Stagnation speed of sound &
+   $\L/\T$ \\
+\\
+MomentumX               & $x$-component of momentum ($\rho u$) &
+   $\M/(\L^2\T)$ \\
+MomentumY               & $y$-component of momentum ($\rho v$) &
+   $\M/(\L^2\T)$ \\
+MomentumZ               & $z$-component of momentum ($\rho w$) &
+   $\M/(\L^2\T)$ \\
+MomentumMagnitude       & Magnitude of momentum ($\rho q$) &
+   $\M/(\L^2\T)$ \\
+\\
+RotatingVelocityX       & $x$-component of velocity, relative to rotating frame ($u_{rx} = u - w_{rx}$) &
+   $\L/\T$ \\
+RotatingVelocityY       & $y$-component of velocity, relative to rotating frame ($u_{ry} = v - w_{ry}$) &
+   $\L/\T$ \\
+RotatingVelocityZ       & $z$-component of velocity, relative to rotating frame ($u_{rz} = w - w_{rz}$) &
+   $\L/\T$ \\
+RotatingMomentumX       & $x$-component of momentum, relative to rotating frame ($\rho u_{rx}$) &
+   $\M/(\L^2\T)$ \\
+RotatingMomentumY       & $y$-component of momentum, relative to rotating frame ($\rho u_{ry}$) &
+   $\M/(\L^2\T)$ \\
+RotatingMomentumZ       & $z$-component of momentum, relative to rotating frame ($\rho u_{rz}$) &
+   $\M/(\L^2\T)$ \\
+RotatingVelocityMagnitude & Velocity magnitude in rotating frame ($q_r = \sqrt{ u_{rx}^2 + u_{ry}^2 + u_{rz}^2 }$) &
+   $\L/\T$ \\
+RotatingPressureStagnation      & Stagnation pressure in rotating frame &
+   $\M/(\L \T^2)$ \\
+RotatingEnergyStagnation        & Stagnation energy per unit mass in rotating frame ($(e_0)_r$) &
+   $\L^2/\T^2$ \\
+RotatingEnergyStagnationDensity & Stagnation energy per unit volume in rotating frame ($\rho (e_0)_r$) &
+   $\M/(\L \T^2)$ \\
+RotatingEnthalpyStagnation      & Stagnation enthalpy per unit mass in rotating frame, rothalpy &
+   $\L^2/\T^2$ \\
+\\
+EnergyKinetic           & $(u^2 + v^2 + w^2) / 2 = q^2 / 2$ &
+   $\L^2/\T^2$ \\
+PressureDynamic         & $\rho q^2 / 2$ &
+   $\M/(\L \T^2)$ \\
+\\
+SoundIntensityDB        & Sound intensity level in decibels,
+                          $10 \log_{10} (I/I_{\rm ref}) =
+                          20 \log_{10} (p/p_{\rm ref})$, where
+                          $I$ is the sound power per unit area,
+                          $I_{\rm ref} = 10^{-12}$ watts/m\tsup{2}
+                          is the reference sound power per unit area,
+                          $p$ is the pressure wave amplitude, and
+                          $p_{\rm ref} = 2 \times 10^{-5}$ N/m\tsup{2}
+                          is the reference pressure. &
+   - \\
+SoundIntensity          & Sound intensity (i.e., sound power per unit area, $I$) &
+   $\M/\T^3$ \\
+\\
+VorticityX              & $\omega_x = \pd{w}{y} - \pd{v}{z} = \v{\omega}\dot\i$ &
+   $\T^{-1}$ \\
+VorticityY              & $\omega_y = \pd{u}{z} - \pd{w}{x} = \v{\omega}\dot\j$ &
+   $\T^{-1}$ \\
+VorticityZ              & $\omega_z = \pd{v}{x} - \pd{u}{y} = \v{\omega}\dot\k$ &
+   $\T^{-1}$ \\
+VorticityMagnitude      & $\omega = \sqrt{ \v{\omega}\dot\v{\omega} }$ &
+   $\T^{-1}$ \\
+\\
+SkinFrictionX           & $x$-component of skin friction ($\v{\tau} \cdot \i$) &
+   $\M/(\L \T^2)$ \\
+SkinFrictionY           & $y$-component of skin friction ($\v{\tau} \cdot \j$) &
+   $\M/(\L \T^2)$ \\
+SkinFrictionZ           & $z$-component of skin friction ($\v{\tau} \cdot \k$) &
+   $\M/(\L \T^2)$ \\
+SkinFrictionMagnitude   & Skin friction magnitude ($\sqrt{ \v{\tau}\dot\v{\tau} }$) &
+   $\M/(\L \T^2)$ \\
+\\
+VelocityAngleX          & Velocity angle ($\arccos(u/q) \in [0,\,180^\circ)$) &
+   $\A$ \\
+VelocityAngleY          & $\arccos(v/q)$ &
+   $\A$ \\
+VelocityAngleZ          & $\arccos(w/q)$ &
+   $\A$ \\
+\\
+VelocityUnitVectorX     & $x$-component of velocity unit vector ($\v{q}\dot\i / q$) &
+   - \\
+VelocityUnitVectorY     & $y$-component of velocity unit vector ($\v{q}\dot\j / q$) &
+   - \\
+VelocityUnitVectorZ     & $z$-component of velocity unit vector ($\v{q}\dot\k / q$) &
+   - \\
+\\
+MassFlow                & Mass flow normal to a plane ($\rho \v{q}\dot\h{n}$) &
+   $\M/(\L^2 \T)$ \\
+\\
+ViscosityKinematic      & Kinematic viscosity ($\nu = \mu / \rho$) &
+   $\L^2/\T$ \\
+ViscosityMolecular      & Molecular viscosity ($\mu$) &
+   $\M/(\L \T)$ \\
+ViscosityEddyKinematic  & Kinematic eddy viscosity ($\nu_t$) &
+   $\L^2/\T$ \\
+ViscosityEddy           & Eddy viscosity ($\mu_t$) &
+   $\M/(\L \T)$ \\
+ThermalConductivity     & Thermal conductivity coefficient ($k$) &
+   $\M \L/(\T^3 \TH)$ \\
+\\
+PowerLawExponent        & Power-law exponent ($n$) in molecular viscosity
+                          or thermal conductivity model &
+   - \\
+SutherlandLawConstant   & Sutherland's Law constant ($T_s$) in molecular
+                          viscosity or thermal conductivity model &
+   $\TH$ \\
+TemperatureReference    & Reference temperature ($T_{\rm ref}$) in molecular
+                          viscosity or thermal conductivity model &
+   $\TH$ \\
+ViscosityMolecularReference  & Reference viscosity ($\mu_{\rm ref}$) in
+                               molecular viscosity model &
+   $\M/(\L \T)$ \\
+ThermalConductivityReference & Reference thermal conductivity ($k_{\rm ref}$)
+                               in thermal conductivity model &
+   $\M \L/(\T^3 \TH)$ \\
+\\
+IdealGasConstant        & Ideal gas constant ($R = c_p - c_v$) &
+   $\L^2/(\T^2 \TH)$ \\
+SpecificHeatPressure    & Specific heat at constant pressure ($c_p$) &
+   $\L^2/(\T^2 \TH)$ \\
+SpecificHeatVolume      & Specific heat at constant volume ($c_v$) &
+   $\L^2/(\T^2 \TH)$ \\
+\\
+ReynoldsStressXX        & Reynolds stress $-\rho \overline{u' u'}$ &
+   $\M/(\L \T^2)$ \\
+ReynoldsStressXY        & Reynolds stress $-\rho \overline{u' v'}$ &
+   $\M/(\L \T^2)$ \\
+ReynoldsStressXZ        & Reynolds stress $-\rho \overline{u' w'}$ &
+   $\M/(\L \T^2)$ \\
+ReynoldsStressYY        & Reynolds stress $-\rho \overline{v' v'}$ &
+   $\M/(\L \T^2)$ \\
+ReynoldsStressYZ        & Reynolds stress $-\rho \overline{v' w'}$ &
+   $\M/(\L \T^2)$ \\
+ReynoldsStressZZ        & Reynolds stress $-\rho \overline{w' w'}$ &
+   $\M/(\L \T^2)$ \\
+\\
+MolecularWeight\textit{Symbol}     & Molecular weight for species
+                                     \textit{Symbol} &
+   - \\
+HeatOfFormation\textit{Symbol}     & Heat of formation per unit mass for species
+                                     \textit{Symbol} &
+   $\L^2/\T^2$ \\
+FuelAirRatio                       & Fuel/air mass ratio &
+   - \\
+ReferenceTemperatureHOF            & Reference temperature for the heat
+                                     of formation &
+   $\TH$ \\
+MassFraction\textit{Symbol}        & Mass of species \textit{Symbol},
+                                     divided by total mass &
+   - \\
+LaminarViscosity\textit{Symbol}    & Laminar viscosity of species
+                                     \textit{Symbol} &
+   $\M/(\L \T)$ \\
+ThermalConductivity\textit{Symbol} & Thermal conductivity of species
+                                     \textit{Symbol} &
+   $\M \L/(\T^3 \TH)$ \\
+EnthalpyEnergyRatio                & The ratio $\beta = h/e =
+                                     \int_{T_{\it ref}}^T c_p\,dT / \int_{T_{\it ref}}^T c_v\,dT$ &
+   - \\
+CompressibilityFactor              & The gas constant of the mixture divided
+                                     by the freestream gas constant,
+                                     $Z = R / R_\infty$ &
+   - \\
+VibrationalElectronEnergy          & Vibrational-electronic excitation
+                                     energy per unit mass &
+   $\L^2/\T^2$ \\
+HeatOfFormation                    & Heat of formation per unit mass
+                                     for the entire mixture,
+                                     $H = \sum_{i=1}^n Y_i H_i$, where
+                                     $n$ is the number of species,
+                                     $Y_i$ is the mass fraction of
+                                     species $i$, and $H_i$ is the
+                                     heat of formation for species
+                                     $i$ at the reference temperature
+                                     \fort{ReferenceTemperatureHOF}.
+                                     This requires that
+                                     \fort{ReferenceTemperatureHOF}
+                                     be specified using the
+                                     \fort{ChemicalKineticsModel} data
+                                     structure. &
+   $\L^2/\T^2$ \\
+VibrationalElectronTemperature     & Vibrational electron temperature &
+   $\TH$ \\
+SpeciesDensity\textit{Symbol}      & Density of species \textit{Symbol} &
+   $\M/\L^3$ \\
+MoleFraction\textit{Symbol}        & Number of moles of species
+                                     \textit{Symbol} divided by the total
+                                     number of moles for all species &
+   - \\
+\\
+Voltage              & Voltage                                 &
+   $\M \L^2/\T \I$ \\
+ElectricFieldX       & $x$-component of electric field vector  &
+   $\M \L/\T \I$ \\
+ElectricFieldY       & $y$-component of electric field vector  &
+   $\M \L/\T \I$ \\
+ElectricFieldZ       & $z$-component of electric field vector  &
+   $\M \L/\T \I$ \\
+MagneticFieldX       & $x$-component of magnetic field vector  &
+   $\I/\L$ \\
+MagneticFieldY       & $y$-component of magnetic field vector  &
+   $\I/\L$ \\
+MagneticFieldZ       & $z$-component of magnetic field vector  &
+   $\I/\L$ \\
+CurrentDensityX      & $x$-component of current density vector &
+   $\I/\L^2$ \\
+CurrentDensityY      & $y$-component of current density vector &
+   $\I/\L^2$ \\
+CurrentDensityZ      & $z$-component of current density vector &
+   $\I/\L^2$ \\
+ElectricConductivity & Electrical conductivity                 &
+   $\M \L/\T^3 \I^2$ \\
+LorentzForceX        & $x$-component of Lorentz force vector   &
+   $\M \L/\T^2$ \\
+LorentzForceY        & $y$-component of Lorentz force vector   &
+   $\M \L/\T^2$ \\
+LorentzForceZ        & $z$-component of Lorentz force vector   &
+   $\M \L/\T^2 $ \\
+JouleHeating         & Joule heating                           &
+   $\M \L^2/\T^2$ \\
+\\
+LengthReference         & Reference length $L$ &
+   $\L$
+\end{longtable}
+
+\newpage
+\subsection{Turbulence Model Solution}
+
+This section lists data-name identifiers for typical Reynolds-averaged
+Navier-Stokes turbulence model variables.
+Turbulence model solution quantities and model constants present a
+particularly difficult nomenclature problem---to be precise we need to
+identify both the variable and the model (and version) that it comes
+from.
+The list in \autoref{t:id_turbulence} falls short in this respect.
+
+\renewcommand{\thetable}{\thesection.4}
+\begin{table}[htbp]
+\centering
+\caption[Data-Name Identifiers for Typical Turbulence Models]{\textbf{Data-Name Identifiers for Typical Turbulence Models}}
+\label{t:id_turbulence}
+\begin{tabular}{>{\ttfamily}l >{\quad}l >{\quad}c}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+TurbulentDistance        & Distance to nearest wall &
+   $\L$ \\
+\\
+TurbulentEnergyKinetic   & $k = {1\over2}(\overline{u'u'} + \overline{v'v'} + \overline{w'w'})$ &
+   $\L^2/\T^2$ \\
+TurbulentDissipation     & $\epsilon$ &
+   $\L^2/\T^3$ \\
+TurbulentDissipationRate & $\epsilon / k = \omega$ &
+   $\T^{-1}$ \\
+\\
+TurbulentBBReynolds      & Baldwin-Barth one-equation model $R_T$ &
+   - \\
+TurbulentSANuTilde       & Spalart-Allmaras one-equation model $\tilde{\nu}$ &
+   $\L^2/\T$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+\subsection{Nondimensional Parameters}
+\label{s:dataname_nondim}
+
+CFD codes are rich in nondimensional governing parameters, such as
+Mach number and Reynolds number, and nondimensional flowfield coefficients,
+such as pressure coefficient.  The problem with these parameters is
+that the definitions and conditions at which they are evaluated can
+vary from code to code.  Reynolds number is particularly notorious in
+this respect.
+
+These parameters have posed a difficult dilemma for us.  Either we
+impose a rigid definition for each and force all database users to
+abide by it, or we develop some methodology for describing the
+particular definition that the user is employing.  The first limits
+applicability and flexibility, and the second adds complexity.  We have
+opted for the second approach, but we include only enough information
+about the definition of each parameter to allow for conversion
+operations.  For example, the Reynolds number includes velocity, length,
+and kinematic viscosity scales in its definition (i.e., $Re = V L_R / \nu$).
+The database description of Reynolds number includes these different
+scales.  By providing these ``definition components'', any code that reads
+Reynolds number from the database can transform its value to an
+appropriate internal definition.  These definition components are
+identified by appending a ``|_|'' to the data-name identifier of the parameter.
+
+Definitions for nondimensional flowfield coefficients follow: the
+pressure coefficient is defined as,
+$$
+ c_p = {p - p_\refer \over {1\over2} \rho_\refer q_\refer^2},
+$$
+where ${1\over2} \rho_\refer q_\refer^2$ is the dynamic pressure evaluated at
+some reference condition, and $p_\refer$ is some reference pressure.  The 
+skin friction coefficient is,
+$$
+ \v{c}_f = {\v{\tau} \over {1\over2} \rho_\refer q_\refer^2},
+$$
+where $\v{\tau}$ is the shear stress or skin friction vector.  Usually, 
+$\v{\tau}$ is evaluated at the wall surface.
+
+The data-name identifiers defined for nondimensional governing
+parameters and flowfield coefficients are listed in
+\autoref{t:id_nondimensional}.
+
+\renewcommand{\thetable}{\thesection.5}
+\settowidth{\tmplengtha}{\fort{Prandtl\_SpecificHeatPressure}}
+\settowidth{\tmplengthb}{$\M \L/(\T^3 \TH)$}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\setlength{\Pwidth}{\linewidth-6\tabcolsep-\tmplengtha-\tmplengthb}
+\begin{longtable}{>{\ttfamily}l >{\raggedright\arraybackslash}p{\Pwidth} c}
+\caption[Data-Name Identifiers for Nondimensional Parameters]{\textbf{Data-Name Identifiers for Nondimensional Parameters}}
+\label{t:id_nondimensional}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endfirsthead
+
+\multicolumn{3}{l}{{\bfseries \autoref{t:id_nondimensional}: Data-Name Identifiers for Nondimensional Parameters} (\emph{Continued})}
+\\*[1ex] \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endhead
+
+\\*[-2ex]\hline
+\multicolumn{3}{r}{\emph{Continued on next page}} \\
+\endfoot
+\\*[-2ex] \hline\hline
+\endlastfoot
+Mach                          & Mach number: $M = q/c$ &
+   - \\
+Mach\_Velocity                & Velocity scale ($q$) &
+   $\L/\T$ \\
+Mach\_VelocitySound           & Speed of sound scale ($c$) &
+   $\L/\T$ \\
+RotatingMach                  & Mach number relative to rotating frame: $M_r = q_r / c$ &
+   - \\
+\\
+Reynolds                      & Reynolds number: $Re = V L_R / \nu$ &
+   - \\
+Reynolds\_Velocity            & Velocity scale ($V$) &
+   $\L/\T$ \\
+Reynolds\_Length              & Length scale ($L_R$) &
+   $\L$ \\
+Reynolds\_ViscosityKinematic  & Kinematic viscosity scale ($\nu$) &
+   $\L^2/\T$ \\
+\\
+Prandtl                       & Prandtl number: $Pr = \mu c_p / k$ &
+   - \\
+Prandtl\_ThermalConductivity  & Thermal conductivity scale ($k$) &
+   $\M \L/(\T^3 \TH)$ \\
+Prandtl\_ViscosityMolecular   & Molecular viscosity scale ($\mu$) &
+   $\M/(\L \T)$ \\
+Prandtl\_SpecificHeatPressure & Specific heat scale ($c_p$) &
+   $\L^2/(\T^2 \TH)$ \\
+PrandtlTurbulent              & Turbulent Prandtl number, $\rho \nu_t c_p / k_t$ &
+   - \\
+\\
+SpecificHeatRatio             & Specific heat ratio: $\gamma = c_p / c_v$ &
+   - \\
+SpecificHeatRatio\_Pressure   & Specific heat at constant pressure ($c_p$) &
+   $\L^2/(\T^2 \TH)$ \\
+SpecificHeatRatio\_Volume     & Specific heat at constant volume ($c_v$) &
+   $\L^2/(\T^2 \TH)$ \\
+\\
+CoefPressure                  & $c_p$ &
+   - \\
+CoefSkinFrictionX             & $\v{c}_f \dot \i$ &
+   - \\
+CoefSkinFrictionY             & $\v{c}_f \dot \j$ &
+   - \\
+CoefSkinFrictionZ             & $\v{c}_f \dot \k$ &
+   - \\
+\\
+Coef\_PressureDynamic         & $\rho_\refer q_\refer^2 / 2$ &
+   $\M/(\L \T^2)$ \\
+Coef\_PressureReference       & $p_\refer$ &
+   $\M/(\L \T^2)$
+\end{longtable}
+
+\subsection{Characteristics and Riemann Invariants Based on 1-D Flow}
+\label{s:dataname_char}
+
+Boundary condition specification for inflow/outflow or farfield
+boundaries often involves Riemann invariants or characteristics of
+the linearized inviscid flow equations.  For an ideal compressible
+gas, these are typically defined as follows: Riemann invariants for an
+isentropic 1-D flow are,
+$$
+ \left[ \pdf{}{t} + (u \pm c) \pdf{}{x} \right] 
+ \left( u \pm {2\over{\gamma - 1}} c \right) = 0.
+$$
+Characteristic variables for the 3-D Euler equations linearized about a
+constant mean flow are,
+$$ 
+ \left[ \pdf{}{t} + \bar{\Lambda}_n \pdf{}{x} \right] W'_n(x,t) = 0,  
+ \qquad n = 1,2,\ldots 5,
+$$
+where the characteristics and corresponding characteristic variables are
+shown in \autoref{t:charvar}.
+\renewcommand{\thetable}{\thesection.6}
+\begin{table}[htbp]
+\centering
+\caption[Characteristic Variables]{\textbf{Characteristic Variables}}
+\label{t:charvar}
+\begin{tabular}{l >{\quad}c >{\quad}c}
+\hline\hline \\*[-2ex]
+\bold{Characteristic} & {\boldmath $\bar{\Lambda}_n$} & {\boldmath $W'_n$}
+\\*[1ex] \hline\hline \\*[-2ex]
+Entropy   & $\bar{u}$             & $p' - \rho'/\bar{c}^2$ \\
+Vorticity & $\bar{u}$             & $v'$  \\
+Vorticity & $\bar{u}$             & $w'$  \\
+Acoustic  & $\bar{u} \pm \bar{c}$ & $p' \pm u'/(\bar{\rho} \bar{c})$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+Barred quantities are evaluated at the mean flow, and primed quantities
+are linearized perturbations.  The only non-zero mean-flow velocity
+component is $\bar{u}$.  The data-name identifiers defined for
+Riemann invariants and characteristic variables are listed in
+\autoref{t:id_chars}.
+
+\renewcommand{\thetable}{\thesection.7}
+\begin{table}[htbp]
+\centering
+\caption[Data-Name Identifiers for Characteristics and Riemann Invariants]{\textbf{Data-Name Identifiers for Characteristics and Riemann Invariants}}
+\label{t:id_chars}
+\begin{tabular}{>{\ttfamily}l >{\quad}l >{\quad}c}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+RiemannInvariantPlus        & $u + 2 c/(\gamma - 1)$         & $\L/\T$ \\
+RiemannInvariantMinus       & $u - 2 c/(\gamma - 1)$         & $\L/\T$ \\
+\\
+CharacteristicEntropy       & $p' - \rho'/\bar{c}^2$         & $\M/(\L \T^2)$ \\
+CharacteristicVorticity1    & $v'$                           & $\L/\T$ \\
+CharacteristicVorticity2    & $w'$                           & $\L/\T$ \\ 
+CharacteristicAcousticPlus  & $p' + u'/(\bar{\rho} \bar{c})$ & $\M/(\L \T^2)$ \\
+CharacteristicAcousticMinus & $p' - u'/(\bar{\rho} \bar{c})$ & $\M/(\L \T^2)$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{table}
+
+\subsection{Forces and Moments}
+
+Conventions for data-name identifiers for forces and moments are defined
+in this section.
+Ideally, forces and moments should be attached to geometric components
+or less ideally to surface grids.
+Currently, the standard mechanism for storing forces and moments is
+generally through the \fort{ConvergenceHistory\_t} node described in
+\autoref{s:ConvergenceHistory}, either attached to the entire
+configuration (under \fort{CGNSBase\_t}, \autoref{s:CGNSBase}) or
+attached to a zone (under \fort{Zone\_t}, \autoref{s:Zone}).
+
+Given a differential force $\v{f}$ (i.e., a force per unit area), the force 
+integrated over a surface is,
+$$
+ \v{F} = F_x \i + F_y \j + F_z \k = \int \v{f} \,dA,
+$$
+where $\i$, $\j$ and $\k$ are the unit vectors in the $x$, $y$ and $z$ 
+directions, respectively.  The moment about a point $\v{r}_0$ integrated 
+over a surface is,
+$$
+ \v{M} = M_x \i + M_y \j + M_z \k 
+       = \int (\v{r} - \v{r}_0) \times \v{f} \,dA.
+$$
+Lift and drag components of the integrated force are,
+$$
+ L = \v{F} \cdot \h{L}  \qquad  D = \v{F} \cdot \h{D} 
+$$
+where $\h{L}$ and $\h{D}$ are the unit vectors in the positive lift and 
+drag directions, respectively.  
+
+Lift, drag and moment are often computed in auxiliary coordinate frames
+(e.g., wind axes or stability axes).  We introduce the convention that
+lift, drag and moment are computed in the $(\xi,\eta,\zeta)$ coordinate
+system.  Positive drag is assumed parallel to the $\xi$-direction (i.e.,
+$\h{D} = \exi$); and positive lift is assumed parallel to the
+$\eta$-direction (i.e., $\h{L} = \eeta$).  Thus, forces and
+moments defined in this auxiliary coordinate system are,
+$$
+ L = \v{F} \cdot \eeta  \qquad  D = \v{F} \cdot \exi 
+$$
+$$
+ \v{M} = M_\xi \exi + M_\eta \eeta + M_\zeta \ezeta 
+       = \int (\v{r} - \v{r}_0) \times \v{f} \,dA.
+$$
+
+Lift, drag and moment coefficients in 3-D are defined as,
+$$
+ C_L = {L \over {1\over2} \rho_\refer q_\refer^2 S_\refer}  \qquad
+ C_D = {D \over {1\over2} \rho_\refer q_\refer^2 S_\refer}  \qquad
+ \v{C}_M = {\v{M} \over {1\over2} \rho_\refer q_\refer^2 c_\refer S_\refer}, 
+$$
+where ${1\over2} \rho_\refer q_\refer^2$ is a reference dynamic pressure,
+$S_\refer$ is a reference area, and $c_\refer$ is a reference length.
+For a wing, $S_\refer$ is typically the wing area and $c_\refer$ is the
+mean aerodynamic chord.
+In 2-D, the sectional force coefficients are,
+$$
+ c_l = {L' \over {1\over2} \rho_\refer q_\refer^2 c_\refer}  \qquad
+ c_d = {D' \over {1\over2} \rho_\refer q_\refer^2 c_\refer}  \qquad
+ \v{c}_m = {\v{M}' \over {1\over2} \rho_\refer q_\refer^2 c_\refer^2}, 
+$$
+where the forces are integrated along a contour (e.g., an airfoil
+cross-section) rather than a surface.
+
+The data-name identifiers and definitions provided for forces
+and moments and their associated coefficients are listed in
+\autoref{t:id_forces}.
+For coefficients, the dynamic pressure and length scales used in the
+normalization are provided.
+
+\renewcommand{\thetable}{\thesection.8}
+\setlength{\LTleft}{\fill}
+\setlength{\LTright}{\fill}
+\begin{longtable}{>{\ttfamily}l >{\quad}l >{\quad}c}
+\caption[Data-Name Identifiers for Forces and Moments]{\textbf{Data-Name Identifiers for Forces and Moments}}
+\label{t:id_forces}
+\\ \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endfirsthead
+
+\multicolumn{3}{l}{{\bfseries \autoref{t:id_forces}: Data-Name Identifiers for Forces and Moments} (\emph{Continued})}
+\\*[1ex] \hline\hline \\*[-2ex]
+\bold{Data-Name Identifier} & \bold{Description} & \bold{Units}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endhead
+
+\\*[-2ex]\hline
+\multicolumn{3}{r}{\emph{Continued on next page}} \\
+\endfoot
+\\*[-2ex] \hline\hline
+\endlastfoot
+ForceX                & $F_x = \v{F} \dot \i$        & $\M \L/\T^2$ \\
+ForceY                & $F_y = \v{F} \dot \j$        & $\M \L/\T^2$ \\
+ForceZ                & $F_z = \v{F} \dot \k$        & $\M \L/\T^2$ \\
+ForceR                & $F_r = \v{F} \dot \er$       & $\M \L/\T^2$ \\
+ForceTheta            & $F_\theta = \v{F} \dot \eth$ & $\M \L/\T^2$ \\
+ForcePhi              & $F_\phi = \v{F} \dot \ephi$  & $\M \L/\T^2$ \\
+\\
+Lift                  & $L$ or $L'$                  & $\M \L/\T^2$ \\
+Drag                  & $D$ or $D'$                  & $\M \L/\T^2$ \\
+MomentX               & $M_x = \v{M} \dot \i$         & $\M \L^2/\T^2$ \\
+MomentY               & $M_y = \v{M} \dot \j$         & $\M \L^2/\T^2$ \\
+MomentZ               & $M_z = \v{M} \dot \k$         & $\M \L^2/\T^2$ \\
+MomentR               & $M_r = \v{M} \dot \er$        & $\M \L^2/\T^2$ \\
+MomentTheta           & $M_\theta = \v{M} \dot \eth$  & $\M \L^2/\T^2$ \\
+MomentPhi             & $M_\phi = \v{M} \dot \ephi$   & $\M \L^2/\T^2$ \\
+MomentXi              & $M_\xi = \v{M} \dot \exi$     & $\M \L^2/\T^2$ \\
+MomentEta             & $M_\eta = \v{M} \dot \eeta$   & $\M \L^2/\T^2$ \\
+MomentZeta            & $M_\zeta = \v{M} \dot \ezeta$ & $\M \L^2/\T^2$ \\
+\\
+Moment\_CenterX       & $x_0 = \v{r}_0 \dot \i$       & $\L$ \\
+Moment\_CenterY       & $y_0 = \v{r}_0 \dot \j$       & $\L$ \\
+Moment\_CenterZ       & $z_0 = \v{r}_0 \dot \k$       & $\L$ \\
+\\
+CoefLift              & $C_L$ or $c_l$                                 & - \\
+CoefDrag              & $C_D$ or $c_d$                                 & - \\
+CoefMomentX           & $\v{C}_M \dot \i$ or $\v{c}_m \dot \i$         & - \\
+CoefMomentY           & $\v{C}_M \dot \j$ or $\v{c}_m \dot \j$         & - \\
+CoefMomentZ           & $\v{C}_M \dot \k$ or $\v{c}_m \dot \k$         & - \\
+CoefMomentR           & $\v{C}_M \dot \er$ or $\v{c}_m \dot \er$       & - \\
+CoefMomentTheta       & $\v{C}_M \dot \eth$ or $\v{c}_m \dot \eth$     & - \\
+CoefMomentPhi         & $\v{C}_M \dot \ephi$ or $\v{c}_m \dot \ephi$   & - \\
+CoefMomentXi          & $\v{C}_M \dot \exi$ or $\v{c}_m \dot \exi$     & - \\
+CoefMomentEta         & $\v{C}_M \dot \eeta$ or $\v{c}_m \dot \eeta$   & - \\
+CoefMomentZeta        & $\v{C}_M \dot \ezeta$ or $\v{c}_m \dot \ezeta$ & - \\
+\\
+Coef\_PressureDynamic & ${1/2} \rho_\refer q_\refer^2$ & $\M/(\L \T^2)$ \\
+Coef\_Area            & $S_\refer$                     & $\L^2$ \\
+Coef\_Length          & $c_\refer$                     & $\L$
+\end{longtable}
+
+\newpage
+\subsection{Time-Dependent Flow}
+
+Data-name identifiers related to time-dependent flow include those
+associated with the storage of grid coordinates and flow solutions
+as a function of time level or iteration (see \autoref{t:id_timedep}).
+Also included are identifiers for storing information defining
+both rigid and arbitrary (i.e., deforming) grid motion.
+
+%\setlength{\LTleft}{\fill}
+%\setlength{\LTright}{\fill}
+\renewcommand{\thetable}{\thesection.9}
+\settowidth{\tmplengtha}{\fort{ArbitraryGridMotionPointers}}
+\settowidth{\tmplengthb}{\bold{Type}}
+\settowidth{\tmplengthc}{\bold{Units}}
+\setlength{\Pwidth}{\linewidth-8\tabcolsep-\tmplengtha-\tmplengthb-\tmplengthc}
+\begin{longtable}{>{\ttfamily}l >{\ttfamily}l >{\raggedright\arraybackslash}p{\Pwidth} c}
+\caption[Data-Name Identifiers for Time-Dependent Flow]{\textbf{Data-Name Identifiers for Time-Dependent Flow}}
+\label{t:id_timedep}
+\\ \hline\hline \\*[-2ex]
+                                      & \bold{Data} & & \\
+\spantwo{\bold{Data-Name Identifier}} & \bold{Type} & \spantwo{\bold{Description}} & \spantwo{\bold{Units}}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endfirsthead
+
+\multicolumn{4}{l}{{\bfseries \autoref{t:id_timedep}: Data-Name Identifiers for Time-Dependent Flow} (\emph{Continued})}
+\\*[1ex] \hline\hline \\*[-2ex]
+                                      & \bold{Data} & & \\
+\spantwo{\bold{Data-Name Identifier}} & \bold{Type} & \spantwo{\bold{Description}} & \spantwo{\bold{Units}}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endhead
+
+\\*[-2ex]\hline
+\multicolumn{4}{r}{\emph{Continued on next page}} \\
+\endfoot
+\\*[-2ex] \hline\hline
+\endlastfoot
+TimeValues       & real & Time values & $\T$ \\
+IterationValues  & int  & Iteration values & - \\
+NumberOfZones    & int  & Number of zones used for each recorded step & - \\
+NumberOfFamilies & int  & Number of families used for each recorded step & - \\
+ZonePointers     & char & Names of zones used for each recorded step & - \\
+FamilyPointers   & char & Names of families used for each recorded step & - \\
+\\
+RigidGridMotionPointers     & char &
+   Names of \fort{RigidGridMotion} structures used for each recorded
+      step for a zone       & - \\
+ArbitraryGridMotionPointers & char &
+   Names of \fort{ArbitraryGridMotion} structures used for each recorded
+      step for a zone       & - \\
+GridCoordinatesPointers     & char &
+   Names of \fort{GridCoordinates} structures used for each recorded step
+      for a zone            & - \\
+FlowSolutionPointers        & char &
+   Names of \fort{FlowSolution} structures used for each recorded step
+      for a zone            & - \\
+\\
+OriginLocation              & real &
+   Physical coordinates of the origin before and after a rigid grid
+      motion                & $\L$ \\
+RigidRotationAngle & real   &
+   Rotation angles about each axis of the translated coordinate system
+      for rigid grid motion & $\A$ \\
+RigidVelocity               & real &
+   Grid velocity vector of the origin translation for rigid grid
+      motion                & $\L/\T$ \\
+RigidRotationRate           & real &
+   Rotation rate vector about the axis of the translated coordinate system
+      for rigid grid motion & $\A/\T$ \\
+\\
+GridVelocityX     & real & $x$-component of grid velocity      &
+   $\L/\T$ \\
+GridVelocityY     & real & $y$-component of grid velocity      &
+   $\L/\T$ \\
+GridVelocityZ     & real & $z$-component of grid velocity      &
+   $\L/\T$ \\
+GridVelocityR     & real & $r$-component of grid velocity      &
+   $\L/\T$ \\
+GridVelocityTheta & real & $\theta$-component of grid velocity &
+   $\A/\T$ \\
+GridVelocityPhi   & real & $\phi$-component of grid velocity   &
+   $\A/\T$ \\
+GridVelocityXi    & real & $\xi$-component of grid velocity    &
+   $\L/\T$ \\
+GridVelocityEta   & real & $\eta$-component of grid velocity   &
+   $\L/\T$ \\
+GridVelocityZeta  & real & $\zeta$-component of grid velocity  &
+   $\L/\T$ \\
+\end{longtable}

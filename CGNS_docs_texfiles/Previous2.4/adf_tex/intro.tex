@@ -1,0 +1,123 @@
+\section{Introduction}
+\label{s:intro}
+\thispagestyle{plain}
+
+Advanced Data Format (ADF) is a library of basic database management
+and I/O subroutines that implements a relatively simple hierarchical
+database.
+ADF is written in ANSI C to enhance portability of the software, and the
+design of the database allows for portability of files from platform to
+platform.
+There is also a Fortran interface.
+The files are self-describing (i.e., it is possible to browse files and
+determine their contents) and extensible (i.e., many different pieces of
+software on different platforms may add or modify information).
+
+The routines allow the user to construct a tree structure with their data.
+(See \autoref{f:example} on p.~\pageref*{f:example}.)
+This structure is very similar to the directory structures of the UNIX
+or DOS operating systems.
+ADF also allows links between nodes within the same file or to different
+files.
+This feature works somewhat like ``soft links'' in the UNIX operating
+system.
+The major difference between the aforementioned directory structures and
+ADF is that the nodes not only contain information about their children
+(next lower-level nodes) but may also contain data.
+
+The installation package includes the source code to ADF, the Fortran
+interface, sample files, and a simple file browser.
+
+\subsection{History of Project}
+
+ADF was developed as part of the CFD
+General Notation System(CGNS) project.
+The purpose of the CGNS project is to define the data models for
+Navier-Stokes based Computational Fluid Dynamics (CFD) technology,
+develop a set of standard interface data structures for those data
+models, and develop the software that will allow implementation of those
+data structures in existing and future CFD analysis tools.
+The CGNS system consists of a collection of conventions, and software
+conforming to these conventions, for the storage and retrieval of CFD
+data.
+Adherence to these conventions is intended to facilitate the exchange of
+CFD data between sites, between application codes such as solvers and
+grid generators, and across computing platforms.
+
+Once the data models (called the \href{../sids/sids.pdf}{Standard
+Interface Data Structures}, or SIDS) were defined, a project was started
+to write software that could faithfully reproduce that information on
+disk.
+ADF is the result of that project.
+While ADF was developed specifically for the CFD process, it is quite
+general and has no built-in knowledge of CFD; therefore, it should
+be applicable to storing any type of data that lends itself to a
+hierarchical definition.
+
+\subsection{Other Software Interfaces and ADF}
+
+Two other software packages were investigated as part of this project.
+The first database interface investigated was the
+Hierarchical Data Format (HDF)
+developed at the National Center for
+Supercomputing Applications at the University of Illinois.
+This database system has a large user base and support and has been
+in existence more than 6 years with utilities and graphical routines
+written with both a C and a Fortran interface.
+The limitation of HDF was that it was not truly hierarchical despite its
+name.
+Any hierarchy has to be built using naming conventions.
+Since the CGNS data models indicated a natural hierarchical structure,
+it seemed appropriate to develop database software that worked in that
+mode by design.
+The ADF design considerations are summarized in
+\hyperref[s:design]{Appendix~\ref*{s:design}}.
+
+The second was the
+Common File Format
+(CFF) developed by McDonnell Douglas Aerospace.
+CFF is a second-generation database management system that provides a
+unifying file structure for CFD data.
+The purpose of the Common File is to insulate the user from the myriad
+of different computer types that make up computer systems so that the
+user or application programmer may process a file from another machine
+without performing explicit conversions.
+CFF was written in Fortran; however, it was felt that portability and
+extensibility could be enhanced using C.
+Much of the experience gained from the McDonnell Douglas group is
+incorporated into ADF due to the cooperative efforts of personnel from
+the CFD group at McDonnell Douglas Aerospace.
+
+\subsection{Organization of Manual}
+
+The main section of this manual explains the basics of the
+hierarchical structure of an ADF database.
+In addition, the concept of a node as
+the basic building block of the hierarchy is developed in detail.
+The remaining sections of this manual are extensive.
+They provide a glossary of terms and
+conventions, as well as information related to the
+ADF version releases,
+version control numbering, and
+architectures that are supported by ADF.
+There are two examples, one in Fortran and one in C, in
+\hyperref[s:sampleFortran]{Appendix~\ref*{s:sampleFortran}} and
+\hyperref[s:sampleC]{Appendix~\ref*{s:sampleC}} respectively, that
+implement the structure illustrated in \autoref{f:example} on
+p.~\pageref*{f:example}.
+These examples should help familiarize the new user with ADF.
+Design considerations, file optimization, and portability issues are
+also discussed.
+The individual ADF core routines are described in detail in
+\hyperref[s:subs]{Appendix~\ref*{s:subs}}.
+They are categorized into
+database-level routines,
+data structure and management subroutines,
+data query subroutines,
+data I/O subroutines, and some
+miscellaneous utility subroutines.
+Numerous examples are included to clarify the use of each subroutine.
+\hyperref[s:errors]{Appendix~\ref*{s:errors}} provides a summary of ADF
+error messages, and \hyperref[s:defaults]{Appendix~\ref*{s:defaults}}
+lists default values for various parameters and limits on dimensions of
+arrays.

@@ -1,0 +1,204 @@
+SetTrack line
+Box 12 3
+   \textbf{ADF Root Node}
+Down 1
+Box 12 3
+   \fort{CGNSBase1}
+   \fort{CGNSBase\_t}
+Tag
+SetTrack none
+Left
+Box 12 3
+   \fort{CGNSLibraryVersion}
+   \fort{CGNSLibraryVersion\_t}
+Tag
+Right 13
+Box 12 3
+   \fort{...}
+ToTag
+SetTrack line
+Up 1
+Right 26
+Down 1
+Up 1
+ToTag
+Down 1
+Box 12 3
+   \fort{Zone1}
+   \fort{Zone\_t}
+Tag
+SetTrack none
+Left
+Box 12 3
+   \fort{ReferenceState}
+   \fort{ReferenceState\_t}
+Tag
+Right 13
+Box 12 3
+   \fort{Zone2}
+   \fort{Zone\_t}
+Right
+Box 12 3
+   \fort{...}
+ToTag
+SetTrack line
+Up 1
+Right 26
+Down 1
+Up 1
+Right 13
+Down 1
+ToTag
+Down 1
+SetTrack none
+Left 26
+Down
+Box 12 3
+   \fort{GridCoordinates}
+   \fort{GridCoordinates\_t}
+Tag
+Down 1
+Right 1
+Down
+Box 10 3
+   \fort{CoordinateX}
+   \fort{DataArray\_t}
+Box 10 3
+   \fort{CoordinateY}
+   \fort{DataArray\_t}
+Box 10 3
+   \fort{CoordinateZ}
+   \fort{DataArray\_t}
+SetTrack line
+Left 1
+Up 4
+Right 1
+SetTrack none
+Left 1
+SetTrack line
+Up 4
+Right 1
+SetTrack none
+Left 1
+SetTrack line
+Up 3.5
+ToTag
+SetTrack none
+Right
+Box 12 3
+   \fort{FlowSolution1}
+   \fort{FlowSolution\_t}
+Tag
+Down 1
+Right 1
+Down
+Box 10 3
+   \fort{GridLocation}
+   \fort{GridLocation\_t}
+Box 10 3
+   \fort{Density}
+   \fort{DataArray\_t}
+Box 10 3
+   \fort{MomentumX}
+   \fort{DataArray\_t}
+Box 10 3
+   \fort{MomentumY}
+   \fort{DataArray\_t}
+Box 10 3
+   \fort{MomentumZ}
+   \fort{DataArray\_t}
+SetTrack line
+Left 1
+Up 4
+Right 1
+SetTrack none
+Left 1
+SetTrack line
+Up 4
+Right 1
+SetTrack none
+Left 1
+SetTrack line
+Up 4
+Right 1
+SetTrack none
+Left 1
+SetTrack line
+Up 4
+Right 1
+SetTrack none
+Left 1
+SetTrack line
+Up 3.5
+ToTag
+SetTrack none
+Right
+Box 12 3
+   \fort{ZoneBC}
+   \fort{ZoneBC\_t}
+Tag
+Down 1
+Right 1
+Down
+Box 10 3
+   \fort{BC1}
+   \fort{BC\_t}
+Box 10 3
+   \fort{...}
+SetTrack line
+Left 1
+Up 4
+Right 1
+SetTrack none
+Left 1
+SetTrack line
+Up 3.5
+ToTag
+SetTrack none
+Right
+Box 12 3
+   \fort{ZoneGridConnectivity}
+   \fort{ZoneGridConnectivity\_t}
+Tag
+Down 1
+Right 1
+Down
+Box 10 3
+   \fort{OversetHoles1}
+   \fort{OversetHoles\_t}
+Box 10 3
+   \fort{GridConnectivity1}
+   \fort{GridConnectivity\_t}
+Box 10 3
+   \fort{...}
+SetTrack line
+Left 1
+Up 4
+Right 1
+SetTrack none
+Left 1
+SetTrack line
+Up 4
+Right 1
+SetTrack none
+Left 1
+SetTrack line
+Up 3.5
+ToTag
+SetTrack none
+Right
+Box 12 3
+   \fort{...}
+SetTrack line
+Up 1
+Left 13
+Down 1
+Up 1
+Left 13
+Down 1
+Up 1
+Left 13
+Down 1
+Up 1
+Left 13
+Down 1

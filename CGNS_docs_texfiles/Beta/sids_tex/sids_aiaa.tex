@@ -1,0 +1,331 @@
+%
+% Tex input file for "CGNS Standard Interface Data Structures" (SIDS)
+%
+% To generate a DVI file, then a PostScript file named sids.ps:
+%
+%     latex sids.tex
+%     dvips sids.dvi -o
+%
+% To generate a PDF file named sids.pdf:
+%
+%     pdflatex sids.tex
+%
+
+\documentclass[11pt,twoside]{article}
+
+%
+% Packages
+%
+\usepackage{tabularx}			% to get \arraybackslash
+\usepackage{longtable}
+%\usepackage[pdftex]{graphicx}
+\usepackage{graphicx}
+\usepackage{subfigure}			% for sub-figures
+   \renewcommand{\subfigcapmargin}{0pt}	% sub-figure caption margins
+\usepackage[bf]{caption}		% for more flexible captions
+   \setlength{\captionmargin}{18pt}	% caption margins
+%\usepackage[tbtags]{amsmath}		% use ams math package
+\usepackage{array}			% use new array and table package
+\usepackage{alltt}			% verbatim input with \ active
+\usepackage[normalem]{ulem}		% for underlining, strike-out
+%\usepackage[htt]{hyphenat}		% for hyphenation inside texttt
+\usepackage{calc}			% calculation package
+\usepackage{fancyhdr}			% fancy headers and footers
+   \fancyhf{}
+   \renewcommand{\headrulewidth}{0pt}
+   \renewcommand{\footrulewidth}{0pt}
+\usepackage{titling}			% more title page control
+\usepackage{xspace}			% common-sense spacing after text macro
+\usepackage{mdwlist}			% more flexible description lists
+\usepackage{epic}			% extended picture environment
+%\usepackage[pdftex]{color}		% colors
+\usepackage{color}			% colors
+\usepackage{pdfcolmk}			% for colors across page breaks
+%\usepackage[T1]{fontenc}		% for better-looking "_" and tt "{"
+\usepackage{ae}				% used instead of above for PDF output
+\usepackage{hyperref}			% for hypertext links in PDF
+   \hypersetup{letterpaper,plainpages=false,
+               pdftitle={CGNS Standard Interface Data Structures},
+               pdfauthor={CGNS Project Group},
+               colorlinks,
+               linkcolor=blue,citecolor=blue,filecolor=red,pagecolor=blue,
+               urlcolor=red}
+   \renewcommand{\sectionautorefname}{Section}
+   \renewcommand{\subsectionautorefname}{Section}
+   \renewcommand{\subsubsectionautorefname}{Section}
+   \renewcommand{\paragraphautorefname}{Section}
+
+%
+% Page layout
+%
+\oddsidemargin 0.0in
+\evensidemargin 0.0in 
+\textwidth 6.5in 
+%\topmargin 0pt
+%\headheight 0pt
+%\headsep 0pt
+\setlength{\topmargin}{-0.5in}		% top margin-1.0in
+\setlength{\headheight}{0.25in}		% header space parameters
+\setlength{\headsep}{0.5in}
+\textheight 8.5in
+\setlength{\topskip}{\baselineskip}	% dist from top of body to 1st baseline
+\setlength{\footskip}{0.75in}		% dist from bottom of body to footer
+
+\raggedbottom
+\setlength{\unitlength}{1.0in}
+\renewcommand{\bottomfraction}{0.95}
+
+\pagestyle{fancy}			% using fancyhdr package
+\fancypagestyle{plain}{%		% page # in corner for plain style
+   \fancyhf{}
+   \fancyfoot[LE,RO]{\bfseries \thepage}}
+\addtocounter{secnumdepth}{1}		% number \paragraph's
+\addtocounter{tocdepth}{1}		%    and include them in TOC
+
+%
+% Misc spacing parameters
+%
+\parskip 5pt plus 1pt minus 1pt
+\newlength{\saveparindent}		% save for use where LaTeX sets it to 0
+\setlength{\saveparindent}{\parindent}
+\parindent 0pt
+\def \baselinestretch {1.0}   
+\setlength{\doublerulesep}{0pt}		% for wider \hlines
+\newlength{\tmplength}			% for temp use wherever needed
+\newlength{\tmplengtha}
+\newlength{\tmplengthb}
+\newlength{\tmplengthc}
+\newlength{\Pwidth}			% for p columns in tables
+
+%
+% User-defined environments
+%
+% "Definition" list with variable-length entries, indented. Requires
+% mdwlist package. (See LaTeX Companion, p 64, and mdwlist documentation.)
+\newenvironment{Ventryi}[1]%
+   {\settowidth{\tmplength}{\hspace{\saveparindent}#1\hspace{1em}}%
+    \begin{basedescript}{%
+           \desclabelwidth{\tmplength}%
+           \desclabelstyle{\nextlinelabel}%
+           \renewcommand{\makelabel}[1]{\hspace{\saveparindent}##1\hfil}}}
+   {\end{basedescript}}
+% Indented definition list with variable-length entries, compact. Requires
+% mdwlist package. (See LaTeX Companion, p 64, and mdwlist documentation.)
+\newenvironment{Ventryic}[1]%
+   {\settowidth{\tmplength}{\hspace{\saveparindent}#1\hspace{1em}}%
+    \begin{basedescript}{%
+           \desclabelwidth{\tmplength}%
+           \desclabelstyle{\nextlinelabel}%
+           \renewcommand{\makelabel}[1]{\hspace{\saveparindent}##1\hfil}
+           \setlength{\topsep}{0in}%
+           \setlength{\parsep}{0in}%
+           \setlength{\itemsep}{0in}}}
+   {\end{basedescript}}
+
+% "changes" environment, to identify changed code by color.  The color is
+% given by the argument, with a default of red.  When the environment is
+% exited, the color is changed to black.
+\newenvironment{changes}[1][red]%
+   {\color{#1}}
+   {\color{black}}
+
+% "example" environment, from original defined by Steve Allmaras
+\newcounter{examplectr}[section]
+\def\theexamplectr{\thesection-\Alph{examplectr}} 
+\newenvironment{example}[1]%
+{\medskip%
+\refstepcounter{examplectr}%
+\parindent 0pt%
+\noindent%
+{\bfseries Example \theexamplectr{:} #1}}
+{}
+
+% "notes" environment
+\newenvironment{notes}%
+{\noindent \textit{Notes}%
+\begin{enumerate*}}
+{\end{enumerate*}}
+
+%
+% User-defined commands
+%
+
+% Degree symbol
+\newcommand{\degree}[1][]{\ensuremath{{#1}^\circ}\xspace}
+
+% Redefine \paragraph as a display heading
+\makeatletter
+\renewcommand{\paragraph}{\@startsection
+   {paragraph}%			% heading name
+   {4}%				% heading level
+   {0in}%			% indentation of heading
+   {0.5\baselineskip}%		% space before heading
+   {0.1\baselineskip}%		% space after heading
+   {\bfseries\normalsize}}%	% style
+\makeatother
+
+% Re-def longtable's caption command to use \captionlabelfont from caption pkg
+% (basis lifted from longtable.sty)
+\makeatletter
+\renewcommand{\LT@makecaption}[3]{%
+  \LT@mcol\LT@cols c{\hbox to\z@{\hss\parbox[t]\LTcapwidth{%
+    \sbox\@tempboxa{{\captionlabelfont #1{#2: }}#3}%
+    \ifdim\wd\@tempboxa>\hsize
+      {\captionlabelfont #1{#2: }}#3%
+    \else
+      \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+    \fi
+    \endgraf\vskip\baselineskip}%
+  \hss}}}
+\makeatother
+
+% Make next page odd, with preceding blank page empty (LaTeX Companion, p 93)
+\newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
+
+% Text subscripts, analogous to \textsuperscript command (from comp.text.tex
+% post by rf@cl.cam.ac.uk (Robin Fairbairns))
+\makeatletter
+\DeclareRobustCommand*\tsub[1]{%
+  \@tsub{\selectfont#1}}
+\def\@tsub#1{%
+  {\m@th\ensuremath{_{\mbox{\fontsize\sf@size\z@#1}}}}}
+\makeatother
+
+% Text superscripts, but shorter
+\newcommand{\tsup}[1]{\textsuperscript{#1}}
+
+% Raise single-line text in a table column to span 2 rows
+\newcommand{\spantwo}[1]{\raisebox{1.6ex}[0in][0in]{#1}}
+
+% Shortcuts for specific fonts
+\newcommand{\bold}[1]{{\normalfont\textbf{#1}}}  % Bold
+\newcommand{\ital}[1]{{\normalfont\textit{#1}}}  % Italic
+\newcommand{\fort}[1]{{\normalfont\texttt{#1}}}  % Fixed font for code stuff
+
+% Use section titles as marks (i.e., in headers) instead of subsection titles
+\renewcommand{\sectionmark}[1]{\markboth{\thesection\ \ #1}{\thesection\ \ #1}}
+\renewcommand{\subsectionmark}[1]{}
+
+%
+\input{macro}
+
+\begin{document}
+
+% Enable hyphenation inside texttt{}, from comp.text.tex posting by
+% Donald Arseneau on 9 Nov 2004.
+%
+% [Didn't need this with the TeTex installation on SGI, but do need it
+% with Linux (Red Hat Enterprise 4).  Why?]
+%
+% [This doesn't seem to work, though, at least for this document.]
+%
+%\normalsize
+%\texttt{\hyphenchar\font=`\-}
+%\small
+%\texttt{\hyphenchar\font=`\-}
+%\footnotesize
+%\texttt{\hyphenchar\font=`\-}
+%\normalsize
+
+\pagenumbering{roman}
+
+%\fancyhead[LE]{\bfseries Standard Interface Data Structures}
+%\fancyhead[RO]{\bfseries \rightmark}
+\fancyfoot[LE,RO]{\bfseries \thepage}
+
+%\setlength{\droptitle}{1.0in}
+\pretitle{\begin{flushleft}\LARGE%
+          \includegraphics[width=2.0in]{../logo/cgns_bw}\\*[0.25in]}
+\posttitle{\par\end{flushleft}\vskip 1.0em}
+\title{{\bfseries CFD General Notation System\\
+Standard Interface Data Structures}\\*[0.25in]
+%{\Large Document Version \textcolor{red}{3.2.2}\\
+%CGNS Version \textcolor{red}{3.2 (beta)}}}
+}
+\author{}
+\date{}
+\maketitle
+\thispagestyle{empty}
+
+%\title{{\LARGE \textbf{CGNS}}\\*[0.5in]
+%The CFD General Notation System\\
+%Standard Interface Data Structures\footnote
+%{This is Version \textcolor{red}{2.1 beta 1 of this document,
+%released ?? ??? 2002}.
+%This document was originally derived from the 11 Aug 1999 draft
+%written by Steve Allmaras at Boeing.}}
+%\author{CGNS Project Group}
+%\date{}
+%\maketitle
+%\thispagestyle{empty}
+
+\clearemptydoublepage
+\setlength{\parskip}{0ex}		% remove blank space between paragraphs
+\thispagestyle{plain}
+
+\clearemptydoublepage
+\input{abstract}
+
+\clearemptydoublepage
+\tableofcontents
+\listoffigures
+\enlargethispage{\baselineskip}
+\listoftables
+%\setlength{\parskip}{0.5\baselineskip}	% put it back
+\parskip 5pt plus 1pt minus 1pt
+
+\clearemptydoublepage
+\pagenumbering{arabic}
+\setcounter{secnumdepth}{-2}
+
+\fancyhead[LE]{\bfseries Standard Interface Data Structures}
+\fancyhead[RO]{\bfseries \rightmark}
+%\fancyfoot[LE,RO]{\bfseries \thepage}
+
+\input{over}
+\setcounter{secnumdepth}{4}
+
+\clearemptydoublepage
+\input{intro} 
+
+\clearemptydoublepage
+\input{design}
+
+\clearemptydoublepage
+\input{conv}
+
+\clearemptydoublepage
+\input{build}
+
+\clearemptydoublepage
+\input{data}
+
+\clearemptydoublepage
+\input{cgnsbase}
+
+\clearemptydoublepage
+\input{gridflow}
+
+\clearemptydoublepage
+\input{cnct}
+
+\clearemptydoublepage
+\input{bc}
+
+\clearemptydoublepage
+\input{floweqn}
+
+\clearemptydoublepage
+\input{timedep}
+
+\clearemptydoublepage
+\input{misc}
+
+\clearemptydoublepage
+\appendix
+\input{dataname}
+
+\clearemptydoublepage
+\input{twozone}
+
+\end{document}

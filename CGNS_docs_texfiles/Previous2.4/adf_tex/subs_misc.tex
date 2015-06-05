@@ -1,0 +1,438 @@
+\subsection{Miscellaneous Routines}
+\label{s:subs_misc}
+
+\fcthdra{Flush\_to\_Disk}{Flush the Data to the Disk}
+\label{sub:Flush_to_Disk}
+
+\begin{fctbox}
+   {ADF\_Flush\_to\_Disk}
+   {ADFFTD}
+   {(ID,error\_return)}
+\hline
+Input  & const double ID    & real*8 ID \\
+\hline
+Output & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Flush\_to\_Disk}, flushes data to disk; it is
+used to force any modified information to be flushed to the physical
+disk.
+This ensures that data will not be lost if a program aborts.
+The control of when to flush all data to disk is provided to the user
+rather than flushing the data every time it is modified, which would
+result in reduced performance.
+
+\fcthdr{Database\_Garbage\_Collection}{Flush the Data to the Disk}
+\label{sub:Database_Garbage_Collection}
+
+\setlength{\savearrayrulewidth}{\arrayrulewidth}
+\setlength{\arrayrulewidth}{0.8pt}
+\noindent
+\begin{tabularx}{\textwidth}{|>{\bfseries\columncolor{subcolor}}r%
+   |>{\ttfamily\columncolor{subcolor}\hsize=1.05\hsize}X%
+   |>{\ttfamily\columncolor{subcolor}\hsize=0.95\hsize}X%
+   |}
+\hline
+\multicolumn{3}{|>{\columncolor{subcolor}}c|}{} \\
+\multicolumn{3}{|>{\ttfamily\columncolor{subcolor}}l|}{ADF\_Database\_Garbage\_Collection (ID,error\_return)} \\
+\multicolumn{3}{|>{\columncolor{subcolor}}c|}{} \\
+\hline
+Language &
+   \multicolumn{1}{>{\bfseries\columncolor{subcolor}}c|}{C} &
+   \multicolumn{1}{>{\bfseries\columncolor{subcolor}}c|}{Fortran} \\
+\hline
+Routine Name &
+   \multicolumn{1}{>{\ttfamily\columncolor{subcolor}}c|}{ADF\_Database\_Garbage\_Collection} &
+   \multicolumn{1}{>{\ttfamily\columncolor{subcolor}}c|}{ADFDGC} \\
+\hline
+Input  & const double ID    & real*8 ID \\
+\hline
+Output & int *error\_return & integer error\_return \\
+\hline
+\end{tabularx}
+\setlength{\arrayrulewidth}{\savearrayrulewidth}
+
+%\begin{fctbox}
+%   {ADF\_Database\_Garbage\_Collection}
+%   {ADFDGC}
+%   {(ID,error\_return)}
+%\hline
+%Input  & const double ID    & real*8 ID \\
+%\hline
+%Output & int *error\_return & integer error\_return \\
+%\hline
+%\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Database\_Garbage\_Collection}, redistributes
+the data within a file to use free space within the file.
+This free space is not located at the end of the file, and it may have
+been created during node deletions or other file operations.
+Neighboring free spaces will be merged.
+
+\noindent
+\emph{Note:} For better file compaction, a utility could be written to
+copy an ADF file into a newly created ADF file without wasted space.
+
+\noindent
+\emph{Note:} This routine is currently not implemented.
+
+\fcthdr{Error\_Message}{Get a Description of the Error}
+\label{sub:Error_Message}
+
+\begin{fctbox}
+   {ADF\_Error\_Message}
+   {ADFERR}
+   {(error\_code,error\_string)}
+\hline
+Input  & const int error\_code & integer error\_code \\
+\hline
+Output & char *error\_string   & character*(*) error\_string \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_string}}
+\item[\textit{error\_code}]
+     The error return code from any ADF routine.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\item[\textit{error\_string}]
+     An 80-byte description for the specified error.
+     If \fort{ADF\_Error\_Message} cannot find a message corresponding
+     to the input \fort{error\_code}, the error string ``\fort{Unknown
+     error\#\textit{nnn}}'' will be returned.
+\end{Ventryi}
+
+This routine, \fort{ADF\_Error\_Message}, returns a textual error
+message when given the error return code from any ADF routine.
+
+\Example
+
+See the \hyperlink{ex:Set\_Error\_State}{example for
+\fort{ADF\_Set\_Error\_State}}.
+
+\fcthdr{Set\_Error\_State}{Set the Error State Flag}
+\label{sub:Set_Error_State}
+
+\begin{fctbox}
+   {ADF\_Set\_Error\_State}
+   {ADFSES}
+   {(error\_state,error\_return)}
+\hline
+Input  & const int error\_state & integer error\_state \\
+\hline
+Output & int *error\_return     & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{error\_state}]
+     Flag specifying the action to take when an error occurs; 0 to
+     return the error code and continue, 1 to abort.
+     The default is 0.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Set\_Error\_State}, sets the error state flag.
+This flag controls the error handling convention for all ADF routines:
+either return the error codes or print an error message and abort the
+program on error.
+The flag covers all open ADF files associated with the current program,
+and it is not done on a file-by-file basis.
+The default state for the ADF interface is to return error codes and not
+abort.
+
+\hypertarget{ex:Set\_Error\_State}{}
+\Example
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) NODNAM
+         CHARACTER*(80) MESS
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,CID1,CID2
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('db.adf','NEW',' ',RID,IERR)
+   C
+   C *** CREATE 2 NODES
+   C
+         CALL ADFCRE(RID,'NODE 1',CID1,IERR)
+         CALL ADFCRE(RID,'NODE 2',CID2,IERR)
+   C
+         CALL ADFGES(IDEFS,IERR)
+         PRINT *,' DEFAULT ERROR STATE = ',IDEFS
+   C
+   C *** REQUEST NODE NAME FOR A NODE THAT DOES NOT EXIST
+   C
+         PRINT *,' *** ON ERROR CONTINUE'
+         CALL ADFGNAM(CID3,NODNAM,IERR)
+         CALL ADFERR(IERR,MESS)
+         PRINT *,'     ADF ERROR OCURRED, MESSAGE: ',MESS
+         PRINT *,' '
+   C
+   C *** SET ABORT ON ERROR FLAG
+   C
+         INEWS = 1
+         CALL ADFSES(INEWS,IERR)
+         PRINT *,' *** ABORT ON ERROR SET'
+   C
+   C *** REQUEST NODE NAME FOR A NODE THAT DOES NOT EXIST
+   C
+         CALL ADFGNAM(CID3,NODNAM,IERR)
+         PRINT *,' HELLO WORLD'
+   C
+         STOP
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   DEFAULT ERROR STATE =            0
+     *** ON ERROR CONTINUE
+         ADF ERROR OCURRED, MESSAGE:
+   ADF 10: ADF file index out of legal range.
+
+     *** ABORT ON ERROR SET
+   ADF 10: ADF file index out of legal range.
+   ADF Aborted: Exiting
+\end{alltt}
+
+\fcthdr{Get\_Error\_State}{Get the Error State}
+\label{sub:Get_Error_State}
+
+\begin{fctbox}
+   {ADF\_Get\_Error\_State}
+   {ADFGES}
+   {(error\_state,error\_return)}
+\hline
+Input  &  &  \\
+\hline
+Output & int *error\_state  & integer error\_state \\
+       & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{error\_state}]
+     Flag specifying the action to take when an error occurs; 0 to
+     return the error code and continue, 1 to abort.
+     The default is 0.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Get\_Error\_State}, returns the currently set
+error state.
+
+\Example
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('db.adf','NEW',' ',RID,IERR)
+   C
+   C *** CHECK THE DEFAULT ERROR STATE
+   C
+         CALL ADFGES(IDEFS,IERR)
+   C
+   C *** SET THE ERROR STATE TO ABORT ON ERROR
+   C
+         CALL ADFSES(1,IERR)
+   C
+   C *** MAKE SURE STATE WAS SET AS DESIRED
+   C
+         CALL ADFGES(NDEFS,IERR)
+   C
+   C *** PRINT OUT RESULTS
+   C
+         PRINT *,' DEFAULT ERROR STATE = ',IDEFS
+         PRINT *,' RESET ERROR STATE   = ',NDEFS
+   C
+         STOP
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   DEFAULT ERROR STATE =            0
+   RESET ERROR STATE   =            1
+\end{alltt}
+
+\fcthdr{Database\_Version}{Get the Version Number of the ADF Library
+That Created the ADF Database}
+
+\label{sub:Database_Version}
+\setlength{\savearrayrulewidth}{\arrayrulewidth}
+\setlength{\arrayrulewidth}{0.8pt}
+\noindent
+\begin{tabularx}{\textwidth}{|>{\bfseries\columncolor{subcolor}}r%
+   |>{\ttfamily\columncolor{subcolor}}X%
+   |>{\ttfamily\columncolor{subcolor}}X%
+   |}
+\hline
+\multicolumn{3}{|>{\columncolor{subcolor}}c|}{} \\
+\multicolumn{3}{|>{\ttfamily\columncolor{subcolor}}l|}{ADF\_Database\_Version (root\_ID,version,creation\_date,modification\_date,} \\
+\multicolumn{3}{|>{\ttfamily\columncolor{subcolor}}l|}{~~~~~~~~~~~~~~~~~~~~~~error\_return)} \\
+\multicolumn{3}{|>{\columncolor{subcolor}}c|}{} \\
+\hline
+Language &
+   \multicolumn{1}{>{\bfseries\columncolor{subcolor}}c|}{C} &
+   \multicolumn{1}{>{\bfseries\columncolor{subcolor}}c|}{Fortran} \\
+\hline
+Routine Name &
+   \multicolumn{1}{>{\ttfamily\columncolor{subcolor}}c|}{ADF\_Database\_Version} &
+   \multicolumn{1}{>{\ttfamily\columncolor{subcolor}}c|}{ADFDVER} \\
+\hline
+Input  & constant double root\_ID & real*8 root\_ID \\
+\hline
+Output & char *version            & character*(*) version \\
+       & char *creation\_date     & character*(*) creation\_date \\
+       & char *modification\_date & character*(*) modification\_date \\
+       & int *error\_return       & integer error\_return \\
+\hline
+\end{tabularx}
+\setlength{\arrayrulewidth}{\savearrayrulewidth}
+
+\begin{Ventryi}{\textit{modification\_date}}
+\item[\textit{root\_ID}]
+     The ID of the root node in the ADF file.
+\item[\textit{version}]
+     A 32-byte character string containing the version ID.
+\item[\textit{creation\_date}]
+     A 32-byte character string containing the creation date of the file.
+\item[\textit{modification\_date}]
+     A 32-byte character string containing the last modification date of
+     the file.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Database\_Version}, returns the version number
+of the ADF library that created an ADF database, the file creation date
+and time, and the last modification date and time.
+A modified ADF database will take on the version ID of the current ADF
+library version if it is higher than the version indicated in the file.
+On return, ``version'' contains a six-character string.
+The meaning of the characters are described in detail in
+\hyperref[s:versions]{Appendix~\ref*{s:versions}}.
+
+\hypertarget{ex:Database\_Version}{}
+\Example
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) NODNAM
+         CHARACTER*(MAXCHR) CVER,LVER,CDATE,MDATE
+         CHARACTER*(80) MESS
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,CID1,CID2
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('db.adf','NEW',' ',RID,IERR)
+   C
+   C *** CREATE 2 NODES
+   C
+         CALL ADFCRE(RID,'NODE 1',CID1,IERR)
+         CALL ADFCRE(RID,'NODE 2',CID2,IERR)
+   C
+         CALL ADFDVER(RID,CVER,CDATE,MDATE,IERR)
+         CALL ADFLVER(LVER,IERR)
+         PRINT *,' VERSION INFORMATION:'
+         PRINT *,'    ADF LIBRARY USED FOR CREATION: ',CVER
+         PRINT *,'    CREATION DATE                : ',CDATE
+         PRINT *,'    MODIFICATION DATE            : ',MDATE
+         PRINT *,'    ADF LIBRARY BEING USED       : ',LVER
+   C
+         STOP
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   VERSION INFORMATION:
+      ADF LIBRARY USED FOR CREATION: ADF Database Version A01007
+      CREATION DATE                : Thu Apr 24 15:41:55 1997
+      MODIFICATION DATE            : Thu Apr 24 15:41:55 1997
+      ADF LIBRARY BEING USED       : ADF Library  Version C01
+\end{alltt}
+
+\fcthdr{Library\_Version}{Get the Version Number of the ADF Library
+That the Application Program is Currently Using}
+\label{sub:Library_Version}
+
+\begin{fctbox}
+   {ADF\_Library\_Version}
+   {ADFLVER}
+   {(version,error\_return)}
+\hline
+Input  &  & \\
+\hline
+Output & char *version      & character*(*) version \\
+       & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{version}]
+     A 32-byte character string containing the ADF library version ID
+     information.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Library\_Version}, gets the ADF library version
+number.
+This is the version number of the ADF library that the application
+program is currently using.
+For this routine, the format of the version ID is ``\fort{ADF Library
+Version A\textit{XXXxxx}}''.
+
+\Example
+
+See the \hyperlink{ex:Database\_Version}{example for
+\fort{ADF\_Database\_Version}}.

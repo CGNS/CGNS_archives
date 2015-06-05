@@ -1,0 +1,338 @@
+\section{Physical Data}
+\label{s:physical}
+\thispagestyle{plain}
+
+\subsection{Data Arrays}
+\label{s:dataarray}
+
+\noindent
+\textit{Node}: \fort{DataArray\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_array\_write(\textcolor{input}{char *ArrayName}, \textcolor{input}{DataType\_t DataType}, & - w m \\
+~~~~~~\textcolor{input}{int DataDimension}, \textcolor{input}{int *DimensionVector}, \textcolor{input}{void *Data}); & \\
+\textcolor{output}{\textit{ier}} = cg\_narrays(\textcolor{output}{\textit{int *narrays}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_array\_info(\textcolor{input}{int A}, \textcolor{output}{\textit{char *ArrayName}}, \textcolor{output}{\textit{DataType\_t *DataType}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{int *DataDimension}}, \textcolor{output}{\textit{int *DimensionVector}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_array\_read(\textcolor{input}{int A}, \textcolor{output}{\textit{void *Data}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_array\_read\_as(\textcolor{input}{int A}, \textcolor{input}{DataType\_t DataType}, \textcolor{output}{\textit{void *Data}}); & r - m \\
+\hline
+call cg\_array\_write\_f(\textcolor{input}{ArrayName}, \textcolor{input}{DataType}, \textcolor{input}{DataDimension}, & - w m \\
+~~~~~\textcolor{input}{DimensionVector}, \textcolor{input}{Data}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_narrays\_f(\textcolor{output}{\textit{narrays}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_array\_info\_f(\textcolor{input}{A}, \textcolor{output}{\textit{ArrayName}}, \textcolor{output}{\textit{\textit{DataType}}}, \textcolor{output}{\textit{DataDimension}}, & r - m \\
+~~~~~\textcolor{output}{\textit{DimensionVector}}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_array\_read\_f(\textcolor{input}{A}, \textcolor{output}{\textit{Data}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_array\_read\_as\_f(\textcolor{input}{A}, \textcolor{input}{DataType}, \textcolor{output}{\textit{Data}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{DimensionVector}}\raggedright
+\item [\fort{narrays}]
+      Number of \fort{DataArray\_t} nodes under the current node.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{A}]
+      Data array index, where $1 \leq \text{\fort{A}} \leq \text{\fort{narrays}}$.
+      (\textcolor{input}{Input})
+\item [\fort{ArrayName}]
+      Name of the \fort{DataArray\_t} node.
+      (\textcolor{input}{Input} for \fort{cg\_array\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_array\_info})
+\item [\fort{DataType}]
+      Type of data held in the \fort{DataArray\_t} node.
+      The admissible types are \fort{Integer}, \fort{RealSingle},
+      \fort{RealDouble}, and \fort{Character}.
+      (\textcolor{input}{Input} for \fort{cg\_array\_write},
+      \fort{cg\_array\_read\_as}; \textcolor{output}{\textit{output}} for
+      \fort{cg\_array\_info})
+\item [\fort{DataDimension}]
+      Number of dimensions.
+      (\textcolor{input}{Input} for \fort{cg\_array\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_array\_info})
+\item [\fort{DimensionVector}]
+      Number of data elements in each dimension.
+      (\textcolor{input}{Input} for \fort{cg\_array\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_array\_info})
+\item [\fort{Data}]
+      The data array.
+      (\textcolor{input}{Input} for \fort{cg\_array\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_array\_read},
+      \fort{cg\_array\_read\_as})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+\newpage
+\subsection{Data Class}
+\label{s:dataclass}
+
+\noindent
+\textit{Node}: \fort{DataClass\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_dataclass\_write(\textcolor{input}{DataClass\_t dataclass}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_dataclass\_read(\textcolor{output}{\textit{DataClass\_t *dataclass}}); & r - m \\
+\hline
+call cg\_dataclass\_write\_f(\textcolor{input}{dataclass}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_dataclass\_read\_f(\textcolor{output}{\textit{dataclass}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{dataclass}}\raggedright
+\item [\fort{dataclass}]
+      Data class for the nodes at this level.
+      See below for the data classes currently supported in CGNS.
+      (\textcolor{input}{Input} for \fort{cg\_dataclass\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_dataclass\_read})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+The data classes currently supported in CGNS are:
+
+\begin{Ventryi}{\fort{NormalizedByUnknownDimensional}}\raggedright
+\item [\fort{Dimensional}]
+      Regular dimensional data.
+\item [\fort{NormalizedByDimensional}]
+      Nondimensional data that is normalized by dimensional reference
+      quantities.
+\item [\fort{NormalizedByUnknownDimensional}]
+      All fields and reference data are nondimensional.
+\item [\fort{NondimensionalParameter}]
+      Nondimensional parameters such as Mach number and lift coefficient.
+\item [\fort{DimensionlessConstant}]
+      Constant such as $\pi$.
+\end{Ventryi}
+These classes are declared within typedef \fort{DataClass\_t} in
+\textit{cgnslib.h}, and as parameters in \textit{cgnslib\_f.h}.
+
+\subsection{Data Conversion Factors}
+\label{s:dataconversion}
+
+\noindent
+\textit{Node}: \fort{DataConversion\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_conversion\_write(\textcolor{input}{DataType\_t DataType}, & - w m \\
+~~~~~~\textcolor{input}{void *ConversionFactors}); & \\
+\textcolor{output}{\textit{ier}} = cg\_conversion\_info(\textcolor{output}{\textit{DataType\_t *DataType}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_conversion\_read(\textcolor{output}{\textit{void *ConversionFactors}}); & r - m \\
+\hline
+call cg\_conversion\_write\_f(\textcolor{input}{DataType}, \textcolor{input}{ConversionFactors}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_conversion\_info\_f(\textcolor{output}{\textit{DataType}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_conversion\_read\_f(\textcolor{output}{\textit{ConversionFactors}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{ConversionOffset}}\raggedright
+\item [\fort{DataType}]
+      Data type in which the conversion factors are recorded.
+      Admissible data types for conversion factors are \fort{RealSingle}
+      and \fort{RealDouble}.
+      (\textcolor{input}{Input} for \fort{cg\_conversion\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_conversion\_info})
+\item [\fort{ConversionFactors}]
+      Two-element array containing the scaling and offset factors.
+      (\textcolor{input}{Input} for \fort{cg\_conversion\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_conversion\_read})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+The \fort{DataConversion\_t} data structure contains factors to convert
+the nondimensional data to ``raw'' dimensional data.
+The scaling and offset factors are contained in the two-element array
+\fort{ConversionFactors}.
+In pseudo-Fortran, the conversion process is as follows:
+
+\begin{indlefttt}
+ConversionScale  = ConversionFactors(1)
+ConversionOffset = ConversionFactors(2)
+Data(\textit{raw}) = Data(\textit{nondimensional})*ConversionScale + ConversionOffset
+\end{indlefttt}
+
+\subsection{Dimensional Units}
+\label{s:dimensionalunits}
+
+\noindent
+\textit{Node}: \fort{DimensionalUnits\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_units\_write(\textcolor{input}{MassUnits\_t mass}, \textcolor{input}{LengthUnits\_t length}, & - w m \\
+~~~~~~\textcolor{input}{TimeUnits\_t time}, \textcolor{input}{TemperatureUnits\_t temperature}, & \\
+~~~~~~\textcolor{input}{AngleUnits\_t angle}); & \\
+\textcolor{output}{\textit{ier}} = cg\_unitsfull\_write(\textcolor{input}{MassUnits\_t mass}, \textcolor{input}{LengthUnits\_t length}, & - w m \\
+~~~~~~\textcolor{input}{TimeUnits\_t time}, \textcolor{input}{TemperatureUnits\_t temperature}, & \\
+~~~~~~\textcolor{input}{AngleUnits\_t angle}, \textcolor{input}{ElectricCurrentUnits\_t current}, & \\
+~~~~~~\textcolor{input}{SubstanceAmountUnits\_t amount}, & \\
+~~~~~~\textcolor{input}{LuminousIntensityUnits\_t intensity}); & \\
+\textcolor{output}{\textit{ier}} = cg\_nunits(\textcolor{output}{\textit{int *nunits}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_units\_read(\textcolor{output}{\textit{MassUnits\_t *mass}}, \textcolor{output}{\textit{LengthUnits\_t *length}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{TimeUnits\_t *time}}, \textcolor{output}{\textit{TemperatureUnits\_t *temperature}}, & \\
+~~~~~~\textcolor{output}{\textit{AngleUnits\_t *angle}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_unitsfull\_read(\textcolor{output}{\textit{MassUnits\_t *mass}}, \textcolor{output}{\textit{LengthUnits\_t *length}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{TimeUnits\_t *time}}, \textcolor{output}{\textit{TemperatureUnits\_t *temperature}}, & \\
+~~~~~~\textcolor{output}{\textit{AngleUnits\_t *angle}}, \textcolor{output}{\textit{ElectricCurrentUnits\_t *current}}, & \\
+~~~~~~\textcolor{output}{\textit{SubstanceAmountUnits\_t *amount}}, & \\
+~~~~~~\textcolor{output}{\textit{LuminousIntensityUnits\_t *intensity}}); & \\
+\hline
+call cg\_units\_write\_f(\textcolor{input}{mass}, \textcolor{input}{length}, \textcolor{input}{time}, \textcolor{input}{temperature}, \textcolor{input}{angle}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_unitsfull\_write\_f(\textcolor{input}{mass}, \textcolor{input}{length}, \textcolor{input}{time}, \textcolor{input}{temperature}, \textcolor{input}{angle}, & - w m \\
+~~~~~\textcolor{input}{current}, \textcolor{input}{amount}, \textcolor{input}{intensity}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_nunits\_f(\textcolor{output}{\textit{int *nunits}}) & r - m \\
+call cg\_units\_read(\textcolor{output}{\textit{mass}}, \textcolor{output}{\textit{length}}, \textcolor{output}{\textit{time}}, \textcolor{output}{\textit{temperature}}, \textcolor{output}{\textit{angle}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_unitsfull\_read\_f(\textcolor{output}{\textit{mass}}, \textcolor{output}{\textit{length}}, \textcolor{output}{\textit{time}}, \textcolor{output}{\textit{temperature}}, \textcolor{output}{\textit{angle}}, & r - m \\
+~~~~~\textcolor{output}{\textit{current}}, \textcolor{output}{\textit{amount}}, \textcolor{output}{\textit{intensity}}, \textcolor{output}{\textit{ier}}) & \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{temperature}}\raggedright
+\item [\fort{mass}]
+      Mass units.
+      Admissible values are \fort{Null}, \fort{UserDefined},
+      \fort{Kilogram}, \fort{Gram}, \fort{Slug}, and
+      \fort{PoundMass}.
+      (\textcolor{input}{Input} for \fort{cg\_units\_write},
+      \fort{cg\_unitsfull\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_units\_read},
+      \fort{cg\_unitsfull\_read})
+\item [\fort{length}]
+      Length units.
+      Admissible values are \fort{Null}, \fort{UserDefined},
+      \fort{Meter}, \fort{Centimeter}, \fort{Millimeter},
+      \fort{Foot}, and \fort{Inch}.
+      (\textcolor{input}{Input} for \fort{cg\_units\_write},
+      \fort{cg\_unitsfull\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_units\_read},
+      \fort{cg\_unitsfull\_read})
+\item [\fort{time}]
+      Time units.
+      Admissible values are \fort{Null}, \fort{UserDefined}, and
+      \fort{Second}.
+      (\textcolor{input}{Input} for \fort{cg\_units\_write},
+      \fort{cg\_unitsfull\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_units\_read},
+      \fort{cg\_unitsfull\_read})
+\item [\fort{temperature}]
+      Temperature units.
+      Admissible values are \fort{Null}, \fort{UserDefined},
+      \fort{Kelvin}, \fort{Celsius}, \fort{Rankine}, and
+      \fort{Fahrenheit}.
+      (\textcolor{input}{Input} for \fort{cg\_units\_write},
+      \fort{cg\_unitsfull\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_units\_read},
+      \fort{cg\_unitsfull\_read})
+\item [\fort{angle}]
+      Angle units.
+      Admissible values are \fort{Null}, \fort{UserDefined},
+      \fort{Degree}, and \fort{Radian}.
+      (\textcolor{input}{Input} for \fort{cg\_units\_write},
+      \fort{cg\_unitsfull\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_units\_read},
+      \fort{cg\_unitsfull\_read})
+\item [\fort{current}]
+      Electric current units.
+      Admissible values are \fort{Null}, \fort{UserDefined},
+      \fort{Ampere}, \fort{Abampere}, \fort{Statampere},
+      \fort{Edison}, and \fort{auCurrent}.
+      (\textcolor{input}{Input} for \fort{cg\_unitsfull\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_unitsfull\_read})
+\item [\fort{amount}]
+      Substance amount units.
+      Admissible values are \fort{Null}, \fort{UserDefined},
+      \fort{Mole}, \fort{Entities}, \fort{StandardCubicFoot}, and
+      \fort{StandardCubicMeter}.
+      (\textcolor{input}{Input} for \fort{cg\_unitsfull\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_unitsfull\_read})
+\item [\fort{intensity}]
+      Luminous intensity units.
+      Admissible values are \fort{Null}, \fort{UserDefined},
+      \fort{Candela}, \fort{Candle}, \fort{Carcel},
+      \fort{Hefner}, and \fort{Violle}.
+      (\textcolor{input}{Input} for \fort{cg\_unitsfull\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_unitsfull\_read})
+\item [\fort{nunits}]
+      Number of units used in the file (i.e., either 5 or 8).
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+The supported units are declared within typedefs in \textit{cgnslib.h}
+and as parameters in \textit{cgnslib\_f.h}.
+
+When reading units data, either \fort{cg\_units\_read} or
+\fort{cg\_unitsfull\_read} may be used, regardless of the number of
+units used in the file.
+If \fort{cg\_unitsfull\_read} is used, but only five units are used
+in the file, the returned values of \fort{current}, \fort{amount},
+and \fort{intensity} will be \fort{Null}.
+
+\newpage
+\subsection{Dimensional Exponents}
+\label{s:dimensionalexponents}
+
+\noindent
+\textit{Node}: \fort{DimensionalExponents\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_exponents\_write(\textcolor{input}{DataType\_t DataType}, \textcolor{input}{void *exponents}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_expfull\_write(\textcolor{input}{DataType\_t DataType}, \textcolor{input}{void *exponents}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_nexponents(\textcolor{output}{\textit{int *nexponents}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_exponents\_info(\textcolor{output}{\textit{DataType\_t *DataType}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_exponents\_read(\textcolor{output}{\textit{void *exponents}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_expfull\_read(\textcolor{output}{\textit{void *exponents}}); & r - m \\
+\hline
+call cg\_exponents\_write\_f(\textcolor{input}{DataType}, \textcolor{input}{exponents}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_expfull\_write\_f(\textcolor{input}{DataType}, \textcolor{input}{exponents}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_nexponents\_f(\textcolor{output}{\textit{nexponents}}, \textcolor{output}{\textit{ier}} ) & r - m \\
+call cg\_exponents\_info\_f(\textcolor{output}{\textit{DataType}}, \textcolor{output}{\textit{ier}} ) & r - m \\
+call cg\_exponents\_read\_f(\textcolor{output}{\textit{exponents}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_expfull\_read\_f(\textcolor{output}{\textit{exponents}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{exponents}}\raggedright
+\item [\fort{DataType}]
+      Data type in which the exponents are recorded.
+      Admissible data types for the exponents are \fort{RealSingle}
+      and \fort{RealDouble}.
+      (\textcolor{input}{Input} for \fort{cg\_exponents\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_exponents\_info})
+\item [\fort{exponents}]
+      Exponents for the dimensional units for mass, length, time,
+      temperature, angle, electric current, substance amount, and
+      luminous intensity, in that order.
+      (\textcolor{input}{Input} for \fort{cg\_exponents\_write},
+      \fort{cg\_expfull\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_exponents\_read},
+      \fort{cg\_expfull\_read})
+\item [\fort{nexponents}]
+      Number of exponents used in the file (i.e., either 5 or 8).
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+When reading exponent data, either \fort{cg\_exponents\_read} or
+\fort{cg\_expfull\_read} may be used, regardless of the number of
+exponents used in the file.
+If \fort{cg\_exponents\_read} is used, but all eight exponents are used
+in the file, only the first five exponents are returned.
+If \fort{cg\_expfull\_read} is used, but only five exponents are used
+in the file, the returned values of the exponents for electric current,
+substance amount, and luminous intensity will be zero.

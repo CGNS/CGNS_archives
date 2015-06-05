@@ -1,0 +1,92 @@
+\section{ADF Glossary of Terms}
+\label{s:glossary}
+\thispagestyle{plain}
+
+\begin{Ventryi}{Node Name}
+\item [ADF]
+      The initialism (acronym) for Advanced Data Format.
+\item [Child]
+      One of the subnodes of a Parent.
+      A child node does not have knowledge of its parent node.
+      The user must keep track of this relationship.
+\item [Database]
+      A hierarchy of ADF nodes.
+      By use of links, it may physically span multiple files.
+\item [File]
+      An ADF file, which a single root node and its underlying structure.
+\item [ID]
+      A unique identifier to access a given node within a file.
+      This 8-byte field contains sufficient information for ADF to
+      locate the node within a file.
+      For any given node, the ID is generated only after the file it
+      resides in has been opened by a program and the user requests
+      information about the node.
+      The ID is valid only within the program that opened the file and
+      while that file is open.
+      If the file is closed and reopened, the ID for any given node
+      will be different.
+      Within different programs, the node-ID for the same node will be
+      different.
+      The ID is never actually written into a file.
+\item [Link-Node]
+      A special type of node.
+      Links are created using the \hyperlink{sub:Link}{\fort{ADF\_Link}}
+      subroutine.
+      The data type of this node is \fort{LK}, and its data is a
+      one-dimensional array containing the name of the file (if other
+      than the current file) containing the node to be linked and the
+      full path name in that file from the root node to the desired
+      node.
+
+      Links provide a mechanism for referring to a node that physically
+      resides in a different part of the hierarchy.
+      The node pointed to by a link may or may not reside in the same
+      file as the link itself.
+      A link within ADF is very similar to a ``soft'' link in the
+      UNIX operating system in that it does not guarantee that the
+      referenced node exists.
+      ADF will ``resolve'' the link only when information is requested
+      about the node.
+      If the ID of a link-node is used in an ADF call, the effect of
+      the call is the same as if the ID of the linked-to node was used.
+      Note that a link node does not have children itself.
+      In \autoref{f:example} on p.~\pageref*{f:example}, the children
+      seen for \fort{L3} are \fort{F4} and \fort{F5}.
+      If a child is ``added'' to \fort{L3}, then in reality, the child
+      is added to \fort{F3}.
+      There are specialized subroutines provided to create link nodes
+      and extract the link details.
+\item [Node]
+      The single component used to construct an ADF database.
+\item [Node name]
+      A node has a 32-character name.
+      Every child node directly under a given parent must have a unique
+      name.
+      Legal characteristics in a name are \fort{A-Z}, \fort{a-z},
+      \fort{0-9}, and special characters (ASCII values from 32 to
+      126, omitting the forward slash ``\fort{/}'', ASCII number 47).
+      Names will be blank filled to 32 bytes; they are case sensitive.
+      Leading blanks are discarded and trailing blanks are ignored,
+      whereas internal blanks are significant.
+\item [Parent]
+      A node that has subnodes directly associated with it.
+\item [Pathname]
+      Within a database, nodes can be referenced using the name of a node
+      along with its parent ID, or by using a ``pathname'' whose syntax is
+      roughly the same as a path name in the UNIX environment.
+      A pathname that begins with a leading slash ``\fort{/}'' is
+      assumed to begin at the root node of the file.
+      If no leading slash is given, the name is assumed to begin at the
+      node specified by the parent ID.
+      Although there is a 32-character limitation on the node Name,
+      there is no restriction on the length of the pathname.
+      For example, equivalent ways to refer to node \fort{N8} in
+      \autoref{f:example} are:
+      \begin{itemize}
+      \item Node-ID for \fort{N6} and name = ``\fort{N8}''
+      \item Node-ID for \fort{N4} and name = ``\fort{N6/N8}''
+      \item Node-ID for \fort{N1} and name = ``\fort{N4/N6/N8}''
+      \item Node-ID for the \fort{Root\_Node} and name =
+            ``\fort{/N1/N4/N6/N8}''
+      \end{itemize}
+\end{Ventryi}

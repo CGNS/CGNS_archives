@@ -1,0 +1,80 @@
+\section{Descriptors}
+\label{s:descriptors}
+\thispagestyle{plain}
+
+\subsection{Descriptive Text}
+\label{s:descriptor}
+
+\noindent
+\textit{Node}: \texttt{Descriptor\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_descriptor\_write(\textcolor{input}{char *name}, \textcolor{input}{char *text}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_ndescriptors(\textcolor{output}{\textit{int *ndescriptors}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_descriptor\_read(\textcolor{input}{int D}, \textcolor{output}{\textit{char *name}}, \textcolor{output}{\textit{char **text}}); & r - m \\
+\hline
+call cg\_descriptor\_write\_f(\textcolor{input}{name}, \textcolor{input}{text}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_ndescriptors\_f(\textcolor{output}{\textit{ndescriptors}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_descriptor\_size\_f(\textcolor{input}{D}, \textcolor{output}{\textit{size}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_descriptor\_read\_f(\textcolor{input}{D}, \textcolor{output}{\textit{name}}, \textcolor{output}{\textit{text}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{ndescriptors}}\raggedright
+\item [\texttt{ndescriptors}]
+      Number of \texttt{Descriptor\_t} nodes under the current node.
+      (\textcolor{output}{Output})
+\item [\texttt{D}]
+      Descriptor index number, where $1 \leq \text{\texttt{D}} \leq \text{\texttt{ndescriptors}}$.
+      (\textcolor{input}{Input})
+\item [\texttt{name}]
+      Name of the \texttt{Descriptor\_t} node.
+      (\textcolor{input}{Input} for \texttt{cg\_descriptor\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_descriptor\_read})
+\item [\texttt{text}]
+      Description held in the \texttt{Descriptor\_t} node.
+      (\textcolor{input}{Input} for \texttt{cg\_descriptor\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_descriptor\_read})
+\item [\texttt{size}]
+      Size of the descriptor data (Fortran interface only).
+      (\textcolor{output}{\textit{Output}})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+Note that with \texttt{cg\_descriptor\_read} the memory for the descriptor
+character string, \texttt{text}, will be allocated by the Mid-Level
+Library.
+The application code is responsible for releasing this memory when it is
+no longer needed by calling \texttt{cg\_free(text)}, described in
+\autoref{s:free}.
+
+\subsection{Ordinal Value}
+\label{s:ordinal}
+
+\noindent
+\textit{Node}: \texttt{Ordinal\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_ordinal\_write(\textcolor{input}{int Ordinal}); & - w m \\
+\textcolor{output}{\textit{ier}} = cg\_ordinal\_read(\textcolor{output}{\textit{int *Ordinal}}); & r - m \\
+\hline
+call cg\_ordinal\_write\_f(\textcolor{input}{Ordinal}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_ordinal\_read\_f(\textcolor{output}{\textit{Ordinal}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{Ordinal}}\raggedright
+\item [\texttt{Ordinal}]
+      Any integer value.
+      (\textcolor{input}{Input} for \texttt{cg\_ordinal\_write};
+      \textcolor{output}{\textit{output}} for \texttt{cg\_ordinal\_read})
+\item [\texttt{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}

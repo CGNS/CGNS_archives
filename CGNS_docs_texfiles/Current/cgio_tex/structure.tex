@@ -1,0 +1,158 @@
+\section{Data Structure Management Routines}
+\label{s:structure}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cgio\_create\_node(\textcolor{input}{int cgio\_num}, \textcolor{input}{double pid}, \textcolor{input}{const char *name}, & - w m \\
+~~~~~~~\textcolor{output}{\textit{double *id}}); & \\
+\textcolor{output}{\textit{ier}} = cgio\_new\_node(\textcolor{input}{int cgio\_num}, \textcolor{input}{double pid}, \textcolor{input}{const char *name}, & - w m \\
+~~~~~~~\textcolor{input}{const char *label}, \textcolor{input}{const char *data\_type}, \textcolor{input}{int ndims}, & \\
+~~~~~~~\textcolor{input}{const cgsize\_tt *dims}, \textcolor{input}{const void *data}, \textcolor{output}{\textit{double *id}}); & \\
+\textcolor{output}{\textit{ier}} = cgio\_delete\_node(\textcolor{input}{int cgio\_num}, \textcolor{input}{double pid}, \textcolor{input}{double id}); & - w m \\
+\textcolor{output}{\textit{ier}} = cgio\_move\_node(\textcolor{input}{int cgio\_num}, \textcolor{input}{double pid}, \textcolor{input}{double id}, & - w m \\
+~~~~~~~\textcolor{input}{double new\_pid}); & \\
+\textcolor{output}{\textit{ier}} = cgio\_number\_children(\textcolor{input}{int cgio\_num}, \textcolor{input}{double id}, \textcolor{output}{\textit{int *num\_child}}); & r w m \\
+\textcolor{output}{\textit{ier}} = cgio\_children\_names(\textcolor{input}{int cgio\_num}, \textcolor{input}{double id}, \textcolor{input}{int start}, & r w m \\
+~~~~~~~\textcolor{input}{int max\_ret}, \textcolor{input}{int name\_len}, \textcolor{output}{\textit{int *num\_ret}}, \textcolor{output}{\textit{char *child\_names}}); & \\
+\textcolor{output}{\textit{ier}} = cgio\_children\_ids(\textcolor{input}{int cgio\_num}, \textcolor{input}{double id}, \textcolor{input}{int start}, & r w m \\
+~~~~~~~\textcolor{input}{int max\_ret}, \textcolor{output}{\textit{int *num\_ret}}, \textcolor{output}{\textit{char *child\_ids}}); & \\
+\hline
+call cgio\_create\_node\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{pid}, \textcolor{input}{name}, \textcolor{output}{\textit{id}}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cgio\_new\_node\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{pid}, \textcolor{input}{name}, \textcolor{input}{label}, \textcolor{input}{data\_type}, \textcolor{input}{ndims}, & - w m \\
+~~~~~\textcolor{input}{dims}, \textcolor{input}{data}, \textcolor{output}{\textit{id}}, \textcolor{output}{\textit{ier}}); & \\
+call cgio\_delete\_node\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{pid}, \textcolor{input}{id}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cgio\_move\_node\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{pid}, \textcolor{input}{id}, \textcolor{input}{new\_pid}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cgio\_number\_children\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{id}, \textcolor{output}{\textit{num\_child}}, \textcolor{output}{\textit{ier}}) & r w m \\
+call cgio\_children\_names\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{id}, \textcolor{input}{start}, \textcolor{input}{max\_ret}, \textcolor{input}{name\_len}, & r w m \\
+~~~~~\textcolor{output}{\textit{num\_ret}}, \textcolor{output}{\textit{child\_names}}, \textcolor{output}{\textit{ier}}) & \\
+call cgio\_children\_ids\_f(\textcolor{input}{cgio\_num}, \textcolor{input}{id}, \textcolor{input}{start}, \textcolor{input}{max\_ret}, & r w m \\
+~~~~~\textcolor{output}{\textit{num\_ret}}, \textcolor{output}{\textit{child\_ids}}, \textcolor{output}{\textit{ier}}) & \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\texttt{child\_names}}\raggedright
+\item [\texttt{cgio\_num}]
+      Database identifier.
+\item [\texttt{pid}]
+      Parent node identifier.
+\item [\texttt{id}]
+      Node identifier.
+\item [\texttt{name}]
+      Node name (max length 32).
+\item [\texttt{label}]
+      Node label (max length 32).
+\item [\texttt{data\_type}]
+      Type of data contained in the node. One of ``MT'', ``I4'', ``I8'',
+      ``U4'', ``U8'', ``R4'', ``C1'', or ``B1''.
+\item [\texttt{ndims}]
+      Number of dimensions for the data (max 12).
+\item [\texttt{dims}]
+      Data dimension values (\texttt{ndims} values).
+\item [\texttt{data}]
+      Data array to be stored with the node.
+\item [\texttt{new\_pid}]
+      New parent node identifier under which the node is to be moved.
+\item [\texttt{num\_child}]
+      Number of children of the specified node.
+\item [\texttt{start}]
+      Starting index for returned child names or ids
+      (1 <= \texttt{start} <= \texttt{num\_child}).
+\item [\texttt{max\_ret}]
+      Maximum child names or ids to be returned
+      (1 <= \texttt{max\_ret} <= \texttt{num\_child-start+1}).
+\item [\texttt{name\_len}]
+      Length reserved for each returned child name.
+\item [\texttt{num\_ret}]
+      Number of returned values of child names or identifiers.
+\item [\texttt{child\_names}]
+      Child node names (\texttt{num\_ret} values). This array should
+      be dimensioned at least (\texttt{name\_len * max\_ret}).
+\item [\texttt{child\_ids}]
+      Child node identifiers (\texttt{num\_ret} values). This array
+       should be dimensioned at least (\texttt{max\_ret}).
+\item [\texttt{ier}]
+      Error status.
+\end{Ventryi}
+
+\subsection{Function Descriptions}
+
+\subsubsection{\texttt{cgio\_create\_node}} \label{create_node}
+    \noindent
+    Creates a new empty node in the database given by \texttt{cgio\_num}
+    as a child of the node identified by \texttt{pid}. The name of the new
+    node is given by \texttt{name}, and must not already exist as a child
+    of the parent node. The node will contain no label, dimensions,
+    or data. Use the Node Management Routines (\autoref{s:node}) to
+    change the properties of the node, and the
+    Data I/O Routines (\autoref{s:dataio}) to add data. Returns 0 and the
+    identifier of the new node in \texttt{id} on success, else an error code.
+
+\subsubsection{\texttt{cgio\_new\_node}} \label{new_node}
+    \noindent
+    Creates a new node in the database given by \texttt{cgio\_num}
+    as a child of the node identified by \texttt{pid}. The name of the new
+    node is given by \texttt{name}, and must not already exist as a child
+    of the parent node. The node label is given by \texttt{label},
+    the type of data by \texttt{data\_type}, the dimensions of the data by
+    \texttt{ndims} and \texttt{dims}, and the data to write to the node
+    by \texttt{data}. This is equivalent to calling the routines:
+    \texttt{cgio\_create\_node}, \texttt{cgio\_set\_label}.
+    \texttt{cgio\_set\_dimensions}, and \texttt{cgio\_write\_all\_data}.
+    Returns 0 and the identifier of the new node in \texttt{id} on success,
+    else an error code.
+
+\subsubsection{\texttt{cgio\_delete\_node}} \label{delete_node}
+    \noindent
+    Deletes the node identified by \texttt{id} below the parent node identified
+    by \texttt{pid} in the database given by \texttt{cgio\_num}. All children
+    of the deleted node will also be deleted unless a link is encountered.
+    The link node will be deleted but nothing below it.
+    Returns 0 on success, else an error code.
+
+\subsubsection{\texttt{cgio\_move\_node}} \label{move_node}
+    \noindent
+    Moves the node indentified by \texttt{id} below the parent node identified
+    by \texttt{pid} to below the new parent node identified by \texttt{new\_pid}
+    in the database given by \texttt{cgio\_num}. A node by the same name as
+    that that for \texttt{id} must not already exist under \texttt{new\_pid}.
+    A node may only be moved if it and the parent nodes all reside in the
+    sane physical database. Returns 0 on success, else an error code.
+
+\subsubsection{\texttt{cgio\_number\_children}} \label{number_children}
+    \noindent
+    Gets the number of children of the node identified by \texttt{id} in the
+    database given by \texttt{cgio\_num}, Returns 0 and the number of children
+    in \texttt{num\_child} on success, else an error code.
+
+\subsubsection{\texttt{cgio\_children\_names}} \label{children_names}
+    \noindent
+    Gets the names of the children of the node identified by \texttt{id} in
+    the database given by \texttt{cgio\_num}. The starting index for the
+    array of names is given by \texttt{start}, and the maximum number of
+    names to return by \texttt{max\_ret}. Both \texttt{start} and \texttt{max\_ret}
+    should be between 1 and \texttt{num\_child}, inclusively. The size reserved
+    for each name in \texttt{child\_names} is given by \texttt{name\_len}.
+    The array \texttt{child\_names} should be dimensioned at least
+    (\texttt{name\_len * max\_ret}). Since node names are limited to a length
+    of \texttt{CGIO\_MAX\_NAME\_LENGHT} (32), \texttt{name\_len} should be at
+    least 32 to ensure the returned names are mot truncated. In C, an
+    additional byte should be added to \texttt{name\_len} allow for the
+    terminating '0' for each name. If successfull, the function returns 0;
+    the actual number of returned names is given by \texttt{num\_ret},
+    and the array of names in \texttt{child\_names}. In C, the names are
+    '0'-terminated within each name field. In Fortran, any unused space
+    is padded with blanks (space character).
+
+\subsubsection{\texttt{cgio\_children\_ids}} \label{children_ids}
+    \noindent
+    Gets the node identifiers of the children of the node identified by
+    \texttt{id} in the database given by \texttt{cgio\_num}.
+    The starting index for the array of ids is given by \texttt{start},
+    and the maximum ids to return by \texttt{max\_ret}. Both \texttt{start}
+    and \texttt{max\_ret} should be between 1 and \texttt{num\_child}, inclusively.
+    The array \texttt{child\_ids} should be dimensioned at least
+    (\texttt{max\_ret}). If successfull, the function returns 0; the
+    actual number of returned ids is given by \texttt{num\_ret}, and the
+    array of identifiers in \texttt{child\_ids}.
+
