@@ -1,0 +1,226 @@
+\section{ADF Design Considerations}
+\label{s:design}
+\thispagestyle{plain}
+
+This section provides a summary of the design considerations that were
+used in the construction of the ADF software library.
+
+\subsection{ADF File Header Information}
+
+Every ADF file has a header section that contains information about the
+file itself.
+The following information from this header is available to the user:
+
+\begin{itemize}
+\item ADF version number of the library that created the database.
+\item File creation date and time.
+\item File modification date and time.
+\item Data format used in database (IEEE big endian, IEEE little endian,
+      etc.)
+\end{itemize}
+
+[Under data format, ``endian'' refers to the ordering of bytes in a
+multi-byte number.
+Big endian is a computer architecture in which, within a given
+multi-byte numeric representation, the most significant byte has the
+lowest address (the word is stored ``big-end-first'').
+Little endian is a computer architecture in which, within a given 16- or
+32-bit word, bytes at lower addresses have lower significance (the word
+is stored ``little-end-first'').]
+
+\subsection{ADF File Optimizations}
+
+To optimize the performance of ADF, the following techniques have been
+incorporated into the ADF software to enhance performance of the file:
+
+\begin{itemize}
+\item Use block-based, unbuffered (raw mode) I/O where available, with
+      block sizes of 4096 bytes.
+\item Align medium to large data chunks on block boundaries.
+\item If the data size is equal to or greater than 2048, then
+      \begin{itemize}
+      \item align data to the next block and
+      \item add extra to free (garbage) lists
+      \end{itemize}
+\item Avoid, where possible, small- to medium-sized chunks of data that
+      span block boundaries.
+\item Align, where possible, to the next block and add extra to free
+      (garbage) lists.
+\end{itemize}
+
+Allow data space to grow by linking data chunks.
+It is possible to increase the last dimension; doing so will extend the
+data.
+However, internal dimensional changes will corrupt the existing data.
+
+The pointer table for child nodes will also contain the child node names.
+
+\subsection{ADF File Portability}
+
+To address code portability and future needs, the following design
+decisions were made:
+
+\begin{itemize}
+\item Use larger than 32-bit file pointers to allow for files larger than
+      4 Gigabytes.
+      (C routine \fort{lseek} may not handle this, but ADF files should
+      allow it.)
+\item Use 48-bit pointers within a block of data.
+      32-bit pointers to 4096-byte blocks and a 16-bit pointer to a
+      position within the block.
+      This allows for files with 4 gigabyte blocks, in other words
+      $2^{32} \times 4096 = 17.5922 + 12$ bytes or 17.59 Tera bytes.
+\item The ID pointers will be 64-bit coded IDs.
+      Users may use double data type (\fort{real*8}).
+      This is parceled as follows: 32 bits for block number, 12 bits for
+      block offset, and 20 bits for file identifier.
+\item Encode the integer information, other than data, in ASCII,
+      Hex-based notation.
+\end{itemize}
+
+\subsection{ADF File Error Checking}
+
+Error checking has been implemented for the ADF file and is summarized
+here.
+Each item in the ADF file will have item-specific boundary tags
+surrounding it to provide file-based corruption checking.
+For variable-sized items, the associated boundary tags will include
+file-based size information.
+Information will be written to the disk in a sequence that will not
+allow corrupt files.
+For example, when adding a new child node, the complete child
+information will be written before the parent's child-table is updated.
+An ADF-core subroutine for downloading data to disk will be provided.
+
+\subsection{ADF Source Code Considerations}
+
+The ADF library of source code will incorporate the use of UNIX ``what''
+strings for the ADF version number and also RCS versioning information
+in the source code and in the object code.
+The source code is written in portable ANSI C, using POSIX-defined system
+calls.
+
+\subsection{ADF Node Header Information}
+
+The following information is contained in an ADF node header:
+
+\begin{itemize}
+\item node boundary tag
+\item name (32 characters)
+\item label (32 characters)
+      \begin{itemize}
+      \item number of subnodes (\fort{num\_sub\_nodes}) is an integer
+            (ASCII, Hex encoded in file).
+      \item address pointer of the subnodes indicated by the variable.
+      \end{itemize}
+\item \fort{sub\_nodes}, which are pointers (ASCII, Hex encoded in file)
+      to a table (the ``child table'') of file pointers and names for each
+      of the node's children.
+      Note that the child name information is redundant and included for
+      performance.
+\item data type is specified in \fort{data\_type} (32 characters allowed).
+\item dimensionality of the data, called \fort{num\_dimensions}.
+      It is ASCII, Hex encoded in the file.
+\item dimension values are listed in the integer array of 12,
+      \fort{dimension\_values}.
+      The dimension values are Hex encoded.
+\item integer value for the number of data chunks is found in
+      \fort{num\_data\_chunks} (ASCII, Hex encoded).
+\item data address, which is as follows:
+      \begin{itemize}
+      \item if \fort{num\_data\_chunks} $= 1$, then a file pointer to data
+      \item if \fort{num\_data\_chunks} $> 1$, then a file pointer to
+            a table of \fort{num\_data\_chunks} file pointers and
+            associated data sizes
+      \end{itemize}
+%
+%      \settowidth{\tmplengtha}{if \fort{num\_data\_chunks}}
+%      \settowidth{\tmplengthb}{\ $= 1,\mbox{\ }$}
+%      \setlength{\Pwidth}{\linewidth-2\tabcolsep-\tmplengtha-\tmplengthb}
+%      \begin{tabular}{l @{}l @{\raggedright\arraybackslash}p{\Pwidth}}
+%      if \fort{num\_data\_chunks} & $\ = 1,\mbox{\ }$ &
+%                                    then a file pointer to data \\
+%                                  & $\ > 1,\mbox{\ }$ &
+%                                    then a file pointer to a table
+%                                    of \fort{num\_data\_chunks} file
+%                                    pointers and associated data sizes
+%      \end{tabular}
+\item ending node boundary tag.
+\end{itemize}
+
+\subsection{Fortran Character Array Portability Concerns}
+\label{s:design:fortran}
+
+Fortran character arrays are different from any other array type because
+they inherently include declared length information.
+Abstractly, they are a compound type: an array and an integer.
+The ANSI standards do not specify the implementation mechanism for
+handling this data type and so it is left to the vendor.
+As one might expect, vendors have devised different policies.
+This is particularly evident in how argument lists are created and used.
+The matter is further complicated when writing functions in other
+languages that are to be called from Fortran.
+
+To keep the interfaces simple and to keep the Fortran and C data I/O
+calls similar (as opposed to having separate data I/O functions for
+character data), ADF suggests abiding by the following rules (these are
+required for Cray T90-mode users):
+
+\begin{itemize}
+\item Do not pass character arrays as the actual data arguments to any
+      ADF read or write function unless that node has been defined with a
+      data type of \fort{C1}.
+\item If a node has been defined as data type \fort{C1}, then pass
+      character arrays only as the actual data arguments to all ADF read
+      and write function.
+\end{itemize}
+
+\emph{Note to Cray T90-mode users:} The above rules must be followed.
+In addition, the given node must be available and have its data type
+correctly defined.
+Error handling is not possible otherwise, and ADF will abort or fail
+regardless of how the error state flag is set.
+
+\subsection{Integer 64 Data Type Portability Concerns}
+
+For portability reasons, it is suggested that the use of the \fort{I8}
+data type be restricted to a 64-bit environment.
+
+\subsection{Compound Data Types Portability Concerns}
+
+For the transportability reasons discussed below, use of compound data
+types is not recommended.
+
+When using compound data types (e.g., with structures in C), it is
+important to be aware of data alignment issues.
+If one is not careful, the actual size of the structure in memory may be
+larger than the sum of the individual members.
+The total size depends on the order and word boundary alignment
+requirements of the specific data types.
+This is platform and compiler dependent and not handled by ADF.
+In order to provide the greatest portability (at least up to 64-bit
+environments), it is recommended that
+
+\begin{itemize}
+\item 8-byte data types (\fort{I8}, \fort{R8}) be aligned on 8 byte
+      boundaries, and
+\item data types smaller than the word size be padded to a size equal to
+      the word size.
+\end{itemize}
+
+So a 4-byte data type (e.g., \fort{I4[1]}) needs ``padding'' (e.g.,
+\fort{I4[2]}) if it is to be followed by an 8-byte data type.
+And assuming a word size of 4 bytes, all \fort{C1}-data-type elements
+need dimension values of multiples of 4 bytes (e.g., \fort{C1[4]},
+\fort{C1[8]}, etc.).
+To be even more careful, size everything in multiples of 8 bytes,
+for example, ``\fort{C1[8]}, \fort{I4[2]}, \fort{C1[16]},
+\fort{R4[6]}, \fort{R8[5]}, \fort{I8[1]}''.
+
+For a given architecture and compiler, and taking into consideration the
+restrictions given above, compound data types should work.
+It is more portable and highly recommended that users write out the
+individual components of a structure into separate nodes.
+It would probably be best to copy the individual components of a list of
+structures into an appropriate array type and write the temporary array
+out using the write-all or write-strided routines.

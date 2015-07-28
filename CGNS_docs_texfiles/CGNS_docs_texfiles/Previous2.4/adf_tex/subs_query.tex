@@ -1,0 +1,395 @@
+\subsection{Data Query Routines}
+\label{s:subs_query}
+
+\fcthdra{Get\_Label}{Get the String in a Node's Label Field}
+\label{sub:Get_Label}
+
+\begin{fctbox}
+   {ADF\_Get\_Label}
+   {ADFGLB}
+   {(ID,label,error\_return)}
+\hline
+Input  & const double ID    & real*8 ID \\
+\hline
+Output & char *label        & character*(*) label \\
+       & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{label}]
+     The 32-character label of the node.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine returns the 32-character string stored in the node's label
+field.
+In C, the label will be null terminated after the last nonblank
+character.
+Therefore, in general, 33 characters should be allocated (32 for the
+label, plus 1 for the null).
+In Fortran, the label is left justified and blank filled to the right.
+The null character is not returned in Fortran, therefore, the variable
+declaration can be for 32 characters (e.g., \fort{CHARACTER*(32)}).
+
+\hypertarget{ex:Get\_Label}{}
+\Example
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) NODNAM,LABL
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,CID
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('db.adf','NEW',' ',RID,IERR)
+         CALL ADFCRE(RID,'NODE 1',CID,IERR)
+         CALL ADFSLB(CID,'THIS IS A NODE LABEL',IERR)
+   C
+         CALL ADFGNAM(CID,NODNAM,IERR)
+         CALL ADFGLB(CID,LABL,IERR)
+   C
+         PRINT *,' NODE NAME = ',NODNAM
+         PRINT *,' LABEL     = ',LABL
+   C
+         STOP
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   NODE NAME = NODE 1
+   LABEL     = THIS IS A NODE LABEL
+\end{alltt}
+
+\fcthdr{Set\_Label}{Set the String in a Node's Label Field}
+\label{sub:Set_Label}
+
+\begin{fctbox}
+   {ADF\_Set\_Label}
+   {ADFSLB}
+   {(ID,label,error\_return)}
+\hline
+Input  & const double ID    & real*8 ID \\
+       & const char *label  & character*(*) label \\
+\hline
+Output & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{label}]
+     The 32-character label for the node.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Set\_Label}, sets the 32-character string in
+the node's label field.
+
+\Example
+
+See the \hyperlink{ex:Get\_Label}{example for \fort{ADF\_Get\_Label}}.
+
+\fcthdr{Get\_Data\_Type}{Get the String in a Node's Data-Type Field}
+\label{sub:Get_Data_Type}
+
+\begin{fctbox}
+   {ADF\_Get\_Data\_Type}
+   {ADFGDT}
+   {(ID,data\_type,error\_return)}
+\hline
+Input  & const double ID    & real*8 ID \\
+\hline
+Output & char *data\_type   & character*(*) data\_type \\
+       & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{data\_type}]
+     The 32-character data type field stored in the node information
+     header.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Get\_Data\_Type}, returns the 32-character
+string in the node's data-type field.
+In C, the label will be null terminated after the last nonblank;
+therefore, at least 33 characters (32 for the label, plus 1 for the
+null) should be allocated for the \textit{data\_type} string.
+In Fortran, the null character is not returned; therefore, the
+declaration for the string \textit{data\_type} can be for 32
+characters.
+
+\hypertarget{ex:Get\_Data\_Type}{}
+\Example
+
+This example illustrates the process of creating a node, storing data in
+it, querying the node for the information in the header, and reading the
+data back out.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+         PARAMETER (MAXROW=2)
+         PARAMETER (MAXCOL=10)
+   C
+         CHARACTER*(MAXCHR) NODNAM,LABL
+         CHARACTER*(MAXCHR) DTYPE
+         REAL R4DATI(MAXROW,MAXCOL),R4DATO(MAXROW,MAXCOL)
+         INTEGER IDIMI(2),IDIMO(2)
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,CID
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('db.adf','NEW',' ',RID,IERR)
+   C
+   C *** GENERATE SOME DATA
+   C
+         IDIMI(1) = MAXROW
+         IDIMI(2) = MAXCOL
+         DO 200 ICOL = 1,MAXCOL
+            DO 100 IROW = 1,MAXROW
+               R4DATI(IROW,ICOL) = 2.0*ICOL*IROW
+     100    CONTINUE
+     200 CONTINUE
+   C
+   C *** GENERATE A NODE AND PUT DATA IN IT
+   C
+         CALL ADFCRE(RID,'NODE 1',CID,IERR)
+         CALL ADFSLB(CID,'LABEL FOR NODE 1',IERR)
+         CALL ADFPDIM(CID,'R4',2,IDIMI,IERR)
+         CALL ADFWALL(CID,R4DATI,IERR)
+   C
+   C *** GET INFORMATION FROM NODE
+   C
+         CALL ADFGNAM(CID,NODNAM,IERR)
+         CALL ADFGLB(CID,LABL,IERR)
+         CALL ADFGDT(CID,DTYPE,IERR)
+         CALL ADFGND(CID,NDIM,IERR)
+         CALL ADFGDV(CID,IDIMO,IERR)
+         CALL ADFRALL(CID,R4DATO,IERR)
+   C
+         PRINT *,' NODE NAME            = ',NODNAM
+         PRINT *,' LABEL                = ',LABL
+         PRINT *,' DATA TYPE            = ',DTYPE
+         PRINT *,' NUMBER OF DIMENSIONS = ',NDIM
+         PRINT *,' DIMENSIONS           = ',IDIMO
+         PRINT *,' DATA:'
+         WRITE(*,300)((R4DATO(I,J),I=1,MAXROW),J=1,MAXCOL)
+     300 FORMAT(2(5X,F10.2))
+   C
+         STOP
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   NODE NAME            = NODE 1
+   LABEL                = LABEL FOR NODE 1
+   DATA TYPE            = R4
+   NUMBER OF DIMENSIONS =            2
+   DIMENSIONS           =            2           10
+   DATA:
+            2.00           4.00
+            4.00           8.00
+            6.00          12.00
+            8.00          16.00
+           10.00          20.00
+           12.00          24.00
+           14.00          28.00
+           16.00          32.00
+           18.00          36.00
+           20.00          40.00
+\end{alltt}
+
+\fcthdr{Get\_Number\_of\_Dimensions}{Get the Number of Node Dimensions}
+\label{sub:Get_Number_of_Dimensions}
+
+\begin{fctbox}
+   {ADF\_Get\_Number\_of\_Dimensions}
+   {ADFGND}
+   {(ID,num\_dims,error\_return)}
+\hline
+Input  & const double ID    & real*8 ID \\
+\hline
+Output & int *num\_dims     & integer num\_dims \\
+       & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{num\_dims}]
+     The integer dimension value.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Get\_Number\_of\_Dimensions}, returns the number
+of data dimensions used in the node.
+Values will be returned only for the number of dimensions defined in the
+node.
+If the number of dimensions for the node is zero, an error is returned.
+
+\Example
+
+See the \hyperlink{ex:Get\_Data\_Type}{example for \fort{ADF\_Get\_Data\_Type}}.
+
+\fcthdr{Get\_Dimension\_Values}{Get the Values of the Node Dimensions}
+\label{sub:Get_Dimension_Values}
+
+\begin{fctbox}
+   {ADF\_Get\_Dimension\_Values}
+   {ADFGDV}
+   {(ID,dim\_vals[],error\_return)}
+\hline
+Input  & const double ID    & real*8 ID \\
+\hline
+Output & int *dim\_vals[]   & integer dim\_vals() \\
+       & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{dim\_vals}]
+     The array (list) of dimension values.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Get\_Dimension\_Values}, returns the array
+(list) of dimension values for a node.
+Values will be returned only for the number of dimensions defined in the
+node.
+If the number of dimensions for the node is zero, an error is returned.
+
+\Example
+
+See the \hyperlink{ex:Get\_Data\_Type}{example for \fort{ADF\_Get\_Data\_Type}}.
+
+\fcthdr{Put\_Dimension\_Information}{Set or Change the Data Type and Dimensions of a Node}
+\label{sub:Put_Dimension_Information}
+
+\begin{fctbox}
+   {ADF\_Put\_Dimension\_Information}
+   {ADFPDIM}
+   {(ID,data\_type,dims,dim\_vals[],error\_return)}
+\hline
+Input  & const double ID        & real*8 ID \\
+       & const char *data\_type & character*(*) data\_type \\
+       & const int dims         & integer dims \\
+       & int dim\_vals[]        & integer dim\_vals() \\
+\hline
+Output & int *error\_return     & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{data\_type}]
+     The 32-character data type of the node.
+     The valid user-definable data types are:
+
+     \noindent\smallskip
+     \begin{tabular}{@{}l c}
+        \uline{\textbf{Data Type}} & \uline{\textbf{Notation}} \\
+        No Data                    & \fort{MT} \\
+        Integer 32                 & \fort{I4} \\
+        Integer 64                 & \fort{I8} \\
+        Unsigned Integer 32        & \fort{U4} \\
+        Unsigned Integer 64        & \fort{U8} \\
+        Real 32                    & \fort{R4} \\
+        Real 64                    & \fort{R8} \\
+        Complex 64                 & \fort{X4} \\
+        Complex 128                & \fort{X8} \\
+        Character (unsigned byte)  & \fort{C1} \\
+        Byte (unsigned byte)       & \fort{B1}
+     \end{tabular}\smallskip
+
+     Compound data types can be defined as a combination of types
+     (``\fort{I4,I4,R8}''), an array (``\fort{I4[25]}''), or a
+     combination of types and arrays (``\fort{I4,C1[20],R8[3]}'').
+     They can contain up to 32 characters.
+     This style of data type definition is not very portable across
+     platforms; therefore, it is not recommended.
+\item[\textit{dims}]
+     The number of dimensions of this node.
+     \textit{dims} can be a number from 0 to 12.
+     ``0'' means no data.
+     The dimension of an array can range from 1 (vector) to 12.
+\item[\textit{dim\_vals}]
+     The array (list) of dimension values for this node.
+     \textit{dim\_vals} is a vector of integers that define
+     the size of the array in each dimension as defined by
+     \textit{dims}.
+     If the dims is zero, the \textit{dims\_vals} are not used.
+     The valid range of \textit{dim\_vals} is from 1 to
+     2,147,483,648.
+     The total data size in bytes, calculated by the
+     \textit{data\_type} size times the dimension values, cannot
+     exceed 2,147,483,648 for any one node.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Put\_Dimension\_Information}, sets or changes
+the data type and dimension information for a node.
+
+\noindent
+\emph{Note:}
+When this routine is used to change the data type or number of
+dimensions of an existing node, any data currently associated with the
+node are lost.
+The dimension values can be changed and the data space will be extended
+as needed.
+Be very careful changing the dimension values.
+The layout of the data is assumed to be Fortran-like.
+If the left-most dimension values are changed, the data are not shifted
+around on disk to account for this; only the amount of data is changed.
+Therefore, the indexing into the data will be changed.
+In general, it is safe to change the right-most dimension value.
+For example, if the array of dimension values was (10,11,20,50), then
+changing the 10, 11, or 20 is very risky, whereas changing the 50 should
+be safe.
+
+\noindent
+\emph{Note:}
+See the discussion of Fortran character array portability in
+\hyperref[s:design:fortran]{Appendix~\ref*{s:design:fortran}}.
+
+\Example
+
+See the \hyperlink{ex:Get\_Data\_Type}{example for \fort{ADF\_Get\_Data\_Type}}.

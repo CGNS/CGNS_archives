@@ -1,0 +1,114 @@
+Box 22 4
+   \textbf{\Large FlowEquationSet Node}
+   (See \autoref{f:CGNSBase}, \autoref{f:Zone})
+Tag
+TxtPos [l] [l] ~
+SetTrack line
+Down 7
+Left 1
+Box 18 10
+   \textbf{Name:} \fort{GoverningEquations}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{GoverningEquations\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{C1}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} Length of string\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{GoverningEquationsType} value\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Parameters:} \fort{CellDimension}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:GoverningEquations}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Right 2
+SetTrack line
+Down 10.5
+Left 1
+Box 18 9
+   \textbf{Name:} \fort{GasModel}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{GasModel\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{C1}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} Length of string\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{GasModelType} value\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:GasModel}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Right 2
+SetTrack line
+Down 10
+Left 1
+Box 18 9
+   \textbf{Name:} \fort{ViscosityModel}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{ViscosityModel\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{C1}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} Length of string\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{ViscosityModelType} value\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:ViscosityModel}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Right 2
+SetTrack line
+Down 10
+Left 1
+Box 18 9
+   \textbf{Name:} \fort{ThermalRelaxationModel}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{ThermalRelaxationModel\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{C1}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} Length of string\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{ThermalRelaxationModelType} value\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:ThermalRelaxationModel}\rule[-0.5ex]{0pt}{1ex}
+ToTag
+Down 6
+Right 1
+Box 18 8
+   \textbf{Name:} \fort{EquationDimension}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} ``\fort{int}''\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{I4}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{EquationDimension} value\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 2
+SetTrack line
+Down 9.5
+Right 1
+Box 18 9
+   \textbf{Name:} \fort{ThermalConductivityModel}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{ThermalConductivityModel\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{C1}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} Length of string\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{ThermalConductivityModelType} value\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:ThermalConductivityModel}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 2
+SetTrack line
+Down 10.5
+Right 1
+Box 18 10
+   \textbf{Name:} \fort{TurbulenceModel}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{TurbulenceModel\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{C1}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} Length of string\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{TurbulenceModelType} value\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Parameters:} \fort{CellDimension}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:TurbulenceModel}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 2
+SetTrack line
+Down 10.5
+Right 1
+Box 18 9
+   \textbf{Name:} \fort{TurbulenceClosure}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{TurbulenceClosure\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{C1}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} Length of string\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{TurbulenceClosureType} value\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} \autoref{f:TurbulenceClosure}\rule[-0.5ex]{0pt}{1ex}

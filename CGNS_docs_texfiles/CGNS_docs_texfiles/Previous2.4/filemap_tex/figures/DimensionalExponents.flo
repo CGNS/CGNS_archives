@@ -1,0 +1,20 @@
+Box 22 4
+   \textbf{\Large DimensionalExponents Node}
+   (See Figure \ref*{f:DataArray})
+SetTrack none
+Down 0
+Left 4
+SetTrack line
+Down 7.5
+Right 3
+TxtPos [l] [l] ~
+Box 20 10
+   \textbf{Name:} \fort{AdditionalExponents}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{AdditionalExponents\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{R4} or \fort{R8}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} 3\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{ElectricCurrentExponent},\rule[-0.5ex]{0pt}{1ex}
+   \hspace*{\indData}\fort{SubstanceAmountExponent},\rule[-0.5ex]{0pt}{1ex}
+   \hspace*{\indData}\fort{LuminousIntensityExponent}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}

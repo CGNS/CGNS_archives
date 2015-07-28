@@ -1,0 +1,489 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%BoundingBox: 62 202 532 574
+%%DocumentSuppliedResources: procset Draw 1.12 0
+%%DocumentNeededResources: font Times-Roman
+%%+ font Times-Italic
+%%Orientation: Portrait
+%%Title: adf_figure.draw3.ps
+%%Pages: 1
+%%Creator: Draw version 1.12 (with mods by Charlie Towne)
+%%CreationDate: Wed Mar 28 10:32:55 2001
+%%For: pstowne@zargon (Charlie Towne)
+%%EndComments
+
+%%BeginProlog
+
+%%BeginResource: procset Draw 1.12 0
+
+% color linewidth origin_x origin_y radius draw_open_circle => ---
+
+/draw_open_circle
+        {
+        newpath
+        0 360 arc
+        setlinewidth
+        set_color
+        stroke
+        } def
+
+% color origin_x origin_y radius draw_filled_circle => ---
+
+/draw_filled_circle
+        {
+        newpath
+        0 360 arc
+        set_color
+        fill
+        } def
+
+% delta_x delta_y origin_x origin_y draw_ellipse => ---
+
+/draw_ellipse
+        {
+        newpath
+        translate               % dx dy
+        exch                    % dy dx
+        dup                     % dy dx dx
+        3 1 roll                % dx dy dx
+        div                     % dx dy/dx
+        1 exch                  % dx 1 dy/dx
+        scale                   % dx
+        0 0                     % dx 0 0
+        3 2 roll                % 0 0 dx
+        0 360 arc
+        } def
+
+% color linewidth delta_x delta_y origin_x origin_y draw_open_ellipse => ---
+
+/draw_open_ellipse
+        {
+        gsave
+        draw_ellipse
+        setlinewidth
+        set_color
+        stroke
+        grestore
+        } def
+
+% color delta_x delta_y origin_x origin_y draw_filled_ellipse => ---
+
+/draw_filled_ellipse
+        {
+        gsave
+        draw_ellipse
+        set_color
+        fill
+        grestore
+        } def
+
+% delta_x delta_y origin_x origin_y start_image => ---
+
+/start_image
+        {
+        gsave
+        translate
+        dup
+        0 exch translate
+        -1 mul scale
+        } def
+
+% end_image => ---
+
+/end_image
+        {
+        grestore
+        } def
+
+% color linewidth delta_x delta_y origin_x origin_y draw_line => ---
+
+/draw_line
+        {
+        newpath
+        moveto
+        rlineto
+        setlinewidth
+        set_color
+        stroke
+        } def
+
+% PostScript procedure for drawing straight stroked arrows, derived from 
+% filled arrow version in PostScript Cookbook.
+% A nice looking headlength can be computed by replacing "headlength" with
+% "headthickness 3 sqrt mul 2 div"
+%
+% color linewidth headthickness delta_x delta_y origin_x origin_y
+%    arrow => ---
+
+/arrowdict 11 dict def
+/arrow
+   { arrowdict begin
+        /taily exch def
+        /tailx exch def
+        /dy exch def
+        /dx exch def
+        dup
+        /halfheadthickness exch 2 div def
+        /headlength exch 3 sqrt mul 2 div def
+        /lwid exch def
+        /clr exch def
+
+        /arrowlength dx dx mul dy dy mul add sqrt def
+        /angle dy dx atan def
+        /base arrowlength headlength sub def
+
+        gsave
+           lwid setlinewidth
+           clr set_color
+           tailx taily translate
+           angle rotate
+           0 0 moveto
+           arrowlength 0 lineto
+           stroke
+           arrowlength 0 moveto
+           base halfheadthickness lineto
+           arrowlength 0 moveto
+           base halfheadthickness neg lineto
+           [] 0 setdash
+           stroke
+        grestore
+
+     end
+   } def
+
+% delta_x delta_y origin_x origin_y draw_rect => ---
+
+/draw_rect
+        {
+        newpath
+        moveto                  % origin_x origin_y
+        dup                     % save delta_y
+        0 exch rlineto          % 0 delta_y
+        exch 0 rlineto          % delta_x 0
+        0 exch neg rlineto      % 0 -delta_y
+        closepath
+        } def
+
+% color linewidth delta_x delta_y origin_x origin_y draw_open_rect => ---
+
+/draw_open_rect
+        {
+        draw_rect
+        setlinewidth
+        set_color
+        stroke
+        } def
+
+% color delta_x delta_y origin_x origin_y draw_filled_rect => ---
+
+/draw_filled_rect
+        {
+        draw_rect
+        set_color
+        fill
+        } def
+
+% width color string size font origin_x origin_y draw_text => ---
+
+/draw_text
+        {
+        gsave
+        moveto
+        findfont
+        exch
+        scalefont
+        setfont                 % pixel-width color string
+        exch                    % pixel-width string color
+        set_color               % pixel-width string
+        dup stringwidth pop     % pixel-width string ps-width
+        exch 3 1 roll           % string pixel-width ps-width
+        div 1.0 scale           % string
+        show
+        grestore
+        } def
+
+% origin_x origin_y start_group => ---
+
+/start_group
+        {
+        gsave
+        translate
+        } def
+
+% --- end_group => ---
+
+/end_group
+        {
+        grestore
+        } def
+
+%%EndResource
+
+%%EndProlog
+
+%%Page: 1 1
+
+%%BeginPageSetup
+
+%%IncludeResource: font Times-Roman
+%%IncludeResource: font Times-Italic
+
+gsave
+
+%0.777637 0.777637 scale
+0.377 0.377 scale
+130 530 translate
+
+% define the color map
+
+/color_map 48 array def			%declare array
+	 0.000000 0.000000 0.000000
+	 1.000000 0.000000 0.000000
+	 0.000000 1.000000 0.000000
+	 1.000000 1.000000 0.000000
+	 0.000000 0.000000 1.000000
+	 1.000000 0.000000 1.000000
+	 0.000000 1.000000 1.000000
+	 1.000000 1.000000 1.000000
+ 	 0.808    0.851    1.000
+	 1.000    0.934    0.801
+	 0.800    1.000    0.900
+	 0.556863 0.556863 0.219608
+	 0.443137 0.443137 0.776471
+	 0.556863 0.219608 0.556863
+	 0.219608 0.556863 0.556863
+	 0.666667 0.666667 0.666667
+	color_map astore pop		%store elements, pop name
+
+% color_index set_color => ---
+
+/set_color
+	{
+	dup                             % save index
+	3 mul 0 add color_map exch get  % fetch red
+	exch
+	dup                             % save index
+	3 mul 1 add color_map exch get  % fetch green
+	exch
+	3 mul 2 add color_map exch get  % fetch blue
+	setrgbcolor
+	} def
+
+%%EndPageSetup
+
+0 2 1240 800 39 191 draw_open_rect
+
+7   420 340 259 11 draw_filled_rect
+0 2 420 340 259 11 draw_open_rect
+
+8 639 911 40 draw_filled_circle
+0 1 639 911 40 draw_open_circle
+
+8 639 751 40 draw_filled_circle
+0 1 639 751 40 draw_open_circle
+
+8 879 751 40 draw_filled_circle
+0 1 879 751 40 draw_open_circle
+
+8 399 751 40 draw_filled_circle
+0 1 399 751 40 draw_open_circle
+
+8 199 591 40 draw_filled_circle
+0 1 199 591 40 draw_open_circle
+
+8 719 591 40 draw_filled_circle
+0 1 719 591 40 draw_open_circle
+
+8 879 591 40 draw_filled_circle
+0 1 879 591 40 draw_open_circle
+
+8 1039 591 40 draw_filled_circle
+0 1 1039 591 40 draw_open_circle
+
+8 559 591 40 draw_filled_circle
+0 1 559 591 40 draw_open_circle
+
+8 119 431 40 draw_filled_circle
+0 1 119 431 40 draw_open_circle
+
+8 239 431 40 draw_filled_circle
+0 1 239 431 40 draw_open_circle
+
+8 119 271 40 draw_filled_circle
+0 1 119 271 40 draw_open_circle
+
+8 639 431 40 draw_filled_circle
+0 1 639 431 40 draw_open_circle
+
+8 759 431 40 draw_filled_circle
+0 1 759 431 40 draw_open_circle
+
+8 959 431 40 draw_filled_circle
+0 1 959 431 40 draw_open_circle
+
+8 1199 431 40 draw_filled_circle
+0 1 1199 431 40 draw_open_circle
+
+[ 6 2 6 2 ] 0 setdash 
+9 399 591 40 draw_filled_circle
+0 1 399 591 40 draw_open_circle
+[ ] 0 setdash
+
+[ 6 2 6 2 ] 0 setdash 
+9 1079 471 40 draw_filled_circle
+0 1 1079 471 40 draw_open_circle
+[ ] 0 setdash
+
+[ 6 2 6 2 ] 0 setdash 
+9 859 471 40 draw_filled_circle
+0 1 859 471 40 draw_open_circle
+[ ] 0 setdash
+
+10 419 291 40 draw_filled_circle
+0 1 419 291 40 draw_open_circle
+
+10 319 171 40 draw_filled_circle
+0 1 319 171 40 draw_open_circle
+
+10 439 171 40 draw_filled_circle
+0 1 439 171 40 draw_open_circle
+
+10 559 171 40 draw_filled_circle
+0 1 559 171 40 draw_open_circle
+
+10 619 71 40 draw_filled_circle
+0 1 619 71 40 draw_open_circle
+
+10 499 71 40 draw_filled_circle
+0 1 499 71 40 draw_open_circle
+
+32 0 (N1) 30 /Times-Roman 385 742 draw_text
+
+32 0 (N2) 30 /Times-Roman 625 741 draw_text
+
+32 0 (N3) 30 /Times-Roman 864 741 draw_text
+
+32 0 (N4) 30 /Times-Roman 183 581 draw_text
+
+27 0 (L3) 30 /Times-Roman 387 582 draw_text
+
+32 0 (N5) 30 /Times-Roman 543 581 draw_text
+
+32 0 (N9) 30 /Times-Roman 703 582 draw_text
+
+45 0 (N10) 30 /Times-Roman 856 581 draw_text
+
+45 0 (N11) 30 /Times-Roman 1017 582 draw_text
+
+32 0 (N6) 30 /Times-Roman 104 423 draw_text
+
+32 0 (N7) 30 /Times-Roman 224 422 draw_text
+
+45 0 (N12) 30 /Times-Roman 617 422 draw_text
+
+45 0 (N13) 30 /Times-Roman 738 422 draw_text
+
+27 0 (L1) 30 /Times-Roman 848 463 draw_text
+
+45 0 (N14) 30 /Times-Roman 938 421 draw_text
+
+27 0 (L2) 30 /Times-Roman 1066 462 draw_text
+
+45 0 (N15) 30 /Times-Roman 1178 422 draw_text
+
+32 0 (N8) 30 /Times-Roman 103 263 draw_text
+
+27 0 (F1) 30 /Times-Roman 308 162 draw_text
+
+27 0 (F2) 30 /Times-Roman 427 163 draw_text
+
+27 0 (F3) 30 /Times-Roman 547 162 draw_text
+
+27 0 (F4) 30 /Times-Roman 487 60 draw_text
+
+27 0 (F5) 30 /Times-Roman 607 61 draw_text
+
+41 0 (Root) 21 /Times-Roman 617 906 draw_text
+
+41 0 (Root) 21 /Times-Roman 397 286 draw_text
+
+0 2 15 -170 -118 604 891 arrow
+
+0 2 15 0 -78 638 870 arrow
+
+0 2 15 168 -119 674 892 arrow
+
+0 2 15 2 -77 397 710 arrow
+
+0 2 15 -134 -109 366 726 arrow
+
+0 2 15 101 -104 428 721 arrow
+
+0 2 15 -99 -108 850 724 arrow
+
+0 2 15 1 -80 878 711 arrow
+
+0 2 15 101 -103 909 724 arrow
+
+0 2 15 101 -104 1069 565 arrow
+
+0 2 15 43 -87 896 555 arrow
+
+0 2 15 -43 -88 699 556 arrow
+
+0 2 15 24 -81 728 553 arrow
+
+0 2 15 21 -80 208 552 arrow
+
+0 2 15 -42 -90 179 557 arrow
+
+0 2 15 1 -81 118 393 arrow
+
+0 2 15 -48 -59 393 261 arrow
+
+0 2 15 8 -41 423 251 arrow
+
+0 2 15 81 -65 448 263 arrow
+
+0 2 15 -19 -31 539 135 arrow
+
+0 2 15 21 -30 575 133 arrow
+
+0 2 15 -5 -41 871 552 arrow
+
+0 2 15 16 -45 1050 553 arrow
+
+[ 12 4 12 4 ] 0 setdash 
+0 2 15 130 -345 414 554 arrow
+[ ] 0 setdash
+
+[ 12 4 12 4 ] 0 setdash 
+0 2 15 -25 -12 821 458 arrow
+[ ] 0 setdash
+
+[ 12 4 12 4 ] 0 setdash 
+0 2 -49 -6 1041 461 draw_line
+[ ] 0 setdash
+
+[ 12 4 12 4 ] 0 setdash 
+0 2 -32 -3 922 448 draw_line
+[ ] 0 setdash
+
+[ 12 4 12 4 ] 0 setdash 
+0 2 15 -36 -4 837 437 arrow
+[ ] 0 setdash
+
+152 0 (ADF_File_One) 28 /Times-Italic 1079 931 draw_text
+
+152 0 (ADF_File_Two) 28 /Times-Italic 515 311 draw_text
+
+48 0 (Level) 24 /Times-Roman 56 587 draw_text
+
+0 2 15 38 0 110 590 arrow
+
+%%PageTrailer
+
+grestore
+showpage
+
+%%Trailer
+%%EOF

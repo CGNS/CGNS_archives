@@ -1,0 +1,1857 @@
+\section{Boundary Conditions}
+\label{s:BC}
+\thispagestyle{plain}
+
+This section is an attempt to unify boundary-condition specifications
+within Navier-Stokes codes.  The structures and conventions developed
+are a compromise between simplicity and generality.  It is imperative
+that they be easy to use initially, but that they are general enough to
+provide future flexibility and extensibility.
+
+This section may be somewhat daunting initially.  It is suggested that
+the reader refer to the several, well-explained examples presented in
+\autoref{s:BCexample} during study of the following sections to help
+resolve any questions and confusions that might arise.
+
+The difficulty with boundary conditions is that there is such a wide
+variety used, and even a single boundary-condition equation is often
+implemented differently in different codes.  Some boundary conditions,
+such as a symmetry plane, are fairly well defined.  Other boundary
+conditions are much looser in their definition and implementation.
+An inflow boundary is a good example.  It is generally accepted how
+many solution quantities should be specified at an inflow boundary
+(from mathematical well-posedness arguments), but what those quantities
+are will change with the class of flow problems (e.g., internal flows
+vs.~external flows), and they will also change from code to code.
+
+An additional difficulty for CFD analysis is that in some situations
+different boundary-condition equations are applied depending on local
+flow conditions.  Any boundary where the flow can change from inflow
+to outflow or supersonic to subsonic is a candidate for flow-dependent
+boundary-condition equations.
+
+These difficulties have molded the design of our boundary-condition
+specification structures and conventions.  We define boundary-condition
+types (\autoref{s:BCType}) that establish the equations to be enforced.
+However, for those more loosely defined boundary conditions, such as
+inflow/outflow, the boundary-condition type merely establishes general
+guidelines on the equations to be imposed.  Augmenting (and superseding)
+the information provided by the boundary-condition type is precisely
+defined boundary-condition solution data.  We rely on our conventions
+for data-name identifiers to identify the exact quantities involved in
+the boundary conditions; these data-name identifier conventions are
+presented in \hyperref[s:dataname]{Appendix~\ref*{s:dataname}}.
+
+One flexibility that is provided by this approach is that
+boundary-condition information can easily be built during the course
+of an analysis.  For example, during grid-generation phases minimal
+information (e.g., the boundary-condition type) may be given.  Then
+prior to running of the flow solver, more specific boundary-condition
+information, such as Dirichlet or Neumann data, may be added to the
+database.
+
+An additional flexibility provided by the structures of this section
+is that both uniform and non-uniform boundary-condition data can be
+described within the same framework.
+
+We realize that most current codes allow little or no flexibility in
+choosing solution quantities to specify for a given boundary-condition
+type.  We also realize the coding effort involved with checking for
+consistency between I/O specifications and internal boundary-condition
+routines.  To make these boundary-condition structures more
+palatable initially, we adopt the convention that if no solution
+quantities are specified for a given boundary-condition type, then
+the code is free to enforce any appropriate boundary condition (see
+\autoref{s:BC_specdata}).
+
+Note that there are no boundary-condition structures defined for
+abutting or overset interfaces, unless they involve cases of symmetry or
+degeneracy.
+In other words, it is a CGNS design intent that a given zone boundary
+segment or location should at most be defined (or covered) by either a
+boundary condition or a multizone interface connectivity, but not by
+both.
+There is also no separate boundary-condition structure for periodic
+boundary conditions (i.e., when a zone interfaces with itself).
+Both of these situations are addressed by the interface connectivity
+data structures described in \autoref{s:connectivity}.
+
+In the sections to follow, the definitions of boundary-condition
+structures are first presented in \autoref{s:BCstruct} through
+\autoref{s:BCProperty}.  Boundary-condition types are then discussed
+in detail in \autoref{s:BCType}, including a description of the
+boundary-condition equations to be enforced for each type; this section
+also describes the distinction between boundary-condition types that
+impose a set of equations regardless of local flow conditions and those
+that impose different sets of boundary-condition equations depending
+on the local flow solution.  The rules for matching boundary-condition
+types and the appropriate sets of boundary-condition equations are
+next discussed in \autoref{s:BCType_assoc}.  Details of specifying
+data to be imposed in boundary-condition equations are provided in
+\autoref{s:BC_specdata}.  Finally, \autoref{s:BCexample} presents
+several examples of boundary conditions.
+
+\subsection{Boundary Condition Structures Overview}
+\label{s:BCstruct}
+
+Prior to presenting the detailed boundary condition structures, we give
+a brief overview of the hierarchy used to describe boundary conditions.
+
+Boundary conditions are classified as either fixed or flow-dependent.
+Fixed boundary conditions enforce a given set of boundary-condition
+equations regardless of flow conditions; whereas, flow-dependent
+boundary conditions enforce different sets of boundary-condition
+equations depending on local flow conditions.  We incorporate both
+fixed and flow-dependent boundary conditions into a uniform framework.
+This allows all boundary conditions to be described in a similar
+manner.  We consider this functionally superior to separately treating
+fixed and flow-dependent boundary conditions, even though the latter
+allows a simpler description mechanism for fixed boundary conditions.
+The current organization also makes sense considering the fact that
+flow-dependent boundary conditions are composed of multiple sets of
+fixed boundary conditions.
+
+\input{bctree}
+
+\autoref{f:bctree} depicts the hierarchy used for prescribing a single
+boundary condition.
+Each boundary condition includes a type that describes the general
+equations to enforce, a patch specification, and a collection of data
+sets.
+The minimum required information for any boundary condition is the patch
+specification and the boundary-condition type (indicated by ``BC type
+(compound)'' in the figure).
+This minimum information is similar to that used in many existing
+flow solvers.
+
+Generality in prescribing equations to enforce and their associated
+boundary-condition data is provided in the optional data sets.  Each
+data set contains all boundary condition data required for a given
+fixed or simple boundary condition.  Each data set is also tagged
+with a boundary-condition type.  For fixed boundary conditions,
+the hierarchical tree contains a single data set, and the two
+boundary-condition types shown in \autoref{f:bctree} are identical.
+Flow-dependent or compound boundary conditions contain multiple
+data sets, each to be applied separately depending on local flow
+conditions.  The compound boundary-condition type describes the
+general flow-dependent boundary conditions, and each data set contains
+associated simple boundary-condition types.  For example, a farfield
+boundary condition would contain four data sets, where each applies
+to the different combinations of subsonic and supersonic inflow and
+outflow.  Boundary-condition types are described in \autoref{s:BCType}
+and \autoref{s:BCType_assoc}.
+
+Within a single data set, boundary condition data is grouped by
+equation type into Dirichlet and Neumann data.  The lower leaves of
+\autoref{f:bctree} show data for generic flow-solution quantities
+$\alpha$ and $\beta$ to be applied in Dirichlet conditions, and data
+for $\gamma$ and $\delta$ to be applied in Neumann boundary conditions.
+|DataArray_t| entities are employed to store these data and to identify
+the specific flow variables they are associated with.
+
+In situations where the data sets (or any information contained therein)
+are absent from a given boundary-condition hierarchy, flow solvers
+are free to impose any appropriate boundary conditions.  Although
+not pictured in \autoref{f:bctree}, it is also possible to specify
+the reference state from which the flow solver should extract the
+boundary-condition data.
+
+\subsection{Zonal Boundary Condition Structure Definition: \texttt{ZoneBC\_t}}
+\label{s:ZoneBC}
+
+All boundary-condition information pertaining to a given
+zone is contained in the |ZoneBC_t| structure.
+\begin{alltt}
+  ZoneBC\_t< int CellDimension, int IndexDimension, int PhysicalDimension > :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    List( BC\_t<CellDimension, IndexDimension, int PhysicalDimension> 
+          BC1 ... BCN ) ;                                                   (o)
+
+    ReferenceState\_t ReferenceState ;                                       (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t}, \fort{BC\_t}, and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{ZoneBC\_t} and shall not include the names \fort{DataClass},
+ \fort{DimensionalUnits}, or \fort{ReferenceState}.
+\item
+ All lists within a \fort{ZoneBC\_t} structure entity may be empty.
+\end{notes}
+
+\fort{ZoneBC\_t} requires three structure parameters, \fort{CellDimension},
+\fort{IndexDimension} and \fort{PhysicalDimension}, which are passed
+onto all \fort{BC\_t} substructures.
+
+Boundary-condition information for a single patch is contained in the
+\fort{BC\_t} structure.
+All boundary-condition information pertaining to a given zone is
+contained in the list of \fort{BC\_t} structure entities.
+If a zone contains $N$ boundary-condition patches, then $N$ (and
+only $N$) separate instances of \fort{BC\_t} must be provided in the
+\fort{ZoneBC\_t} entity for the zone.
+That is, each boundary-condition patch must be represented by a single
+\fort{BC\_t} entity.
+
+Reference data applicable to all boundary conditions of a zone is
+contained in the |ReferenceState| structure.  |DataClass| defines the
+zonal default for the class of data contained in the boundary conditions
+of a zone.  If the boundary conditions contain dimensional data,
+|DimensionalUnits| may be used to describe the system of dimensional
+units employed.  If present, these three entities take precedence of
+all corresponding entities at higher levels of the hierarchy.  These
+precedence rules are further discussed in \autoref{s:precedence}.
+
+Reference-state data is useful for situations where boundary-condition
+data is not provided, and flow solvers are free to enforce any
+appropriate boundary condition equations.  The presense of
+|ReferenceState| at this level or below specifies the appropriate
+flow conditions from which the flow solver should extract its
+boundary-condition data.
+For example, when computing an external flowfield around an airplane, an
+engine nozzle exit is often simulated by imposing a stagnation pressure
+boundary condition (or some other stagnation quantity) different from
+freestream.
+The nozzle-exit
+stagnation quantities could be specified in an instance of
+|ReferenceState| at this level or below in lieu of providing explicit
+Dirichlet or Neumann data (see \autoref{s:BC_specdata}).
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Boundary Condition Structure Definition: \texttt{BC\_t}}
+\label{s:BCdefn}
+
+|BC_t| contains boundary-condition information for a single BC surface
+patch of a zone.
+A BC patch is the subrange of the face of a zone where a given boundary
+condition is applied.
+
+The structure contains a boundary-condition type, as well as one or
+more sets of boundary-condition data that are used to define the
+boundary-condition equations to be enforced on the BC patch.  For most
+boundary conditions, a single data set is all that is needed.  The
+structure also contains information describing the normal vector to the
+BC surface patch.
+
+\begin{alltt}
+  BC\_t< int CellDimension, int IndexDimension, int PhysicalDimension > :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    BCType\_t BCType ;                                                       (r)
+
+    GridLocation\_t GridLocation ;                                           (o/d)
+
+    IndexRange\_t<IndexDimension> PointRange ;                               (r:o)
+    IndexArray\_t<IndexDimension, ListLength[], int> PointList ;             (o:r)
+
+    int[IndexDimension] InwardNormalIndex ;                                 (o)
+
+    IndexArray\_t<PhysicalDimension, ListLength[], real> InwardNormalList ;  (o)
+
+    List( BCDataSet\_t<CellDimension, IndexDimension, ListLength[],
+          GridLocation> BCDataSet1 ... BCDataSetN ) ;                       (o)
+
+    BCProperty\_t BCProperty ;                                               (o)
+
+    FamilyName\_t FamilyName ;                                               (o)
+
+    List( AdditionalFamilyName\_t AddFamilyName1 ... AddFamilyNameN ) ;      (o)
+
+    ReferenceState\_t ReferenceState ;                                       (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+
+    int Ordinal ;                                                           (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t}, \fort{BCDataSet\_t}, and
+      \fort{UserDefinedData\_t}
+      lists are as shown; users may choose other legitimate names.
+      Legitimate names must be unique within a given instance
+      of \fort{BC\_t} and shall not include the names
+      \fort{BCProperty}, \fort{BCType}, \fort{DataClass},
+      \fort{DimensionalUnits}, 
+      \fort{FamilyName}, \fort{GridLocation}, \fort{InwardNormalIndex},
+      \fort{InwardNormalList}, \fort{Ordinal}, \fort{PointList},
+      \fort{PointRange} or \fort{ReferenceState}.
+\item \fort{GridLocation} is optional; if absent its default value is \fort{Vertex}.
+      For other allowble values, see the table below. 
+\item One of \fort{PointRange} or \fort{PointList} must be specified but not
+     both. They must define a face subrange of the zone.
+\item \fort{InwardNormalIndex} is only an option for structured grids.
+      For unstructured grid boundaries, it should not be used.
+      \fort{InwardNormalIndex} may have only one nonzero element, whose sign
+      indicates the computational-coordinate direction of the BC patch normal;
+      this normal points into the interior of the zone.
+\item \fort{InwardNormalList} contains a list of vectors normal to the BC patch
+      pointing into the interior of the zone.
+      It is a function of \fort{PhysicalDimension} and \fort{ListLength[]}.
+      The vectors are located at the vertices of the BC patch when
+      \fort{GridLocation} is set to \fort{Vertex}. Otherwise, they are
+      located at edge/face midpoints.
+      The vectors are not required to have unit magnitude.
+\item If \fort{PointRange} and \fort{InwardNormalList} are specified,
+      an ordering convention is needed for indices on the BC patch.
+      An ordering convention is also needed if a range is specified and
+      local data is present in the |BCDataSet_t| substructures.
+      FORTRAN multidimensional array ordering is used.
+\end{notes}
+
+|BCType| specifies the boundary-condition type, which gives general
+information on the boundary-condition equations to be enforced.
+
+The BC patch may be specified by \fort{PointRange}
+if it constitutes a logically rectangular region.
+In all other cases, \fort{PointList} should be
+used to list the vertices or cell edges/faces making up the BC patch.  When
+\fort{GridLocation} is set to \fort{Vertex}, then \fort{PointList} or
+\fort{PointRange} refer to vertex indices, for both structured and unstructured
+grids.  When \fort{GridLocation} is set to \fort{EdgeCenter}, then \fort{PointRange/List}
+refer to edge elements.  For 3--D grids, when \fort{GridLocation} is set to
+\fort{FaceCenter}, \fort{IFaceCenter}, etc., then \fort{PointRange/List} refer
+to face elements.  The interpretation of \fort{PointRange/List} is summarized
+in the table below:
+
+\begin{center}
+\begin{tabular}{||c|c|c|c|c||}
+ \hline
+\texttt{CellDimension} & \multicolumn{4}{c||}{\texttt{GridLocation}} \\
+& \texttt{Vertex} & \texttt{EdgeCenter} & \texttt{*FaceCenter} & \texttt{CellCenter} \\
+ \hline
+1 & vertices & $-$ & $-$     & cells (line elements) \\
+2 & vertices & edges & $-$   & cells (area elements) \\
+3 & vertices & edges & faces & cells (volume elements) \\
+ \hline
+\end{tabular}
+\end{center}
+
+Note: In the table, \fort{*FaceCenter} stands for the possible types: \fort{FaceCenter},
+\fort{IFaceCenter}, \fort{JFaceCenter} or \fort{KFaceCenter}.
+
+For structured grids, face centers are indexed using the minimum of the
+connecting vertex indices, as described in \autoref{s:structgrid}.  For
+unstructured grids, edge and face elements are indexed using their element
+numbering as defined in the \fort{Elements\_t} data structures.
+
+The BC patch defined by \fort{PointRange/List} is a surface region over which
+the particular set of boundary conditions is applied.  However, in the current
+standard there is no mechanism to specify whether boundary conditions are
+enforced in the weak or strong form.  If boundary conditions are imposed using
+collocation (i.e., strong form), there is also no requirement that they be
+imposed at the same locations used to define the BC patch (via
+\fort{PointRange/List}).  In the case when BC patches are defined in terms of
+vertices (or edges in 3--D), then the bounding vertices will be located on
+multiple BC patches.  If boundary conditions are imposed using collocation at
+vertices, then for this case there is no mechanism to determine which BC patch
+takes precedence for any of these bounding vertices.
+
+Some boundary conditions require a normal direction to be specified in
+order to be properly imposed.
+For structured zones a computational-coordinate normal can be derived
+from the BC patch specification by examining redundant index components.
+Alternatively, for structured zones this information can be provided
+directly by |InwardNormalIndex|.
+From Note 4, this vector points into the zone and can have only one
+non-zero element.
+For  exterior faces of a zone in 3-D, |InwardNormalIndex| should take the
+following values:
+\begin{center}
+\begin{tabular}{c c @{\quad\quad\quad\quad}c c}
+\hline\hline \\*[-2ex]
+\bold{Face} & \fort{InwardNormalIndex} & \bold{Face} & \fort{InwardNormalIndex}
+\\*[1ex] \hline\hline \\*[-2ex]
+$i$-min & $[+1,0,0]$ & $i$-max & $[-1,0,0]$ \\
+$j$-min & $[0,+1,0]$ & $j$-max & $[0,-1,0]$ \\
+$k$-min & $[0,0,+1]$ & $k$-max & $[0,0,-1]$
+\\*[1ex] \hline\hline
+\end{tabular}
+\end{center}
+
+The physical-space normal vectors of the BC patch may be described by
+\fort{InwardNormalList}; these are located at vertices or cell faces,
+consistent with the BC patch specification.
+\fort{InwardNormalList} is listed as an optional field because it is not
+always needed to enforce boundary conditions, and the physical-space
+normals of a BC patch can usually be constructed from the grid.
+However, there are some situations, such as grid-coordinate singularity
+lines, where \fort{InwardNormalList} becomes a required field, because
+it cannot be generated from other information.
+
+The |BC_t| structure provides for a list of boundary-condition
+data sets, described in the next section.  In general, the proper
+|BCDataSet_t| instance to impose on the BC patch is determined
+by the |BCType| association table (\autoref{t:BCType_assoc} on
+p.~\pageref*{t:BCType_assoc}).  The mechanics of determining the proper
+data set to impose is described in \autoref{s:BCType_assoc}.
+
+For a few boundary conditions, such as a symmetry plane or polar
+singularity, the value of |BCType| completely describes the equations to
+impose, and no instances of |BCDataSet_t| are needed.
+For ``simple'' boundary conditions, where a single set of Dirichlet and/or
+Neumann data is applied, a single |BCDataSet_t| will likely appear
+(although this is not a requirement).
+For ``compound'' boundary conditions, where the equations to impose are
+dependent on local flow conditions, several instances of |BCDataSet_t|
+will likely appear; the procedure for choosing the proper data set is
+more complex as described in \autoref{s:BCType_assoc}.
+
+A \fort{BCProperty\_t} data structure, described in
+\autoref{s:BCProperty}, may be used to record special properties
+associated with particular boundary condition patches, such as wall
+functions or bleed regions.
+
+\fort{FamilyName} identifies the family to which the boundary belongs.
+Family names link the mesh boundaries to the CAD surfaces.
+(See \autoref{s:Family}.)
+Boundary conditions may also be defined directly on families.
+In this case, the \fort{BCType} must be \fort{FamilySpecified}.
+If, under a \fort{BC\_t} structure, both \fort{FamilyName\_t} and
+\fort{BCType\_t} are present, and the \fort{BCType} is \emph{not}
+\fort{FamilySpecified}, then the \fort{BCType} which \emph{is} specified
+takes precedence over any \fort{BCType} which might be stored in a
+\fort{FamilyBC\_t} structure under the specified \fort{Family\_t}.
+
+Reference data applicable to the boundary conditions of a BC patch is
+contained in the \fort{ReferenceState} structure.
+|DataClass| defines the default for the class of data contained in the
+boundary conditions.
+If the boundary conditions contain dimensional data, |DimensionalUnits|
+may be used to describe the system of dimensional units employed.
+If present, these three entities take precedence of all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+|Ordinal| is user-defined and has no restrictions on the values that
+it can contain.
+It is included for backward compatibility to assist implementation of
+the CGNS system into applications whose I/O depends heavily on the
+numbering of BC patches.
+Since there are no restrictions on the values contained in |Ordinal|
+(or that |Ordinal| is even provided), there is no guarantee that the
+BC patches for a given zone in an existing CGNS database will have
+sequential values from 1 to $N$ without holes or repetitions.
+Use of |Ordinal| is discouraged and is on a user-beware basis.
+
+\subsubsection*{FUNCTION \texttt{ListLength[]}:}
+
+\noindent return value: |int| \\
+\noindent dependencies: |PointRange|, |PointList|
+
+\fort{BC\_t} requires the structure function \fort{ListLength}, which
+is used to specify the number of vertices or edge/face elements
+making up the BC patch.  If
+\fort{PointRange} is specified, then \fort{ListLength} is obtained
+from the number of points (inclusive) between the beginning and ending
+indices of \fort{PointRange}.
+If \fort{PointList} is specified, then \fort{ListLength} is the number
+of indices in the list of points.
+In this situation, \fort{ListLength} becomes a user input along with the
+indices of the list \fort{PointList}.
+By ``user'' we mean the application code that is generating the CGNS
+database.
+If \fort{ElementRange} or \fort{ElementList} is specified, then
+\fort{ListLength} is defined by the cell faces making up the BC patch.
+
+\fort{ListLength} is also the number of elements in the list
+\fort{InwardNormalList}.
+Note that syntactically \texttt{PointList} and
+\fort{InwardNormalList} must have the same number of elements.
+
+If neither \texttt{PointRange} or \texttt{PointList} is specified in a
+particular \texttt{BCDataSet\_t} substructure, \texttt{List\-Length} must
+be passed into it to determine the length of BC data arrays.
+
+\subsection{Boundary Condition Data Set Structure Definition: \texttt{BCDataSet\_t}}
+\label{s:BCDataSet}
+
+|BCDataSet_t| contains Dirichlet and Neumann data for a single set of
+boundary-condition equations.
+Its intended use is for simple boundary-condition types, where the
+equations imposed do not depend on local flow conditions.
+
+\begin{alltt}
+  BCDataSet\_t< int CellDimension, int IndexDimension, int ListLengthParameter,
+                GridLocation\_t GridLocationParameter > :=
+    \{
+    List( Descriptor\_t Descriptor1 ... DescriptorN ) ;                      (o)
+
+    BCTypeSimple\_t BCTypeSimple ;                                           (r)
+
+    BCData\_t<ListLengthBCData[]> DirichletData ;                            (o)
+    BCData\_t<ListLengthBCData[]> NeumannData ;                              (o)
+
+    GridLocation\_t GridLocation ;                                           (o/d)
+
+    IndexRange\_t<IndexDimension> PointRange ;                               (o)
+    IndexArray\_t<IndexDimension, ListLength, int> PointList ;               (o)
+
+    ReferenceState\_t ReferenceState ;                                       (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item Default names for the \fort{Descriptor\_t} and
+      \fort{UserDefinedData\_t} lists are as shown; users may choose other
+      legitimate names.
+      Legitimate names must be unique within a given instance
+      of \fort{BCDataSet\_t} and shall not include the names
+      \fort{BCTypeSimple},
+      \fort{DataClass}, \fort{DimensionalUnits}, \fort{DirichletData},
+      \fort{GridLocation}, \fort{NeumannData}, \fort{PointList},
+      \fort{PointRange}, or \fort{ReferenceState}.
+\item \fort{BCTypeSimple} is the only required field.
+      All other fields are optional and the \fort{Descriptor\_t} list
+      may be empty.
+\item \fort{GridLocation} is optional; if absent its default value is
+      \fort{GridLocationParameter}.  For 2--D grids (\fort{CellDimension} = 2),
+      \fort{GridLocation} may take the values of \fort{Vertex} or \fort{EdgeCenter}.
+      For 3--D grids (\fort{CellDimension} = 3), \fort{GridLocation} may take the
+      values of \fort{Vertex}, \fort{EdgeCenter}, \fort{FaceCenter}, \fort{IFaceCenter},
+      \fort{JFaceCenter} or \fort{KFaceCenter}.
+\item \fort{PointRange} and \fort{PointList} are both optional;
+      only one of them may be specified.  They must define a face subrange of the zone.
+\end{notes}
+
+\fort{BCDataSet\_t} requires the structure parameters \fort{CellDimension},
+\fort{IndexDimension}, \fort{ListLengthParameter} and
+\fort{GridLocationParameter}.  These are all used to control the grid location
+and length of data arrays in the \fort{Dirichlet} and \fort{Neumann}
+substructures.  They are inputs for the structure functions \fort{ListLength[]}
+and \fort{ListLengthBCData[]} defined below.
+
+|BCTypeSimple| specifies the boundary-condition type, which gives general
+information on the bound\-ary-con\-di\-tion equations to be enforced.
+|BCTypeSimple_t| is defined in \autoref{s:BCType} along with the meanings
+of all the |BCTypeSimple| values.  
+|BCTypeSimple| is also used for matching boundary condition data sets as 
+discussed in \autoref{s:BCType_assoc}.
+
+Boundary-condition data is separated by equation type into Dirichlet
+and Neumann conditions.  Dirichlet boundary conditions impose the
+value of the given variables, whereas Neumann boundary conditions
+impose the normal derivative of the given variables.  The mechanics of
+specifying Dirichlet and Neumann data for boundary conditions is covered
+in \autoref{s:BC_specdata}.
+
+The substructures \fort{DirichletData} and \fort{NeumannData} contain
+boundary-condition data which may be constant over the BC patch or
+defined locally at each vertex or edge/face of the patch.
+Locally defined data can be specified in one of two ways.
+If \fort{GridLocation}, \fort{PointRange} and \fort{PointList} are all absent,
+then the data is defined consistent with the BC patch specification of the
+parent \fort{BC\_t} structure.  In this case, the location of the locally defined
+data is given by \fort{GridLocationParameter} and the length of the data arrays
+are given by \fort{ListLengthParameter}.  If \fort{GridLocation} and one of
+\fort{PointRange} or \fort{PointList} is present, then the same rules provided
+in Section~\autoref{s:BCdefn} apply.  In this case, the length of the data arrays
+is given by \fort{ListLength[]}.
+
+Reference quantities applicable to the set of boundary-condition data are
+contained in the \fort{ReferenceState} structure.
+|DataClass| defines the default for the class of data contained in the
+boundary-condition data.
+If the boundary conditions contain dimensional data, |DimensionalUnits|
+may be used to describe the system of dimensional units employed.
+If present, these three entities take precedence of all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsubsection*{FUNCTION \texttt{ListLength[]}:}
+
+\noindent return value: |int| \\
+\noindent dependencies: |PointRange|, |PointList|
+
+\fort{BCDataSet\_t} requires the structure function \fort{ListLength}, which is
+used to specify the length of locally defined Dirichlet and Neumann data arrays
+when the grid location of these quatities differs from that of the BC patch
+definition. The definition of \fort{ListLength} is identical to that provided in
+\fort{BC\_t} (\autoref{s:BCdefn}).
+
+\subsubsection*{FUNCTION \texttt{ListLengthBCData[]}:}
+
+\noindent return value: |int| \\
+\noindent dependencies: |ListLengthParameter|, |PointRange|, |PointList|
+
+\fort{BCDataSet\_t} also requires the structure function
+\fort{ListLengthBCData}. If \fort{PointRange} or \fort{PointList} is present,
+then \fort{ListLengthBCData} takes the value of \fort{ListLength}.  If both are
+absent, then it takes the value \fort{ListLengthParameter}.
+
+\subsection{Boundary Condition Data Structure Definition: \texttt{BCData\_t}}
+\label{s:BCData}
+
+|BCData_t| contains a list of variables and associated data for
+boundary-condition specification.
+Each variable may be given as global data (i.e., a scalar) or local data
+defined at each grid point or cell face of the BC patch.
+By convention all data specified in a given instance of |BCData_t| is to
+be used in the same \emph{type} of boundary-condition equation.
+For example, the use of separate |BCData_t| substructures for Dirichlet
+and Neumann equations in the |BCDataSet_t| structure of the previous
+section.
+
+\begin{alltt}
+  BCData\_t< int ListLength > :=
+    \{
+    List( Descriptor\_t  Descriptor1 ... DescriptorN ) ;                     (o)
+
+    List( DataArray\_t<DataType, 1, 1>     
+          DataGlobal1 ... DataGlobalN ) ;                                   (o)
+
+    List( DataArray\_t<DataType, 1, ListLength>       
+          DataLocal1 ... DataLocalN ) ;                                     (o)
+
+    DataClass\_t DataClass ;                                                 (o)
+                
+    DimensionalUnits\_t DimensionalUnits ;                                   (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{BCData\_t} and shall not include the names \fort{DataClass} or
+ \fort{DimensionalUnits}.
+\item
+ There are no required elements; all three lists may be empty.
+\end{notes}
+
+This structure definition shows separate lists for global verses local
+data.  The global data is essentially scalars, while the local data
+variables have size determined by the structure parameter |ListLength|.
+For |DataArray_t| entities with standardized data-name identifiers
+listed in \hyperref[s:dataname]{Appendix~\ref*{s:dataname}}, |DataType|
+is determined by convention.
+For user-defined variables, |DataType| is a user input.
+
+Two important points need to be mentioned regarding this structure
+definition.  First, this definition allows a given instance of
+|BCData_t| to have a mixture of global and local data.  For example, if
+a user specifies Dirichlet data that has a uniform stagnation pressure
+but has a non-uniform velocity profile, this structure allows the user
+to describe the stagnation pressure by a scalar in the |DataGlobal| list
+and the velocity by an array in the |DataLocal| list.  Second, the only
+distinction between the lists (aside from default names, which will be
+seldom used) is the parameters passed into the |DataArray_t| structure.
+Therefore, in actual implementation of this |BCData_t| structure it
+may not be possible to distinguish between members of the global and
+local lists without querying inside the |DataArray_t| substructures.
+Straightforward mapping onto the ADF or HDF database will not provide any
+distinctions between the members of the two lists.  This hopefully will
+not cause any problems.
+
+|DataClass| defines the default for the class of data contained in the
+boundary-condition data.
+If the boundary-condition data is dimensional, |DimensionalUnits| may be
+used to describe the system of dimensional units employed.
+If present, these two entities take precedence of all corresponding
+entities at higher levels of the hierarchy.
+These precedence rules are further discussed in \autoref{s:precedence}.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsection{Boundary Condition Property Structure Definition: \texttt{BCProperty\_t}}
+\label{s:BCProperty}
+
+\fort{BCProperty\_t} allows the recording of special properties associated
+with particular boundary condition patches.
+At the current time, only two properties (\fort{WallFunction\_t}
+and \fort{Area\_t}) are included, but extensions involving
+boundary conditions may be implemented as additional nodes under
+\fort{BCProperty\_t} in the future.
+
+\begin{alltt}
+  BCProperty\_t :=
+    \{
+    List( Descriptor\_t  Descriptor1 ... DescriptorN ) ;                     (o)
+
+    WallFunction\_t WallFunction ;                                           (o)
+
+    Area\_t Area ;                                                           (o)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t}, \fort{DataArray\_t}, and
+ \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{BCProperty\_t} and shall not include the names \fort{WallFunction} or
+ \fort{Area}.
+\end{notes}
+
+The \fort{WallFunction\_t} and \fort{Area\_t} data structures may be
+used to record properties associated with the use of wall functions, or
+area-related boundary conditions such as bleed, respectively.
+
+The \fort{UserDefinedData\_t} data structure allows arbitrary
+user-defined data to be stored in \fort{Descriptor\_t} and
+\fort{DataArray\_t} children without the restrictions or implicit
+meanings imposed on these node types at other node locations.
+
+\subsubsection{Wall Function Structure Definition: \texttt{WallFunction\_t}}
+\label{s:WallFunction}
+
+The \fort{WallFunction\_t} data structure allows data associated with
+the use of wall function boundary conditions to be recorded.
+
+\begin{alltt}
+  WallFunction\_t :=
+    \{
+    List( Descriptor\_t  Descriptor1 ... DescriptorN ) ;                     (o)
+
+    WallFunctionType\_t WallFunctionType ;                                   (r)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t} and \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{WallFunction\_t} and shall not include the name
+ \fort{WallFunctionType}.
+\end{notes}
+
+\fort{WallFunctionType\_t} is a required enumeration data structure
+that is used to define the type of wall functions being used.
+\begin{alltt}
+  WallFunctionType\_t := Enumeration(
+    WallFunctionTypeNull,
+    WallFunctionTypeUserDefined,
+    Generic ) ;
+\end{alltt}
+Because there is such a wide array of methods for employing wall
+functions (few of which are well-documented), the type \fort{Generic}
+is used to simply indicate that a wall function is employed, without
+specifying details.
+
+\subsubsection{Area Structure Definition: \texttt{Area\_t}}
+\label{s:Area}
+
+The \fort{Area\_t} data structure allows data associated with
+area-related boundary conditions such as bleed to be recorded.
+
+\begin{alltt}
+  Area\_t :=
+    \{
+    List( Descriptor\_t  Descriptor1 ... DescriptorN ) ;                     (o)
+
+    AreaType\_t AreaType ;                                                   (r)
+    DataArray\_t<real, 1, 1>  SurfaceArea ;                                  (r)
+    DataArray\_t<real, 1, 32> RegionName ;                                   (r)
+
+    List( UserDefinedData\_t UserDefinedData1 ... UserDefinedDataN ) ;       (o)
+    \} ;
+\end{alltt}
+
+\begin{notes}
+\item
+ Default names for the \fort{Descriptor\_t} and \fort{UserDefinedData\_t}
+ lists are as shown; users may choose other legitimate names.
+ Legitimate names must be unique within a given instance of
+ \fort{Area\_t} and shall not include the names \fort{AreaType},
+ \fort{RegionName}, or \fort{SurfaceArea}.
+\end{notes}
+
+\fort{AreaType\_t} is a required enumeration data structure
+that is used to define the type of area being defined.
+\begin{alltt}
+  AreaType\_t := Enumeration(
+    AreaTypeNull,
+    AreaTypeUserDefined,
+    BleedArea,
+    CaptureArea ) ;
+\end{alltt}
+
+If \fort{AreaType} is set to \fort{BleedArea}, the value of
+\fort{SurfaceArea} is the size of the current bleed surface.
+Note that bleed is commonly used with wall boundary conditions.
+The bleed area is the surface area of the boundary condition patch.
+
+If \fort{AreaType} is set to \fort{CaptureArea}, then
+\fort{SurfaceArea} represents the size of the current capture surface.
+For inlet flows, for example, the capture area is the area of a
+fictitious surface in front of the inlet in which mass is pulled into
+the inlet.
+This is used to calculate the mass flow for the boundary condition patch
+based on the formula:
+$$
+{\it mass\:flow} = {\it MFR} \, \rho_{\infty} U_{\infty} A_{\it cap}
+$$
+where \textit{MFR} is the desired mass flow ratio and
+$A_{\it cap}$ is the capture area.
+Another interpretation is the far-upstream cross-sectional area of the
+stream tube which feeds the inlet.
+Note that the capture area is usually defined with an outflow boundary
+condition, which is commonly used at an engine face.
+
+The \fort{RegionName} is character identifier, and is needed so that a
+specific region can span multiple surfaces over multiple zones.
+
+\subsection{Boundary Condition Type Structure Definition: \texttt{BCType\_t}} 
+\label{s:BCType}
+
+\texttt{BCType\_t} is an enumeration type that identifies the boundary-condition
+equations to be enforced at a given boundary location.
+\begin{alltt}
+  BCType\_t := Enumeration(
+    BCTypeNull, BCTypeUserDefined, BCAxisymmetricWedge, BCDegenerateLine.
+    BCDegeneratePoint, BCDirichlet, BCExtrapolate, BCFarfield, BCGeneral,
+    BCInflow, BCInflowSubsonic, BCInflowSupersonic, BCNeumann,
+    BCOutflow, BCOutflowSubsonic, BCOutflowSupersonic, BCSymmetryPlane,
+    BCSymmetryPolar, BCTunnelInflow, BCTunnelOutflow, BCWall,
+    BCWallInviscid, BCWallViscous, BCWallViscousHeatFlux,
+    BCWallViscousIsothermal, FamilySpecified ) ;
+\end{alltt}
+The boundary-condition type is further defined as simple,
+\texttt{BCTypeSimple\_t}, or compound, \texttt{BCTypeCompound\_t},
+which are subsets of the enumeration type \texttt{BCType\_t}.
+\begin{alltt}
+  BCTypeSimple\_t := Enumeration(
+    BCTypeNull, BCTypeUserDefined, BCAxisymmetricWedge, BCDegenerateLine.
+    BCDegeneratePoint, BCDirichlet, BCExtrapolate, BCGeneral,
+    BCInflowSubsonic, BCInflowSupersonic, BCNeumann,
+    BCOutflowSubsonic, BCOutflowSupersonic, BCSymmetryPlane,
+    BCSymmetryPolar, BCTunnelInflow, BCTunnelOutflow, BCWall,
+    BCWallInviscid, BCWallViscous, BCWallViscousHeatFlux,
+    BCWallViscousIsothermal, FamilySpecified ) ;
+\end{alltt}
+
+\begin{alltt}
+  BCTypeCompound\_t := Enumeration(
+    BCTypeNull, BCTypeUserDefined, BCInflow, BCOutflow,
+    BCFarfield ) ;
+\end{alltt}
+
+The members of \texttt{BCTypeSimple\_t} completely identify the equations to
+impose, while those of \texttt{BCTypeCompound\_t} give a general description of the class of
+boundary-condition equations to impose.
+The specific boundary-condition equations to enforce for each value
+of \texttt{BCType\_t} are listed in \autoref{t:BCTypeSimple} and
+\autoref{t:BCTypeCompound}.
+
+The subdivision of \texttt{BCType\_t} is based on function.  For simple
+boundary conditions, the equations and data imposed are fixed; whereas,
+for compound boundary conditions different sets of equations are
+imposed depending on local flow conditions at the boundary.  This
+distinction requires additional rules for dealing with simple and
+compound boundary-condition types.  These rules are discussed in
+\autoref{s:BCType_assoc}.
+
+For the inflow/outflow boundary-condition descriptions, 3-D inviscid
+compressible flow is assumed; the 2-D equivalent should be obvious.
+These same boundary conditions are typically used for viscous cases
+also.  This ``3-D Euler'' assumption will be noted wherever used.
+
+In the following tables, $Q$ is the solution vector, $\v{q}$ is the
+velocity vector whose magnitude is $q$, the unit normal to the boundary
+is $\h{n}$, and $\pd{()}{n} = \h{n}\dot\nabla$ is differentiation normal
+to the boundary.
+
+\newenvironment{mylist}
+{\begin{list}{$\bullet$}{%
+\topsep    0pt%
+\parsep    0pt%
+\partopsep 0pt%
+\itemsep   0pt}}
+{\end{list}}
+
+\settowidth{\tmplengtha}{\fort{BCTypeSimple\_t }\bold{Identifier}\quad}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\setlength{\Pwidth}{\linewidth-4\tabcolsep-\tmplengtha}
+\begin{longtable}{>{\ttfamily}p{\tmplengtha} >{\raggedright\arraybackslash}p{\Pwidth}}
+\caption[Simple Boundary Condition Types]{\textbf{Simple Boundary Condition Types}}
+\label{t:BCTypeSimple}
+\\ \hline\hline \\*[-2ex]
+BCType\_t \bold{or} \\
+BCTypeSimple\_t \bold{Identifier} & \spantwo{\bold{Boundary Condition Description}}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endfirsthead
+
+\multicolumn{2}{l}{{\bfseries \autoref{t:BCTypeSimple}: Simple Boundary Condition Types} (\emph{Continued})}
+\\*[1ex] \hline\hline \\*[-2ex]
+BCType\_t \bold{or} \\
+BCTypeSimple\_t \bold{Identifier} & \spantwo{\bold{Boundary Condition Description}}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endhead
+
+\\*[-2ex]\hline
+\multicolumn{2}{r}{\emph{Continued on next page}} \\
+\endfoot
+\\*[-2ex] \hline\hline
+\endlastfoot
+
+BCGeneral               & Arbitrary conditions on $Q$ or $\pd{Q}{n}$ \\[0.5\baselineskip]
+
+BCDirichlet             & Dirichlet condition on $Q$ vector \\[0.5\baselineskip]
+
+BCNeumann               & Neumann condition on $\pd{Q}{n}$ \\[0.5\baselineskip]
+
+BCExtrapolate           & Extrapolate $Q$ from interior \\[0.5\baselineskip]
+
+BCWallInviscid          & Inviscid (slip) wall
+                          \begin{mylist}
+                          \item normal velocity specified (default:
+                                $\v{q}\cdot\hat{n} = 0$)
+                          \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCWallViscousHeatFlux   & Viscous no-slip wall with heat flux
+                          \begin{mylist}
+                          \item velocity Dirichlet (default: $q = 0$)
+                          \item temperature Neumann (default: adiabatic,
+                                $\pd{T}{n} = 0$)
+                          \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCWallViscousIsothermal & Viscous no-slip, isothermal wall
+                          \begin{mylist}
+                          \item velocity Dirichlet (default: $q = 0$)
+                          \item temperature Dirichlet
+                          \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCWallViscous           & Viscous no-slip wall; special cases are
+                          |BCWallViscousHeatFlux| and
+                          |BCWallViscousIsothermal|
+                          \begin{mylist}
+                          \item velocity Dirichlet (default: $q = 0$)
+                          \item Dirichlet or Neumann on temperature
+                          \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCWall                  & General wall condition; special cases are
+                          |BCWallInviscid|, |BCWallViscous|,
+                          |BCWallViscousHeatFlux| and
+                          |BCWallViscousIsothermal| \\[0.5\baselineskip]
+
+BCInflowSubsonic        & Inflow with subsonic normal velocity
+                          \begin{mylist}
+                          \item specify 4; extrapolate 1 (3-D Euler)
+                          \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCInflowSupersonic      & Inflow with supersonic normal velocity
+                          \begin{mylist}
+                          \item specify 5; extrapolate 0 (3-D Euler)
+                          \end{mylist}
+                          Same as |BCDirichlet| \\[0.5\baselineskip]
+
+BCOutflowSubsonic       & Outflow with subsonic normal velocity
+                          \begin{mylist}
+                          \item specify 1; extrapolate 4 (3-D Euler)
+                          \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCOutflowSupersonic     & Outflow with supersonic normal velocity
+                          \begin{mylist}
+                          \item specify 0; extrapolate 5 (3-D Euler)
+                          \end{mylist}
+                          Same as |BCExtrapolate| \\[0.5\baselineskip]
+
+BCTunnelInflow          & Tunnel inlet (subsonic normal velocity)
+                          \begin{mylist}
+                          \item specify cross-flow velocity, stagnation
+                                enthalpy, entropy 
+                          \item extrapolate 1 (3-D Euler)
+                          \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCTunnelOutflow         & Tunnel exit (subsonic normal velocity)
+                          \begin{mylist}
+                          \item specify static pressure
+                          \item extrapolate 4 (3-D Euler)
+                          \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCDegenerateLine        & Face degenerated to a line \newline
+                          \begin{picture}(1.3,0.8)(-2.2,0.0)
+                             \drawline(0.0,0.0)(1.0,0.2)(1.0,0.5)(0.0,0.3)(0.0,0.0)
+                             \drawline(0.0,0.0)(-0.2,0.8)(0.2,0.9)(1.0,0.5)
+                             \drawline(0.0,0.3)(-0.2,0.8)
+                             \dashline{0.05}(1.0,0.2)(0.2,0.9)
+                          \end{picture} \\
+
+BCDegeneratePoint       & Face degenerated to a point \newline
+                          \begin{picture}(1.3,0.8)(-2.2,0.0)
+                             \drawline(0.0,0.0)(1.0,0.2)(1.0,0.5)(0.0,0.3)(0.0,0.0)
+                             \drawline(0.0,0.0)(-0.2,0.8)(1.0,0.5)
+                             \drawline(0.0,0.3)(-0.2,0.8)
+                             \dashline{0.05}(1.0,0.2)(-0.2,0.8)
+                          \end{picture} \\
+
+BCSymmetryPlane         & Symmetry plane; face should be coplanar
+                          \begin{mylist}
+                          \item density, pressure: $\pd{()}{n} = 0$
+                          \item tangential velocity:
+                                $\pd{(\v{q}\!\times\!\hat{n})}{n} = 0$
+                          \item normal velocity: $\v{q}\cdot\hat{n} = 0$
+                          \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCSymmetryPolar         & Polar-coordinate singularity line; special
+                          case of |BCDegenerateLine| where degenerate
+                          face is a straight line and flowfield has
+                          polar symmetry; $\hat{s}$ is singularity line
+                          tangential unit vector
+                          \begin{mylist}
+                          \item normal velocity: $\v{q}\!\times\!\hat{s} = 0$
+                          \item all others: $\pd{()}{n} = 0$, \ $n$ normal
+                                to $\hat{s}$
+                          \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCAxisymmetricWedge     & Axisymmetric wedge; special
+                          case of |BCDegenerateLine| where 
+                          degenerate face is a straight line \\
+
+FamilySpecified         & A boundary condition type is being specified for
+                          the family to which the current boundary belongs.
+                          A \fort{FamilyName\_t} specification must exist
+                          under \fort{BC\_t}, corresponding to a
+                          \fort{Family\_t} structure under \fort{CGNSBase\_t}.
+                          Under the \fort{Family\_t} structure there must
+                          be a \fort{FamilyBC\_t} structure specifying a
+                          valid \fort{BCType} (other than
+                          \fort{FamilySpecified}!).
+                          If any of these are absent, the boundary
+                          condition type is undefined. \\
+\end{longtable}
+
+\settowidth{\tmplengtha}{\fort{BCTypeCompound\_t }\bold{Identifier}\quad}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\setlength{\Pwidth}{\linewidth-4\tabcolsep-\tmplengtha}
+\begin{longtable}{>{\ttfamily}p{\tmplengtha} >{\raggedright\arraybackslash}p{\Pwidth}}
+\caption[Compound Boundary Condition Types]{\textbf{Compound Boundary Condition Types}}
+\label{t:BCTypeCompound}
+\\ \hline\hline \\*[-2ex]
+BCType\_t \bold{or} \\
+BCTypeCompound\_t \bold{Identifier} & \spantwo{\bold{Boundary Condition Description}}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endfirsthead
+
+\multicolumn{2}{l}{{\bfseries \autoref{t:BCTypeCompound}: Compound Boundary Condition Types} (\emph{Continued})}
+\\*[1ex] \hline\hline \\*[-2ex]
+BCType\_t \bold{or} \\
+BCTypeCompound\_t \bold{Identifier} & \spantwo{\bold{Boundary Condition Description}}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endhead
+
+\\*[-2ex]\hline
+\multicolumn{2}{r}{\emph{Continued on next page}} \\
+\endfoot
+\\*[-2ex] \hline\hline
+\endlastfoot
+
+BCInflow   & Inflow, arbitrary normal Mach;
+             test on normal Mach, then perform one of:
+             |BCInflowSubsonic|, |BCInflowSupersonic| \\[0.5\baselineskip]
+
+BCOutflow  & Outflow, arbitrary normal Mach;
+             test on normal Mach, then perform one of:
+             |BCOutflowSubsonic|, |BCOutflowSupersonic| \\[0.5\baselineskip]
+
+BCFarfield & Farfield inflow/outflow, arbitrary normal Mach;
+             test on normal velocity and normal Mach, 
+             then perform one of:
+             |BCInflowSubsonic|, |BCInflowSupersonic|,
+             |BCOutflowSubsonic|, |BCOutflowSupersonic| \\
+\end{longtable}
+
+\subsection{Matching Boundary Condition Data Sets} 
+\label{s:BCType_assoc}
+
+\enlargethispage{\baselineskip}
+The |BC_t| structure allows for a arbitrary list of boundary-condition
+data sets, described by the |BCDataSet_t| structure.  For simple
+boundary conditions, a single data set must be chosen from a list
+that may contain more than one element.  Likewise, for a compound
+boundary condition, a limited number of data sets must be chosen
+and applied appropriately.  The mechanism for proper choice of data
+sets is controlled by the |BCType| field of the |BC_t| structure,
+the |BCTypeSimple| field of the |BCDataSet_t| structure, and the
+boundary-condition type association table (\autoref{t:BCType_assoc}).
+In the following discussion, we will use the ``|/|'' notation for fields
+or elements of a structure type.
+
+|BC_t| is used for both simple and compound boundary conditions; hence,
+the field |BC_t/BCType| is of type |BCType_t|.
+Conversely, the substructure |BCDataSet_t| is intended to enforce a
+single set of boundary-condition equations independent of local flow
+conditions (i.e., it is appropriate only for simple boundary conditions).
+This is why the field |BCDataSet_t/BCTypeSimple| is of type
+|BCTypeSimple_t| and not |BCType_t|.
+The appropriate choice of data sets is determined by matching the field
+|BC_t/BCType| with the field |BCDataSet_t/BCTypeSimple| as specified in 
+\autoref{t:BCType_assoc}.
+
+For simple boundary conditions, a single match from the list of
+\fort{BCDataSet\_t} instances is required.
+For all \fort{BCTypeSimple\_t} identifiers, except
+\fort{BCInflowSupersonic} and \fort{BCOutflowSupersonic}, an exact match
+is necessary.
+\fort{BCInflowSupersonic} will match itself or \fort{BCDirichlet};
+\fort{BCOutflowSupersonic} will match itself or \fort{BCExtrapolate}.
+
+For compound boundary conditions, the association table specifies which
+simple boundary-condition types are appropriate.
+Since compound boundary conditions enforce different boundary-condition
+equation sets depending on local flow conditions, several instances of
+|BCDataSet_t| will be matched for each |BCTypeCompound_t| identifier.
+The accompanying rule determines which of the matching data sets to
+apply at a given location on the BC patch.
+
+This provides a general procedure applicable to both \fort{BCTypeSimple\_t}
+and \fort{BCTypeCompound\_t} situations.
+For a given \fort{BC\_t/BCType} use those instances of \fort{BCDataSet\_t}
+whose field \fort{BC\-Data\-Set\_t/BC\-Type\-Sim\-ple} matches according to
+\autoref{t:BCType_assoc}.
+Apply the matching data set or sets as prescribed by the appropriate
+usage rule.
+
+\newpage
+\settowidth{\tmplengtha}{\fort{BCOutflowSupersonic}\quad}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\setlength{\LTcapwidth}{\linewidth}
+\setlength{\Pwidth}{\linewidth-4\tabcolsep-\tmplengtha}
+\begin{longtable}{>{\ttfamily}p{\tmplengtha} >{\raggedright\arraybackslash}p{\Pwidth}}
+\caption[Associated Boundary Condition Types and Usage Rules]{\textbf{Associated Boundary Condition Types and Usage Rules}}
+\label{t:BCType_assoc}
+\\ \hline\hline \\*[-2ex]
+BCType\_t \bold{Identifier} & \bold{Associated} \texttt{BCTypeSimple\_t} \bold{Identifiers and Usage Rules}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endfirsthead
+
+\multicolumn{2}{l}{{\bfseries \autoref{t:BCType_assoc}: Associated Boundary Condition Types and Usage Rules} (\emph{Continued})}
+\\*[1ex] \hline\hline \\*[-2ex]
+BCType\_t \bold{Identifier} & \bold{Associated} \texttt{BCTypeSimple\_t} \bold{Identifiers and Usage Rules}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endhead
+
+\\*[-2ex]\hline
+\multicolumn{2}{r}{\emph{Continued on next page}} \\
+\endfoot
+\\*[-2ex] \hline\hline 
+\endlastfoot
+
+BCInflow            & |BCInflowSupersonic| \\
+                    & |BCInflowSubsonic| \\[0.25\baselineskip]
+                    & {\it Usage Rule:}
+                      \begin{mylist}
+                      \item if supersonic normal Mach, choose
+                            |BCInflowSupersonic|;
+                      \item else, choose |BCInflowSubsonic|
+                      \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCOutflow           & |BCOutflowSupersonic| \\
+                    & |BCOutflowSubsonic| \\[0.25\baselineskip]
+                    & {\it Usage Rule:}
+                      \begin{mylist}
+                      \item if supersonic normal Mach, choose
+                            |BCOutflowSupersonic|;
+                      \item else, choose |BCOutflowSubsonic|
+                      \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCFarfield          & |BCInflowSupersonic| \\
+                    & |BCInflowSubsonic| \\
+                    & |BCOutflowSupersonic| \\
+                    & |BCOutflowSubsonic| \\[0.25\baselineskip]
+                    & {\it Usage Rule:}
+                      \begin{mylist}
+                      \item if inflow and supersonic normal Mach, choose
+                            |BCInflowSupersonic|;
+                      \item else if inflow, choose |BCInflowSubsonic|;
+                      \item else if outflow and supersonic normal Mach,
+                            choose |BCOutflowSupersonic|;
+                      \item else, choose |BCOutflowSubsonic|
+                      \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCInflowSupersonic  & |BCInflowSupersonic| \\
+                    & |BCDirichlet| \\[0.25\baselineskip]
+                    & {\it Usage Rule:}
+                      \begin{mylist}
+                      \item choose either; |BCInflowSupersonic| takes
+                            precedence
+                      \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+BCOutflowSupersonic & |BCOutflowSupersonic| \\
+                    & |BCExtrapolate| \\[0.25\baselineskip]
+                    & {\it Usage Rule:}
+                      \begin{mylist}
+                      \item choose either; |BCOutflowSupersonic| takes
+                            precedence
+                      \end{mylist}\mbox{}\vspace{-0.5\baselineskip} \\
+
+All others          & Self-matching \\
+\end{longtable}
+
+Although we present a strict division between the two categories of
+boundary-condition types, we realize that some overlap may exist.
+For example, some of the more general simple boundary-condition types,
+such as |BCWall|, may include a situation of inflow/outflow (say if the
+wall is porous).  These complications require further guidelines on
+appropriate definition and use of boundary-condition types.  The real
+distinctions between |BCTypeSimple_t| and |BCTypeCompound_t| are as
+follows:
+\begin{itemize}
+\item |BCTypeSimple_t| identifiers always match themselves;
+      |BCTypeCompound_t| identifiers never match themselves.
+\item |BCTypeSimple_t| identifiers always produce a single match; 
+      |BCTypeCompound_t| will produce multiple matches.
+\item The usage rule for |BCTypeSimple_t| identifiers is always
+      trivial---apply the single matching data set regardless of local
+      flow conditions.
+\end{itemize}
+Therefore, any boundary condition that involves application of different
+data sets depending on local flow conditions should be classified
+|BCTypeCompound_t|.  If a type that we have classified |BCTypeSimple_t|
+is used as a compound type (|BCWall| for a porous wall is an example),
+then it should somehow be reclassified.  One option is to define a new
+|BCTypeCompound_t| identifier and provide associated |BCTypeSimple_t|
+types and a usage rule.  Another option may be to allow some identifiers
+to be both |BCTypeSimple_t| and |BCTypeCompound_t| and let their
+appropriate use be based on context.  This is still undetermined.
+
+%\clearpage
+\subsection{Boundary Condition Specification Data} 
+\label{s:BC_specdata}
+
+For a given simple boundary condition (i.e., one that is not
+dependent on local flow conditions), the database provides a set of
+boundary-condition equations to be enforced through the structure
+definitions for |BCDataSet_t| and |BCData_t| (\autoref{s:BCDataSet}
+and \autoref{s:BCData}).  Apart from the boundary-condition type, the
+precise equations to be enforced are described by boundary-condition
+solution data.  These specified solution data are arranged by ``equation
+type'':
+
+\begin{Ventryi}{Neumann:}
+   \item [Dirichlet:]
+         $Q         = (Q)_{\rm specified}$
+   \item [Neumann:]
+         $\pd{Q}{n} = ( \pd{Q}{n} )_{\rm specified}$
+\end{Ventryi}
+
+The |DirichletData| and |NeumannData| entities of
+|BCData_t| list both the solution variables involved in the
+equations (through the data-name identifier conventions of
+\hyperref[s:dataname]{Appendix~\ref*{s:dataname}}) and the specified
+solution data.
+
+Two issues need to be addressed for specifying Dirichlet or Neumann 
+boundary-condition data.  The first is whether the data is global or local: 
+
+\begin{Ventryi}{global BC data:}
+   \item [Global BC data:]
+         Data applied globally to the BC patch; for example, specifying
+         a uniform total pressure at an inflow boundary
+   \item [Local BC data:]
+         Data applied locally at each vertex or cell face
+         of the BC patch; an example of this is varying total pressure
+         specified at each grid point at an inflow boundary
+\end{Ventryi}
+The second issue is describing the actual solution quantities that are
+to be specified.  Both of these issues are addressed by use of the
+|DataArray_t| structure.
+
+For some types of boundary conditions, many different combinations of
+solution quantities could be specified.  For example, |BCInflowSubsonic|
+requires 4 solution quantities to be specified in 3-D, but what those 4
+quantities are varies with applications (e.g., internal verses external
+flows) and codes.  We propose the convention that the actual data
+being specified for any |BCType| is given by the list of |DataArray_t|
+entities included in |DirichletData| and |NeumannData| structures
+(actually by the identifier attached to each instance of |DataArray_t|).
+This frees us from having to define \emph{many} versions of a given
+|BCType| (e.g., |BCInflowSubsonic1|, |BCInflowSubsonic2|, etc.), where
+each has a precisely defined set of Dirichlet data.  We are left with
+the easier task of defining \emph{how many} Dirichlet or Neumann
+quantities must be provided for each |BCType|.
+
+An example of using |DataArray_t|-identifier conventions to describe
+BC specification data is the following: subsonic inflow with uniform
+stagnation pressure, mass flow and cross-flow angle specified; the
+Dirichlet data are stagnation pressure = 2.56, mass flow = 1.34, and
+cross-flow angle has a $y$-component of 0.043 and a $z$-component of
+0.02 (ignore dimensional-units or normalization for the present).  The
+specified solution variables and associated data are described as shown:
+\begin{alltt}
+  BCData\_t<ListLength=?> DirichletData = 
+    \{\{
+    DataArray\_t<real, 1, 1> PressureStagnation = \{\{ Data(real, 1, 1) = 2.56  \}\} ;
+    DataArray\_t<real, 1, 1> MassFlow           = \{\{ Data(real, 1, 1) = 1.34  \}\} ;
+    DataArray\_t<real, 1, 1> VelocityAngleY     = \{\{ Data(real, 1, 1) = 0.043 \}\} ;
+    DataArray\_t<real, 1, 1> VelocityAngleZ     = \{\{ Data(real, 1, 1) = 0.02  \}\} ;
+    \}\} ;
+\end{alltt}
+Basically, this states that \fort{DirichletData} contains four
+instances of \fort{DataArray\_t} with identifiers or names
+\fort{PressureStagnation}, \fort{MassFlow}, \fort{VelocityAngleY} and
+\fort{VelocityAngleZ}.
+Each \fort{DataArray\_t} structure entity contains a single
+floating-point value; these are the Dirichlet data for the BC.
+Note that \fort{Data(real, 1, 1)} means a single floating-point value.
+
+The global verses local data issue can be easily handled by storing
+either a scalar, as shown above, for the global BC data case; or storing
+an array for the local BC data case.  Storing an array of local BC data
+allows the capability for specifying non-constant solution profiles,
+such as ``analytic'' boundary-layer profiles or profiles derived from
+experimental data.  For the above example, if the stagnation pressure is
+instead specified at every vertex of the boundary-condition patch the
+following results:
+\begin{alltt}
+  BCData\_t<ListLength=99> DirichletData = 
+    \{\{
+    DataArray\_t<real, 1, 99> PressureStagnation = 
+      \{\{ Data(real, 1, 99) = (PTOT(n), n=1,99) \}\} ;
+    DataArray\_t<real, 1, 1> MassFlow           = \{\{ Data(real, 1, 1) = 1.34  \}\} ;
+    DataArray\_t<real, 1, 1> VelocityAngleY     = \{\{ Data(real, 1, 1) = 0.043 \}\} ;
+    DataArray\_t<real, 1, 1> VelocityAngleZ     = \{\{ Data(real, 1, 1) = 0.02  \}\} ;
+    \}\} ;
+\end{alltt}
+where, say, the boundary face is logically rectangular and contains
+$11\cross 9$ vertices and the stagnation pressure at the vertices is
+given by the array |PTOT()|.
+
+To facilitate implementation of boundary conditions into existing flow
+solvers, we adopt the convention that if no boundary-condition data is
+specified, then flow solvers are free to enforce any appropriate
+boundary-condition equations.
+This includes situations where entities of |BCDataSet_t|, |BCData_t|
+or |DataArray_t| are absent within the boundary-condition hierarchy.
+By convention, if no \fort{BCDataSet} entities are present, then
+application codes are free to enforce appropriate BCs for the given
+value of \fort{BCType}.
+Furthermore, if the entities \fort{DirichletData} and \fort{NeumannData}
+are not present in an instance of \fort{BCDataSet\_t}, or if
+insufficient data is present in |DirichletData| or |NeumannData|
+(e.g., if only one Dirichlet variable is present for a subsonic
+inflow condition), then application codes are free to fill out
+the boundary-condition data as appropriate for the |BCTypeSimple|
+identifier.
+
+The various levels of BC implementation allowed are shown in
+\autoref{f:BCimplementations}, from the lowest level in which
+the application codes interpret the \fort{BCType}, to the fully
+SIDS-compliant BC implementation which completely defines the BC within
+the CGNS file.
+
+\setlength{\tmplength}{\unitlength}	% save existing unit length
+\setlength{\unitlength}{\baselineskip}	% unit length for example hierarchy figure
+\begin{figure}[!htb]
+   \centering
+   \begin{minipage}[b]{0.295\linewidth}
+      \subfigure[Lowest-level allowed (application code interprets meaning of \fort{BCType})]
+          {\resizebox{\linewidth}{!}{\input{bc.figs/bcimpl_low_cet.pic}}}
+   \end{minipage}%
+   \hfill%
+   \begin{minipage}[b]{0.614\linewidth}
+      \subfigure[Fully SIDS-compliant]
+          {\resizebox{\linewidth}{!}{\input{bc.figs/bcimpl_full_cet.pic}}}
+   \end{minipage}
+   \caption{Boundary Condition Implementation Levels}
+   \label{f:BCimplementations}
+\end{figure}
+\setlength{\unitlength}{\tmplength}	% reset unit length to original vlue
+
+An alternative approach to the present design could be to list all the
+solution variables and data (as |DataArray_t|-like structures) for the
+boundary condition, and contain descriptive tags in each one to indicate
+if they are Dirichlet or Neumann data.  We have not taken this approach.
+We think grouping boundary-condition data by ``equation type'' as we have
+done better allows for future extension to other types of boundary
+conditions (e.g., 2nd-order non-reflecting BC's that result in P.D.E.'s
+to be solved at the boundary).
+
+\subsection{Boundary Condition Examples}  
+\label{s:BCexample}
+
+This section contains boundary-condition examples with increasing
+complexity.  Included is the most simple |BC_t| entity and one of
+the most complex.  The examples show situations of local and global
+boundary-condition data, simple and compound boundary-condition types,
+and multiple boundary-condition data sets that must be matched with the
+appropriate boundary-condition type.
+
+\begin{example}{Symmetry Plane}
+\label{ex:bc1}
+
+Symmetry plane for a patch on the $i$-min face of a 3-D structured zone.  
+\begin{alltt}
+  !  CellDimension = 3, IndexDimension = 3
+  BC\_t<3,3,3> BC1 =
+    \{\{
+    BCType\_t BCType = BCSymmetryPlane ;
+
+    IndexRange\_t<3> PointRange =
+      \{\{
+      int[3] Begin = [1,1,1 ] ;
+      int[3] End   = [1,9,17] ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+Since the boundary-condition equations to be enforced are completely
+defined by the boundary-condition type |BCSymmetryPlane|, no other
+information needs to be provided, except for the extent of the BC patch.
+The BC patch is specified by |PointRange| with a beginning index of
+(1,1,1) and an ending index of (1,9,17).
+By default, these refer to vertices.
+\end{example}
+
+\begin{example}{Viscous Solid Wall I}
+\label{ex:bc2}
+
+A viscous solid wall for a 3-D structured zone, where a Dirichlet
+condition is enforced for temperature; the wall temperature for the
+entire wall is specified to be 273 K.
+The BC patch is on the $j$-min face and is bounded by the indices
+(1,1,1) and (33,1,9).
+\begin{alltt}
+  !  CellDimension = 3, IndexDimension = 3
+  BC\_t<3,3,3> BC2 =
+    \{\{
+    BCType\_t BCType = BCWallViscousIsothermal ;
+
+    IndexRange\_t<3> PointRange =
+      \{\{
+      int[3] Begin = [1 ,1,1] ;
+      int[3] End   = [33,1,9] ;
+      \}\} ;
+
+    !  ListLength = 33*9 = 297
+    BCDataSet\_t<297> BCDataSet1 =
+      \{\{
+      BCTypeSimple\_t BCTypeSimple = BCWallViscousIsothermal ;
+
+      !  Data array length = ListLength = 297
+      BCData\_t<297> DirichletData =
+        \{\{
+        DataArray\_t<real, 1, 1> Temperature =
+          \{\{
+          Data(real, 1, 1) = 273. ;
+          
+          DataClass\_t DataClass = Dimensional ;
+
+          DimensionalUnits\_t DimensionalUnits = 
+            \{\{
+            MassUnits        = MassUnitsNull ;
+            LengthUnits      = LengthUnitsNull ;
+            TimeUnits        = TimeUnitsNull ;
+            TemperatureUnits = Kelvin ;
+            AngleUnits       = AngleUnitsNull ;
+            \}\} ;
+          \}\} ;
+        \}\} ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+
+This is an example of a simple boundary-condition type,
+|BCWallViscousIsothermal|.
+By default there is a zero Dirichlet condition on the velocity, and
+|BCDataSet1| states there is a Dirichlet condition on temperature with a
+global value of 273 K.
+The data set contains a single |BCData_t| entity, called
+|DirichletData|, meaning a (possibly empty) collection of Dirichlet
+conditions should be enforced.
+Within |DirichletData|, there is a single |DataArray_t| entity; this
+narrows the specification to a single Dirichlet condition.
+This lone entity has the identifier |Temperature|, which by conventions
+defined in \hyperref[s:dataname]{Appendix~\ref*{s:dataname}} is the
+identifier for static temperature.
+The data contained in |Temperature| is a floating-point scalar with a
+value of 273.
+The qualifiers |DataClass| and |DimensionalUnits| specifies that the
+temperature is dimensional with units of |Kelvin|.
+
+Since |BCWallViscousIsothermal| is a simple boundary-condition type,
+the appropriate data set contains a |BCTypeSimple| entity whose value
+is |BCWallViscousIsothermal|.  For this example, only a single data set
+is provided, and this data set has the correct boundary-condition type.
+This is an example of a trivial data-set match.
+
+Apart from velocity and temperature, additional ``numerical'' boundary
+conditions are typically required by Navier-Stokes flow solvers, but
+none are given here; therefore, a code is free to implement other
+additional boundary conditions as desired.
+
+Although the boundary-condition data is global, we include in this
+example structure parameters that are the lengths of potential
+local-data arrays.
+Comments are added to the example with the ``|!|'' notation to document
+the structure parameters.
+The \fort{BC\_t} structure function |ListLength| is evaluated based on
+|PointRange|.
+Since |GridLocation| is not specified in \fort{BC2}, any local data is
+at vertices by default.
+The entity |Temperature| contains global data, so the value of
+|ListLength| is unused in |DirichletData|.
+
+This example raises the question of whether unused structure parameters
+are required in structure entities.  The answer is no.  We included them
+here for completeness.  The purpose of structure parameters is to mimic
+the need to define elements of a entity based on information contained
+elsewhere (at a higher level) in the CGNS database.  When this need is
+not present in a given instance of a structure entity, the structure
+parameters are superfluous.
+In some of the following examples, structure parameters that are superfluous
+or otherwise not needed are denoted by ``|?|''.
+\end{example}
+
+\begin{example}{Subsonic Inflow}
+\label{ex:bc3}
+
+Subsonic inflow for a 2-D structured zone: The BC patch is on the
+$i$-min face and  includes $j \in [2, 7]$.
+As prescribed by the boundary-condition type, three quantities must be
+specified.  Uniform entropy and stagnation enthalpy are specified with
+values of 0.94 and 2.85, respectively.  A velocity profile is specified
+at face midpoints, given by the array |v_inflow(j)|.  No dimensional or
+nondimensional information is provided.
+\begin{alltt}
+  !  CellDimension = 2, IndexDimension = 2
+  BC\_t<2,2,?> BC3 =
+    \{\{
+    BCType\_t BCType = BCInflowSubsonic ;
+
+    GridLocation\_t GridLocation = FaceCenter ;
+
+    IndexRange\_t<2> PointRange = 
+      \{\{ 
+      int[2] Begin = [1,2] ;
+      int[2] End   = [1,6] ;
+      \}\} ;
+
+    !  ListLength = 5
+    BCDataSet\_t<5> BCDataSet1 =
+      \{\{
+      BCTypeSimple\_t BCTypeSimple = BCInflowSubsonic ;
+
+      !  Data array length = ListLength = 5
+      BCData\_t<5> DirichletData =
+        \{\{
+        DataArray\_t<real, 1, 1> EntropyApprox = 
+          \{\{ 
+          Data(real, 1, 1) = 0.94 ;
+          \}\} ;
+
+        DataArray\_t<real, 1, 1> EnthalpyStagnation = 
+          \{\{ 
+          Data(real, 1, 1) = 2.85 ;
+          \}\} ;
+
+        DataArray\_t<real, 1, 5> VelocityY =
+          \{\{
+          Data(real, 1, 5) = (v\_inflow(j), j=3,7) ;
+          \}\} ;
+        \}\} ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+This is another example of a simple boundary-condition type.
+The primary additional complexity included in this example is multiple
+Dirichlet conditions with one containing local data.
+\texttt{DirichletData} contains three \texttt{DataArray\_t} entities named
+\texttt{EntropyApprox}, \texttt{EnthalpyStagnation} and \texttt{VelocityY}.
+This specifies three Dirichlet boundary conditions to be enforced, and
+the names identify the solution quantities to set.
+Since both \texttt{EntropyApprox} and \texttt{EnthalpyStagnation} have an
+array-length structure parameter of one, they identify global data, and
+the values are provided.
+\texttt{VelocityY} is an array of data values and contains the values in
+\texttt{v\_inflow()}.
+The length of the array is given by \texttt{ListLength}, which represents
+the number of cell faces because \texttt{BC3} is specified using
+the value of \fort{FaceCenter} for \fort{GridLocation}.
+Note that the beginning and ending indices on the array
+\texttt{v\_inflow()} are unimportant (they are user inputs); there just
+needs to be five values provided.
+\end{example}
+
+\begin{example}{Outflow}
+\label{ex:bc4}
+
+Outflow boundary condition with unspecified normal Mach number for an
+$i$-max face of a 3-D structured zone: for subsonic outflow, a uniform
+pressure is specified; for supersonic outflow, no boundary-condition
+equations are
+specified.
+\begin{alltt}
+  !  CellDimension = 3, IndexDimension = 3
+  BC\_t<3,3,3> BC4 =
+    \{\{
+    BCType\_t BCType = BCOutflow ;
+
+    IndexRange\_t<3> PointRange = \{\{ \}\} ;
+
+    BCDataSet\_t<?> BCDataSetSubsonic =
+      \{\{
+      BCTypeSimple\_t BCTypeSimple = BCOutflowSubsonic ;
+
+      BCData\_t<?> DirichletData =
+        \{\{
+        DataArray\_t<real, 1, 1> Pressure = \{\{ \}\} ;
+        \}\} ;
+      \}\} ;
+
+    BCDataSet\_t<?> BCDataSetSupersonic =
+      \{\{
+      BCTypeSimple\_t BCTypeSimple = BCOutflowSupersonic ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+This is an example of a complex boundary-condition type; the equation
+set to be enforced depends on the local flow conditions, namely the Mach
+number normal to the boundary.
+Two data sets are provided, |BCDataSetSubsonic| and |BCDataSetSupersonic|;
+recall the names are unimportant and are user defined.
+The first data set has a boundary-condition type of |BCOutflowSubsonic|
+and prescribes a global Dirichlet condition on static pressure.
+Any additional boundary conditions needed may be applied by a flow solver.
+The second data set has a boundary-condition type of |BCOutflowSupersonic|
+with no additional boundary-condition equation specification.
+Typically, all solution quantities are extrapolated from the interior for
+supersonic outflow.
+From the boundary-condition type association table
+(\autoref{t:BCType_assoc}), |BCOutflow| requires two data sets with
+boundary-condition types |BCOutflowSubsonic| and |BCOutflowSupersonic|.
+The accompanying usage rule states that the data set for
+|BCOutflowSubsonic| should be used for a subsonic normal Mach number;
+otherwise, the data set for |BCOutflowSupersonic| should be enforced.
+
+Any additional data sets with boundary-condition types other than
+\fort{BCOutflowSubsonic} or \fort{BCOutflowSupersonic} could be
+provided (the definition of \fort{BC\_t} allows an arbitrary list of
+\fort{BCDataSet\_t} entities); however, they should be ignored by any
+code processing the boundary-condition information.
+Another caveat is that providing two data sets with the same simple
+boundary-condition type would cause indeterminate results --- which one is
+the correct data set to apply?
+
+The actual global data value for static pressure is not provided; an
+abbreviated form of the |Pressure| entity is shown.
+This example also uses the ``|?|'' notation for unused data-array-length  
+structure parameters.                                                   
+\end{example}
+
+\begin{example}{Farfield}
+\label{ex:bc5}
+
+Farfield boundary condition with arbitrary flow conditions for a $j$-max
+face of a 2-D structured zone: If subsonic inflow, specify entropy,
+vorticity and incoming acoustic characteristics; if supersonic inflow
+specify entire flow state; if subsonic outflow, specify incoming
+acoustic characteristic; and if supersonic outflow, extrapolate all
+flow quantities.
+None of the extrapolated quantities for the different boundary condition
+possibilities need be stated.
+\begin{alltt}
+  !  CellDimension = 2, IndexDimension = 2
+  BC\_t<2,2,2> BC5 =
+    \{\{
+    BCType\_t BCType = BCFarfield ;
+
+    IndexRange\_t<2> PointRange = \{\{ \}\} ;
+
+    int[2] InwardNormalIndex = [0,-1] ;
+
+    BCDataSet\_t<?> BCDataSetInflowSupersonic =
+      \{\{
+      BCTypeSimple\_t BCTypeSimple = BCInflowSupersonic ;
+      \}\} ;
+
+    BCDataSet\_t<?> BCDataSetInflowSubsonic =
+      \{\{
+      BCTypeSimple\_t BCTypeSimple = BCInflowSubsonic ;
+
+      BCData<?> DirichletData = 
+        \{\{
+        DataArray\_t<real, 1, 1> CharacteristicEntropy      = \{\{ \}\} ;
+        DataArray\_t<real, 1, 1> CharacteristicVorticity1   = \{\{ \}\} ;
+        DataArray\_t<real, 1, 1> CharacteristicAcousticPlus = \{\{ \}\} ;
+        \}\} ;
+      \}\} ;
+
+    BCDataSet\_t<?> BCDataSetOutflowSupersonic =
+      \{\{
+      BCTypeSimple\_t BCTypeSimple = BCOutflowSupersonic ;
+      \}\} ;
+
+    BCDataSet\_t<?> BCDataSetOutflowSubsonic =
+      \{\{
+      BCTypeSimple\_t BCTypeSimple = BCOutflowSubsonic ;
+
+      BCData<?> DirichletData = 
+        \{\{
+        DataArray\_t<real, 1, 1> CharacteristicAcousticMinus = \{\{ \}\} ;
+        \}\} ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+The farfield boundary-condition type is the most complex of the compound
+boundary-condition types.
+\texttt{BCFarfield} requires four data sets; these data sets must
+contain the simple boundary-condition types \texttt{BCInflowSupersonic},
+\texttt{BCInflowSubsonic}, \texttt{BCOutflowSupersonic} and
+\texttt{BCOutflowSubsonic}.
+This example provides four appropriate data sets.
+The usage rule given for \texttt{BCFarfield} in \autoref{t:BCType_assoc}
+states which set of boundary-condition equations to be enforced based on
+the normal velocity and normal Mach number.
+
+The data set for supersonic-inflow provides no information
+other than the boundary-condition type.  A flow solver is
+free to apply any conditions that are appropriate; typically
+all solution quantities are set to freestream reference state
+values.  The data set for subsonic-inflow states that three
+Dirichlet conditions should be enforced; the three data
+identifiers provided are among the list of conventions given in
+\hyperref[s:dataname_char]{Appendix~\ref*{s:dataname_char}}.
+The data set for supersonic-outflow only provides the boundary-condition
+type, and the data set for subsonic-outflow provides one
+Dirichlet condition on the incoming acoustic characteristic,
+|CharacteristicAcousticMinus|.
+
+Also provided in the example is the inward-pointing
+computational-coordinate normal; the normal points in the $-j$
+direction, meaning the BC patch is a $j$-max face.  This information
+could also be obtained from the BC patch description given in
+|IndexRange|.
+
+Note that this example shows only the overall layout of the
+boundary-condition entity.
+\fort{IndexRange} and all \fort{DataArray\_t} entities are abbreviated,
+and all unused structure functions are not evaluated.
+\end{example}
+
+\newpage
+\begin{example}{Viscous Solid Wall II}
+\label{ex:bc6}
+
+There are circumstances when a user may wish to define a BC patch using
+vertices (under \fort{BC\_t}), but store the BC data at face centers
+(under \fort{BCDataSet\_t}).
+The following example is similar to \hyperref[ex:bc2]{Example~\ref*{ex:bc2}},
+with the exception that the Dirichlet data for temperature is stored at
+face centers rather than at vertices.
+
+As before, the example is a viscous solid wall in a 3-D structured
+zone, where a Dirichlet condition is enforced for temperature; the wall
+temperature for the entire wall is specified to be 273 K.
+The BC patch is on the $j$-min face and is bounded by the indices
+(1,1,1) and (33,1,9).
+\begin{alltt}
+  !  CellDimension = 3, IndexDimension = 3
+  BC\_t<3,3,3> BC2 =
+    \{\{
+    BCType\_t BCType = BCWallViscousIsothermal ;
+
+    !  Grid location is Vertex by default
+    IndexRange\_t<3> PointRange =
+      \{\{
+      int[3] Begin = [1 ,1,1] ;
+      int[3] End   = [33,1,9] ;
+      \}\} ;
+
+    !  ListLength = 33*9 = 297
+    BCDataSet\_t<297> BCDataSet1 =
+      \{\{
+      BCTypeSimple\_t BCTypeSimple = BCWallViscousIsothermal ;
+
+      GridLocation\_t GridLocation = FaceCenter ;
+      IndexRange\_t<3> PointRange =
+        {{
+        int[3] Begin = [1 ,1,1] ;
+        int[3] End   = [32,1,8] ;
+        }} ;
+
+      !  ListLength = 32*8 = 256
+      BCData\_t<256> DirichletData =
+        \{\{
+        DataArray\_t<real, 1, 1> Temperature =
+          \{\{
+          Data(real, 1, 1) = 273. ;
+          
+          DataClass\_t DataClass = Dimensional ;
+
+          DimensionalUnits\_t DimensionalUnits = 
+            \{\{
+            MassUnits        = MassUnitsNull ;
+            LengthUnits      = LengthUnitsNull ;
+            TimeUnits        = TimeUnitsNull ;
+            TemperatureUnits = Kelvin ;
+            AngleUnits       = AngleUnitsNull ;
+            \}\} ;
+          \}\} ;
+        \}\} ;
+      \}\} ;
+    \}\} ;
+\end{alltt}
+
+As in \hyperref[ex:bc2]{Example~\ref*{ex:bc2}},
+although the boundary-condition data is global, we include in this
+example structure parameters that are the lengths of potential
+local-data arrays.
+In \fort{BC\_t}, \fort{GridLocation} is not specified, and thus is
+\fort{Vertex} by default.
+The structure function \fort{ListLength} is 297, based on the
+specification of \fort{PointRange}, and that value is passed to
+\fort{BCDataSet\_t}.
+
+In this example \fort{PointRange} is specified in \fort{BCDataSet\_t},
+so the \fort{ListLength} passed into it from \fort{BC\_t} is not used.
+In \fort{BCDataSet\_t}, \fort{GridLocation} is specified as
+\fort{FaceCenter}, and \fort{PointRange} is set accordingly.
+The corresponding value of \fort{ListLength} is 256, which is passed
+into \fort{BCData\_t}.
+
+As before, in \fort{BCData\_t} the entity \fort{Temperature} contains
+global data, so the value of \fort{ListLength} is unused.
+\end{example}

@@ -1,0 +1,94 @@
+Box 22 4
+   \textbf{\Large GridConnectivity1to1 Node}
+   (See Figure \ref*{f:ZoneGridConnectivity})
+SetTrack none
+Down 0
+Left 4
+SetTrack line
+Down 6.5
+Right 3
+TxtPos [l] [l] ~
+Box 20 9
+   \textbf{Name:} \fort{Transform}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} ``\fort{int[IndexDimension]}''\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{I4}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} \fort{IndexDimension}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} Transformation matrix (shorthand)\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Parameters:} \fort{IndexDimension}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 4
+SetTrack line
+Down 10
+Right 3
+Box 20 9
+   \textbf{Name:} \fort{PointRange}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{IndexRange\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{I4}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 2\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} \fort{IndexDimension},2\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{Begin[]}, \fort{End[]}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Parameters:} \fort{IndexDimension}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 4
+SetTrack line
+Down 10
+Right 3
+Box 20 9
+   \textbf{Name:} \fort{PointRangeDonor}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{IndexRange\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{I4}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimensions:} 2\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Dimension Values:} \fort{IndexDimension},2\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data:} \fort{Begin[]}, \fort{End[]}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Parameters:} \fort{IndexDimension}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 4
+SetTrack line
+Down 7.5
+Right 3
+Box 20 4
+   \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{Descriptor\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 4
+SetTrack line
+Down 5
+Right 3
+Box 20 4
+   \textbf{Name:} \fort{Ordinal}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{Ordinal\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See Figure:} \ref*{f:Zone}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 4
+SetTrack line
+Down 6
+Right 3
+Box 20 6
+   \textbf{Name:} \fort{GridConnectivityProperty}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{GridConnectivityProperty\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Data-Type:} \fort{MT}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Cardinality:} 0,1\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Child Nodes:} Figure \ref*{f:GridConnectivityProperty}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 4
+SetTrack line
+Down 6
+Right 3
+Box 20 4
+   \textbf{Name:} User defined\rule[-0.5ex]{0pt}{1ex}
+   \textbf{Label:} \fort{UserDefinedData\_t}\rule[-0.5ex]{0pt}{1ex}
+   \textbf{See Figure:} \ref*{f:CGNSBase}\rule[-0.5ex]{0pt}{1ex}
+SetTrack none
+Left 12
+Down 4
+Right
+Text
+   \textit{Note:}
+   
+   \textbullet ~~\fort{GridConnectivity1to1} is only applicable to structured-to-structured 1-to-1 mesh
+   \hspace*{\indbullet}connectivity.

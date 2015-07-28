@@ -1,0 +1,223 @@
+\section{Solution Data}
+\label{s:solution}
+\thispagestyle{plain}
+
+\subsection{Flow Solution}
+\label{s:flowsolution}
+
+\noindent
+\textit{Node}: \fort{FlowSolution\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_sol\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{char *solname}, & - w m \\
+~~~~~~\textcolor{input}{GridLocation\_t location}, \textcolor{output}{\textit{int *S}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_nsols(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{int *nsols}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_sol\_info(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int S}, \textcolor{output}{\textit{char *solname}}, & r - m \\
+~~~~~~\textcolor{output}{\textit{GridLocation\_t *location}}); & \\
+\hline
+call cg\_sol\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{solname}, \textcolor{input}{location}, \textcolor{output}{\textit{S}}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_nsols\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{nsols}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_sol\_info\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{S}, \textcolor{output}{\textit{solname}}, \textcolor{output}{\textit{location}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{location}}\raggedright
+\item [\fort{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\fort{B}]
+      Base index number, where $1 \leq \text{\fort{B}} \leq \text{\fort{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\fort{Z}]
+      Zone index number, where $1 \leq \text{\fort{Z}} \leq \text{\fort{nzones}}$.
+      (\textcolor{input}{Input})
+\item [\fort{S}]
+      Flow solution index number, where $1 \leq \text{\fort{S}} \leq \text{\fort{nsols}}$.
+      (\textcolor{input}{Input} for \fort{cg\_sol\_info};
+      \textcolor{output}{\textit{output}} for \fort{cg\_sol\_write})
+\item [\fort{nsols}]
+      Number of flow solutions for zone \fort{Z}.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{solname}]
+      Name of the flow solution.
+      (\textcolor{input}{Input} for \fort{cg\_sol\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_sol\_info})
+\item [\fort{location}]
+      Grid location where the solution is recorded.
+      The current admissible locations are \fort{Vertex},
+      \fort{CellCenter}, \fort{IFaceCenter}, \fort{JFaceCenter},
+      and \fort{KFaceCenter}.
+      (\textcolor{input}{Input} for \fort{cg\_sol\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_sol\_info})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+The above functions are used to create, and get information about,
+\fort{FlowSolution\_t} nodes.
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_field\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int S}, \textcolor{input}{DataType\_t datatype}, & - w m \\
+~~~~~~\textcolor{input}{char *fieldname}, \textcolor{input}{void *solution\_array}, \textcolor{output}{\textit{int *F}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_field\_partial\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int S}, & - w m \\
+~~~~~~\textcolor{input}{DataType\_t datatype}, \textcolor{input}{char *fieldname}, \textcolor{input}{int *range\_min}, & \\
+~~~~~~\textcolor{input}{int *range\_max}, \textcolor{input}{void *solution\_array}, \textcolor{output}{\textit{int *F}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_nfields(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int S}, \textcolor{output}{\textit{int *nfields}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_field\_info(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int S}, \textcolor{input}{int F}, & r - m \\
+~~~~~~\textcolor{output}{\textit{DataType\_t *datatype}}, \textcolor{output}{\textit{char *fieldname}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_field\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int S}, \textcolor{input}{char *fieldname}, & r - m \\
+~~~~~~\textcolor{input}{DataType\_t datatype}, \textcolor{input}{int *range\_min}, \textcolor{input}{int *range\_max}, & \\
+~~~~~~\textcolor{output}{\textit{void *solution\_array}}); & \\
+\hline
+call cg\_field\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{S}, \textcolor{input}{datatype}, \textcolor{input}{fieldname}, \textcolor{input}{solution\_array}, & - w m \\
+~~~~~\textcolor{output}{\textit{F}}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_field\_partial\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{S}, \textcolor{input}{datatype}, \textcolor{input}{fieldname}, & - w m \\
+~~~~~\textcolor{input}{range\_min}, \textcolor{input}{range\_max}, \textcolor{input}{solution\_array}, \textcolor{output}{\textit{F}}, \textcolor{output}{\textit{ier}}) & \\
+call cg\_nfields\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{S}, \textcolor{output}{\textit{nfields}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_field\_info\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{S}, \textcolor{input}{F}, \textcolor{output}{\textit{datatype}}, \textcolor{output}{\textit{fieldname}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_field\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{S}, \textcolor{input}{fieldname}, \textcolor{input}{datatype}, \textcolor{input}{range\_min}, & r - m \\
+~~~~~\textcolor{input}{range\_max}, \textcolor{output}{\textit{solution\_array}}, \textcolor{output}{\textit{ier}}) & \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{solution\_array}}\raggedright
+\item [\fort{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\fort{B}]
+      Base index number, where $1 \leq \text{\fort{B}} \leq \text{\fort{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\fort{Z}]
+      Zone index number, where $1 \leq \text{\fort{Z}} \leq \text{\fort{nzones}}$.
+      (\textcolor{input}{Input})
+\item [\fort{S}]
+      Flow solution index number, where $1 \leq \text{\fort{S}} \leq \text{\fort{nsols}}$.
+      (\textcolor{input}{Input})
+\item [\fort{F}]
+      Solution array index number, where $1 \leq \text{\fort{F}} \leq \text{\fort{nfields}}$.
+      (\textcolor{input}{Input} for \fort{cg\_field\_info};
+      \textcolor{output}{\textit{output}} for \fort{cg\_field\_write})
+\item [\fort{nfields}]
+      Number of data arrays in flow solution \fort{S}.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{datatype}]
+      Data type in which the solution array is written.
+      Admissible data types for a solution array are \fort{Integer},
+      \fort{RealSingle}, and \fort{RealDouble}.
+      (\textcolor{input}{Input} for \fort{cg\_field\_write},
+      \fort{cg\_field\_read};
+      \textcolor{output}{\textit{output}} for \fort{cg\_field\_info})
+\item [\fort{fieldname}]
+      Name of the solution array.
+      It is strongly advised to use the SIDS nomenclature conventions
+      when naming the solution arrays to insure file compatibility.
+      (\textcolor{input}{Input} for \fort{cg\_field\_write},
+      \fort{cg\_field\_read};
+      \textcolor{output}{\textit{output}} for \fort{cg\_field\_info})
+\item [\fort{range\_min}]
+      Lower range index (eg., \fort{imin, jmin, kmin}).
+      (\textcolor{input}{Input})
+\item [\fort{range\_max}]
+      Upper range index (eg., \fort{imax, jmax, kmax}).
+      (\textcolor{input}{Input})
+\item [\fort{solution\_array}]
+      Array of solution values for the range prescribed.
+      (\textcolor{input}{Input} for \fort{cg\_field\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_field\_read})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+The above functions are used to read and write solution arrays stored
+below a \fort{FlowSolution\_t} node.
+
+When writing, the function \fort{cg\_field\_write} will
+automatically write the full range of the solution (i.e., the entire
+\fort{solution\_array}).
+The function \fort{cg\_field\_partial\_write} may be used to write
+only a subset of \fort{solution\_array}.
+
+If the file was opened in ``write mode'', using
+\fort{cg\_field\_partial\_write} will overwrite the existing solution
+only for the specified range.
+In ``modify mode'', the existing solution will first be deleted, then
+replaced by the new solution.
+
+The function \fort{cg\_field\_read} returns the solution array
+\fort{fieldname}, for the range prescribed by \fort{range\_min} and
+\fort{range\_max}.
+The array is returned to the application in the data type requested in
+\fort{datatype}.
+This data type does not need to be the same as the one in which the data is
+stored in the file.
+A solution array stored as double precision in the CGNS file can be
+returned to the application as single precision, or vice versa.
+
+In Fortran, when using \fort{cg\_field\_read\_f} to read a 2D or 3D
+solution, the extent of each dimension of \fort{solution\_array} must
+be consistent with the requested range.
+When reading a 1D solution, the declared size can be larger than the
+requested range.
+For example, for a 2D zone with $100 \times 50$ vertices, if
+\fort{range\_min} and \fort{range\_max} are set to (11,11) and (20,20)
+to read a subset of the solution, then \fort{solution\_array} must be
+dimensioned (10,10).
+If \fort{solution\_array} is declared larger (e.g., (100,50)) the
+indices for the returned array values will be wrong.
+
+\subsection{Discrete Data}
+\label{s:discretedata}
+
+\noindent
+\textit{Node}: \fort{DiscreteData\_t}
+
+\begin{fctbox}
+\textcolor{output}{\textit{ier}} = cg\_discrete\_write(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{char *DiscreteName}, & - w m \\
+~~~~~~\textcolor{output}{\textit{int *D}}); & \\
+\textcolor{output}{\textit{ier}} = cg\_ndiscrete(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{output}{\textit{int *ndiscrete}}); & r - m \\
+\textcolor{output}{\textit{ier}} = cg\_discrete\_read(\textcolor{input}{int fn}, \textcolor{input}{int B}, \textcolor{input}{int Z}, \textcolor{input}{int D}, & r - m \\
+~~~~~~\textcolor{output}{\textit{char *DiscreteName}}); & \\
+\hline
+call cg\_discrete\_write\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{DiscreteName}, \textcolor{output}{\textit{D}}, \textcolor{output}{\textit{ier}}) & - w m \\
+call cg\_ndiscrete\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{output}{\textit{ndiscrete}}, \textcolor{output}{\textit{ier}}) & r - m \\
+call cg\_discrete\_read\_f(\textcolor{input}{fn}, \textcolor{input}{B}, \textcolor{input}{Z}, \textcolor{input}{D}, \textcolor{output}{\textit{DiscreteName}}, \textcolor{output}{\textit{ier}}) & r - m \\
+\end{fctbox}
+
+\noindent
+\textbf{\textcolor{input}{Input}/\textcolor{output}{\textit{Output}}}
+
+\begin{Ventryi}{\fort{DiscreteName}}\raggedright
+\item [\fort{fn}]
+      CGNS file index number.
+      (\textcolor{input}{Input})
+\item [\fort{B}]
+      Base index number, where $1 \leq \text{\fort{B}} \leq \text{\fort{nbases}}$.
+      (\textcolor{input}{Input})
+\item [\fort{Z}]
+      Zone index number, where $1 \leq \text{\fort{Z}} \leq \text{\fort{nzones}}$.
+      (\textcolor{input}{Input})
+\item [\fort{D}]
+      Discrete data index number, where $1 \leq \text{\fort{D}} \leq \text{\fort{ndiscrete}}$.
+      (\textcolor{input}{Input} for \fort{cg\_discrete\_read};
+      \textcolor{output}{\textit{output}} for \fort{cg\_discrete\_write})
+\item [\fort{ndiscrete}]
+      Number of \fort{DiscreteData\_t} data structures under zone \fort{Z}.
+      (\textcolor{output}{\textit{Output}})
+\item [\fort{DiscreteName}]
+      Name of \fort{DiscreteData\_t} data structure.
+      (\textcolor{input}{Input} for \fort{cg\_discrete\_write};
+      \textcolor{output}{\textit{output}} for \fort{cg\_discrete\_read})
+\item [\fort{ier}]
+      Error status.
+      (\textcolor{output}{\textit{Output}})
+\end{Ventryi}
+
+\fort{DiscreteData\_t} nodes are intended for the storage of fields
+of data not usually identified as part of the flow solution, such as
+fluxes or equation residuals.

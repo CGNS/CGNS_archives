@@ -1,0 +1,101 @@
+\section{ADF Error Messages}
+\label{s:errors}
+\thispagestyle{plain}
+
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\settowidth{\tmplength}{\bold{Number}}
+\setlength{\Pwidth}{\linewidth-4\tabcolsep-\tmplength}
+\begin{longtable}{c >{\raggedright\arraybackslash}p{\Pwidth}}
+\caption[ADF Error Messages]{\textbf{ADF Error Messages}}
+\label{t:errors}
+\\ \hline\hline \\*[-2ex]
+\bold{Number} & \bold{Error Message}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endfirsthead
+
+\multicolumn{2}{l}{{\bfseries \autoref{t:errors}: ADF Error Messages} (\emph{Continued})}
+\\*[1ex] \hline\hline \\*[-2ex]
+\bold{Number} & \bold{Error Message}
+\\*[1ex] \hline\hline \\*[-2ex]
+\endhead
+
+\\*[-2ex]\hline
+\multicolumn{2}{r}{\emph{Continued on next page}} \\
+\endfoot
+\\*[-2ex] \hline\hline
+\endlastfoot
+-1 & No Error \\
+ 1 & Integer number is less than a given minimum value \\
+ 2 & Integer value is greater than given maximum value \\
+ 3 & String length of zero of blank string detected \\
+ 4 & String length longer than maximum allowable length \\
+ 5 & String length is not an ASCII-Hex string \\
+ 6 & Too many ADF files opened \\
+ 7 & ADF file status was not recognized \\
+ 8 & ADF file open error \\
+ 9 & ADF file not currently opened \\
+10 & ADF file index out of legal range \\
+11 & Block/offset out of legal range \\
+12 & A string pointer is null \\
+13 & FSEEK error \\
+14 & FWRITE error \\
+15 & FREAD error \\
+16 & Internal error: Memory boundary tag bad \\
+17 & Internal error: Disk boundary tag bad \\
+18 & File Open Error: NEW - File already exists\footnote{
+     The user is trying to create a new file and give it a name.
+     The system has responded that the name has already been used.} \\
+19 & ADF file format was not recognized \\
+20 & Attempt to free the RootNode disk information \\
+21 & Attempt to free the FreeChunkTable disk information \\
+22 & File Open Error: OLD - File does not exist\footnote{
+     The user wants to open an existing file that supposedly has the
+     given name.
+     The system has responded that no file by that name exists.} \\
+23 & Entered area of unimplemented code \\
+24 & Subnode entries are bad \\
+25 & Memory allocation failed \\
+26 & Duplicate child name under a parent node \\
+27 & Node has no dimensions \\
+28 & Node's number of dimensions is not in legal range \\
+29 & Specified child is not a child of the specified parent \\
+30 & Data-Type is too long \\
+31 & Invalid Data-Type \\
+32 & A pointer is null \\
+33 & Node had no data associated with it \\
+34 & Error zeroing out of memory \\
+35 & Requested data exceeds actual data available \\
+36 & Bad end value \\
+37 & Bad stride values \\
+38 & Minimum value is greater than maximum value \\
+39 & The format of this machine does not match a known signature\footnote{
+     When ADF wakes up, it tries to figure out what data format the
+     machine it is running on uses (e.g., IEEE big endian, IEEE little
+     endian, Cray).
+     If it doesn't recognize the format, it can't convert files created
+     on other platforms to the current one, so it issues this error
+     message and punts.} \\
+40 & Cannot convert to or from an unknown native format \\
+41 & The two conversion formats are equal; no conversion done \\
+42 & The data format is not supported on a particular machine \\
+43 & File close error \\
+44 & Numeric overflow/underflow in data conversion \\
+45 & Bad start value \\
+46 & A value of zero is not allowable \\
+47 & Bad dimension value \\
+48 & Error state must be either a 0 (zero) or a 1 (one) \\
+49 & Dimensional specifications for disk and memory are unequal \\
+50 & Too many link levels are used; may be caused by a recursive link \\
+51 & The node is not a link. It was expected to be a link. \\
+52 & The linked-to node does not exist \\
+53 & The ADF file of a linked node is not accessible \\
+54 & A node ID of 0.0 is not valid \\
+55 & Incomplete data when reading multiple data blocks \\
+56 & Node name contains invalid characters \\
+57 & ADF file version incompatible with this library version \\
+58 & Nodes are not from the same file \\
+59 & Priority stack error \\
+60 & Machine format and file format are incomplete \\
+61 & Flush error
+\end{longtable}

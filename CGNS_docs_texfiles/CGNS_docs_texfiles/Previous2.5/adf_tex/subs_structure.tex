@@ -1,0 +1,1845 @@
+\subsection{Data Structure and Management Routines}
+\label{s:subs_structure}
+
+\fcthdra{Create}{Create a Node}
+\label{sub:Create}
+
+\begin{fctbox}       
+   {ADF\_Create}
+   {ADFCRE}
+   {(PID,name,ID,error\_return)}
+\hline
+Input  & const double PID   & real*8 PID \\
+       & const char *name   & character*(*) name \\
+\hline
+Output & double *ID         & real*8 ID \\
+       & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{PID}]
+     ID of the parent node of the created child node.
+\item[\textit{name}]
+     Name of the parent node.
+\item[\textit{ID}]
+     The ID of the newly created child node.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Create}, creates a new node (not a link) as a
+child of a given parent node.
+
+Default node header values in this new node are:
+\begin{itemize*}
+\item label = blank
+\item number of subnodes = 0
+\item datatype = \fort{MT}
+\item number of dimensions = 0
+\item data = \fort{NULL}
+\end{itemize*}
+
+\Example
+
+This example opens a database and creates a node under the root node.
+Note that the default values for a newly created node are label = \fort{' '},
+datatype = \fort{MT}, dimension = \fort{null}, data = none.
+These are reset as required using the routines
+\hyperlink{sub:Set\_Label}{\fort{ADFSLB}},
+\hyperlink{sub:Put\_Dimension\_Information}{\fort{ADFPDIM}} and
+\hyperlink{sub:Write\_All\_Data}{\fort{ADFWALL}}/\hyperlink{sub:Write\_Data}{\fort{ADFWRIT}}.
+Note also that the root node is named ``\fort{ADF MotherNode}''.
+This name is generated when the database is first opened.
+If desired, it could be reset using \hyperlink{sub:Put\_Name}{\fort{ADFPNAM}}.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) NODNAM
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,PID,CID
+         INTEGER I,J,IERR,NUMCLD
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('db.adf','NEW',' ',RID,IERR)
+   C
+   C *** CREATE NODES AT FIRST LEVEL
+   C
+         DO 150 I = 1,3
+            WRITE(NODNAM,'(A7,I1)')'PARENT.',I
+            CALL ADFCRE(RID,NODNAM,PID,IERR)
+   C
+   C ****** CREATE NODES AT SECOND LEVEL
+   C
+            NUMCLD = I*I
+            DO 110 J = 1,NUMCLD
+               WRITE(NODNAM,'(A6,I1,A1,I1)')'CHILD.',I,'x',J
+               CALL ADFCRE(PID,NODNAM,CID,IERR)
+     110    CONTINUE
+   C
+   C ****** PRINT NODE NAMES JUST CREATED
+   C
+            CALL PRTCLD(PID)
+     150 CONTINUE
+   C
+   C *** PRINT NAMES OF NODES ATTACHED TO ROOT NODE
+   C
+         CALL PRTCLD(RID)
+   C
+         STOP
+         END
+   C
+   C ************* SUBROUTINES ****************
+   C
+         SUBROUTINE ERRCHK(IERR)
+   C
+   C *** CHECK ERROR CONDITION
+   C
+         CHARACTER*80 MESS
+         IF (IERR .GT. 0) THEN
+            CALL ADFERR(IERR,MESS)
+            PRINT *,MESS
+            CALL ABORT('ADF ERROR')
+         ENDIF
+         RETURN
+         END
+
+         SUBROUTINE PRTCLD(PID)
+   C
+   C *** PRINT TABLE OF CHILDREN GIVEN A PARENT NODE-ID
+   C
+         PARAMETER (MAXCLD=10)
+         PARAMETER (MAXCHR=32)
+         REAL*8 PID
+         CHARACTER*(MAXCHR) NODNAM,NDNMS(MAXCLD)
+         CALL ADFGNAM(PID,NODNAM,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFNCLD(PID,NUMC,IERR)
+         CALL ERRCHK(IERR)
+         WRITE(*,120)NODNAM,NUMC
+     120 FORMAT(/,' PARENT NODE NAME = ',A,/,
+        X       '     NUMBER OF CHILDREN = ',I2,/,
+        X       '     CHILDREN NAMES: ')
+         NLEFT = NUMC
+         ISTART = 1
+   C     --- TOP OF DO-WHILE LOOP
+     130 CONTINUE
+            CALL ADFCNAM(PID,ISTART,MAXCLD,LEN(NDNMS),
+        X                NUMRET,NDNMS,IERR)
+            CALL ERRCHK(IERR)
+            WRITE(*,140)(NDNMS(K),K=1,NUMRET)
+     140    FORMAT(2(8X,A))
+            NLEFT = NLEFT - MAXCLD
+            ISTART = ISTART + MAXCLD
+         IF (NLEFT .GT. 0) GO TO 130
+         RETURN
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   PARENT NODE NAME = PARENT.1
+       NUMBER OF CHILDREN =  1
+       CHILDREN NAMES:
+          CHILD.1.1
+
+   PARENT NODE NAME = PARENT.2
+       NUMBER OF CHILDREN =  4
+       CHILDREN NAMES:
+          CHILD.2.1                               CHILD.2.2
+          CHILD.2.3                               CHILD.2.4
+
+   PARENT NODE NAME = PARENT.3
+       NUMBER OF CHILDREN =  9
+       CHILDREN NAMES:
+          CHILD.3.1                               CHILD.3.2
+          CHILD.3.3                               CHILD.3.4
+          CHILD.3.5                               CHILD.3.6
+          CHILD.3.7                               CHILD.3.8
+          CHILD.3.9
+
+   PARENT NODE NAME = ADF MotherNode
+       NUMBER OF CHILDREN =  3
+       CHILDREN NAMES:
+          PARENT.1                                PARENT.2
+          PARENT.3
+\end{alltt}
+
+\fcthdr{Delete}{Delete a Node}
+\label{sub:Delete}
+
+\begin{fctbox}
+   {ADF\_Delete}
+   {ADFDEL}
+   {(PID,ID,error\_return)}
+\hline
+Input  & const double PID   & real*8 PID \\
+       & const double ID    & real*8 ID \\
+\hline
+Output & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{PID}]
+     The ID of the node's parent.
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+In general, this routine, \fort{ADF\_Delete}, deletes a node and all of
+its children.
+Given the starting node, a recursive search is done down the hierarchy,
+deleting all nodes.
+If a ``link'' is encountered during the deletion (i.e., the specified node
+or any of its children), then the link is deleted, and the downward
+search stops.
+That is, the link information is deleted, but not the actual node it
+refers to.
+
+To understand the deletion of a node that is a link, it must be
+remembered that a link is merely a reference to another node.
+Therefore, the deletion of a node that is a link is the deletion of that
+reference, not the referred node itself.
+The reason for this is that a link may actually point to data in another
+file that may be owned by another user.
+Therefore, it would not be proper for ADF to try to delete that node.
+Therefore, ADF stops at the link.
+
+When a node is deleted, any links that reference it are left ``dangling.''
+In other words, the existing links to the node still reference the node,
+but if ADF is asked to resolve that reference, it will determine that
+the referred to node doesn't exist and will return an error flag.
+
+Note that the parent ID of the node to be deleted is required.
+This is due to the fact that child nodes do not know the ID of their
+parent node.
+Thus when a node is deleted, in order for the child table of the parent
+to be updated properly, the parent ID must be supplied as an input.
+
+\Example
+
+This example opens a database and creates three nodes attached to the
+root node.
+It also generates nodes to each of these base nodes.
+Then one of the base nodes is deleted.
+Not only is the node ``\fort{PARENT.2}'' deleted; all of its children
+are deleted at the same time.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) NODNAM
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,PID,CID
+         INTEGER I,J,IERR,NUMCLD
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('db.adf','NEW',' ',RID,IERR)
+   C
+   C *** CREATE NODES AT FIRST LEVEL
+   C
+         DO 150 I = 1,3
+            WRITE(NODNAM,'(A7,I1)')'PARENT.',I
+            CALL ADFCRE(RID,NODNAM,PID,IERR)
+   C
+   C ****** CREATE NODES AT SECOND LEVEL
+   C
+            NUMCLD = I*I
+            DO 110 J = 1,NUMCLD
+               WRITE(NODNAM,'(A6,I1,A1,I1)')'CHILD.',I,'.',J
+               CALL ADFCRE(PID,NODNAM,CID,IERR)
+     110    CONTINUE
+     150 CONTINUE
+   C
+   C *** PRINT NAMES OF NODES ATTACHED TO ROOT NODE
+   C
+         CALL PRTCLD(RID)
+   C
+   C *** PRINT NAMES OF CHILDREN UNDER PARENT.2
+   C
+         CALL ADFGNID(RID,'PARENT.2',PID,IERR)
+         CALL PRTCLD(PID)
+   C
+   C *** NOW DELETE PARENT.2
+   C
+         CALL ADFDEL(RID,PID,IERR)
+         CALL PRTCLD(RID)
+   C
+   C *** JUST FOR GRINS, LOOK FOR CHILDREN UNDER ORIGINAL ID
+   C
+         CALL ADFGNID(RID,'/PARENT.2/CHILD.2.1',CID,IERR)
+         CALL ERRCHK(IERR)
+   C
+         STOP
+         END
+   C
+   C ************* SUBROUTINES ****************
+   C
+         SUBROUTINE ERRCHK(IERR)
+   C
+   C *** CHECK ERROR CONDITION
+   C
+         CHARACTER*80 MESS
+         IF (IERR .GT. 0) THEN
+            CALL ADFERR(IERR,MESS)
+            PRINT *,MESS
+            CALL ABORT('ADF ERROR')
+         ENDIF
+         RETURN
+         END
+
+         SUBROUTINE PRTCLD(PID)
+   C
+   C *** PRINT TABLE OF CHILDREN GIVEN A PARENT NODE-ID
+   C
+         PARAMETER (MAXCLD=10)
+         PARAMETER (MAXCHR=32)
+         REAL*8 PID
+         CHARACTER*(MAXCHR) NODNAM,NDNMS(MAXCLD)
+         CALL ADFGNAM(PID,NODNAM,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFNCLD(PID,NUMC,IERR)
+         CALL ERRCHK(IERR)
+         WRITE(*,120)NODNAM,NUMC
+     120 FORMAT(/,' PARENT NODE NAME = ',A,/,
+        X       '     NUMBER OF CHILDREN = ',I2,/,
+        X       '     CHILDREN NAMES:')
+         NLEFT = NUMC
+         ISTART = 1
+   C     --- TOP OF DO-WHILE LOOP
+     130 CONTINUE
+            CALL ADFCNAM(PID,ISTART,MAXCLD,LEN(NDNMS),
+        X                NUMRET,NDNMS,IERR)
+            CALL ERRCHK(IERR)
+            WRITE(*,140)(NDNMS(K),K=1,NUMRET)
+     140    FORMAT(2(8X,A))
+            NLEFT = NLEFT - MAXCLD
+            ISTART = ISTART + MAXCLD
+         IF (NLEFT .GT. 0) GO TO 130
+         RETURN
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   PARENT NODE NAME = ADF MotherNode
+       NUMBER OF CHILDREN = 3
+       CHILDREN NAMES:
+          PARENT.1                                PARENT.2
+          PARENT.3
+
+   PARENT NODE NAME = PARENT.2
+       NUMBER OF CHILDREN = 4
+       CHILDREN NAMES:
+          CHILD.2.1                               CHILD.2.2
+          CHILD.2.3                               CHILD.2.4
+
+   PARENT NODE NAME = ADF MotherNode
+       NUMBER OF CHILDREN = 2
+       CHILDREN NAMES:
+          PARENT.1                                PARENT.3
+
+   ADF 29: Specified child is NOT a child of the specified parent.
+  IOT Trap
+  Abort - core dumped
+\end{alltt}
+
+\fcthdr{Children\_Names}{Get the Names of the Child Nodes}
+\label{sub:Children_Names}
+
+\setlength{\savearrayrulewidth}{\arrayrulewidth}
+\setlength{\arrayrulewidth}{0.8pt}
+\noindent
+\begin{tabularx}{\textwidth}{|>{\bfseries\columncolor{subcolor}}r%
+   |>{\ttfamily\columncolor{subcolor}}X%
+   |>{\ttfamily\columncolor{subcolor}}X%
+   |}
+\hline
+\multicolumn{3}{|>{\columncolor{subcolor}}c|}{} \\
+\multicolumn{3}{|>{\ttfamily\columncolor{subcolor}}l|}{ADF\_Children\_Names (PID,istart,imax\_num,imax\_name\_length,inum\_ret,names,} \\
+\multicolumn{3}{|>{\ttfamily\columncolor{subcolor}}l|}{~~~~~~~~~~~~~~~~~~~~error\_return)} \\
+\multicolumn{3}{|>{\columncolor{subcolor}}c|}{} \\
+\hline
+Language &
+   \multicolumn{1}{>{\bfseries\columncolor{subcolor}}c|}{C} &
+   \multicolumn{1}{>{\bfseries\columncolor{subcolor}}c|}{Fortran} \\
+\hline
+Routine Name &
+   \multicolumn{1}{>{\ttfamily\columncolor{subcolor}}c|}{ADF\_Children\_Names} &
+   \multicolumn{1}{>{\ttfamily\columncolor{subcolor}}c|}{ADFCNAM} \\
+\hline
+Input  & const double PID             & real*8 PID \\
+       & const int istart             & integer istart \\
+       & const int imax\_num          & integer imax\_num \\
+       & const int imax\_name\_length & integer imax\_name\_length \\
+\hline
+Output & int *inum\_ret               & integer inum\_ret \\
+       & char *names                  & character*(*) names \\
+       & int *error\_return           & integer error\_return \\
+\hline
+\end{tabularx}
+\setlength{\arrayrulewidth}{\savearrayrulewidth}
+
+\begin{Ventryi}{\textit{imax\_name\_length}}
+\item[\textit{PID}]
+     The ID of the parent node to use.
+\item[\textit{istart}]
+     The $n$th child's name (to start with the first, use
+     $\text{\textit{istart}} = 1$).
+\item[\textit{imax\_num}]
+     The maximum number of names to return.
+\item[\textit{imax\_name\_length}]
+     The number of characters allocated to hold the name of each
+     child node.
+\item[\textit{inum\_ret}]
+     The number of names returned.
+\item[\textit{names}]
+     The names of the children.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Children\_Names}, returns the child names
+directly associated with a parent node.
+The names of the children are not guaranteed to be returned in any
+particular order.
+For example, if four child nodes were created in the order:
+\fort{node1}, \fort{node2}, \fort{node3}, \fort{node4}, when the
+call to \fort{ADFCNAM} is made, there is no guarantee that the order
+of the node names in the character array names will be the same.
+
+The reason for not guaranteeing node ordering has to do with efficient
+use of disk space.
+Although the concept of ``linked lists'' works fine in central memory, it
+is not particularly efficient on disk.
+Therefore, static tables are used to maintain parent/child lists.
+The order in which children names are returned is the order found in the
+static table.
+If a child node is deleted, an empty slot is created and will be used by
+the next child node created under that parent node.
+
+The indexing of a child is Fortran-like and begins with 1, but as noted
+above, this does not imply a notion of node ordering.
+To start with a child node listed as the first index, use an
+\textit{istart} value of 1.
+
+\noindent
+\uline{\textit{C Programming Notes}}
+\begin{itemize}
+\item Node names can be up to 32 characters.
+      ADF appends the null (\fort{{\textbackslash}0}) character to the
+      end of each node name.
+      Therefore, at least 33 characters should be allocated for each
+      node name to be returned.
+\item \textit{imax\_name\_length} is used to ``stride'' through the
+      character array passed to ADF.
+      For example, if 50 characters per name were allocated, the first
+      character of the first name would be in the first allocated byte
+      (position [0]), and the second name would start in the 51st byte
+      (position [50]) and so on.
+      The length of the individual names can be determined using the
+      \fort{strlen} function.
+\end{itemize}
+
+\noindent
+\uline{\textit{Fortran Programming Notes}}
+\begin{itemize}
+\item Node names can be up to 32 characters.
+      The returned names are left justified and blank filled within the
+      array.
+      No null (\fort{{\textbackslash}0}) character is appended to the
+      name; therefore, an appropriate declaration would be
+      \fort{CHARACTER*(32)}.
+\end{itemize}
+
+\hypertarget{ex:Children\_Names}{}
+\Example
+
+This example creates three nodes attached to the root node.
+It then creates a varying number of child nodes under each of the base
+nodes.
+Lastly, it queries the database to find out how many children were
+created and then gets the child names.
+The thing to notice in this example is that the character array
+\fort{NDNMS} is not large enough to hold all the names under
+\fort{PARENT.3}.
+The array \fort{NDNMS} will hold only five names at a time; therefore,
+a loop was set up to read a subset of the name list during each pass.
+Note also that the call to \fort{ADFCNAM} may request more names than
+are present.
+If this occurs, the routine will return all that is available in the
+output array \textit{names} and return that number in the
+\textit{inum\_ret} variable.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCLD=5)
+         PARAMETER (NDATA=10)
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) NODNAM,NDNMS(MAXCLD)
+   C
+   C     RID - ROOT ID
+   C     CID - CHILD ID
+   C     PID - PARENT ID
+   C
+         REAL*8 RID,CID,PID
+         INTEGER I,J,K,IERR,NUMCLD,NLEFT,ISTART
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('DB.ADF','NEW',' ',RID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** CREATE NODES AT FIRST LEVEL
+   C
+         DO 150 I = 1,3
+            WRITE(NODNAM,'(A7,I1)')'PARENT.',I
+            CALL ADFCRE(RID,NODNAM,PID,IERR)
+            CALL ERRCHK(IERR)
+   C
+   C ****** CREATE NODES AT SECOND LEVEL
+   C
+            NUMCLD = I*I
+            DO 110 J = 1,NUMCLD
+               WRITE(NODNAM,'(A6,I1,A1,I1)')'CHILD.',I,'.',J
+               CALL ADFCRE(PID,NODNAM,CID,IERR)
+               CALL ERRCHK(IERR)
+     110    CONTINUE
+   C
+   C ****** GET NUMBER AND NAMES OF CHILDREN JUST CREATED
+   C        AND PRINT THEM OUT
+   C
+            CALL ADFGNAM(PID,NODNAM,IERR)
+            CALL ERRCHK(IERR)
+            CALL ADFNCLD(PID,NUMC,IERR)
+            CALL ERRCHK(IERR)
+            WRITE(*,120)I,NODNAM,NUMC
+     120    FORMAT(' LEVEL = ',I2,' PARENT NODE NAME = ',A,/,
+        X          '     NUMBER OF CHILDREN = ',I2,/,
+        X          '     CHILDREN NAMES:')
+            NLEFT = NUMC
+            ISTART = 1
+   C        --- TOP OF DO-WHILE LOOP
+     130    CONTINUE
+               CALL ADFCNAM(PID,ISTART,MAXCLD,LEN(NDNMS),
+        X                   NUMRET,NDNMS,IERR)
+               CALL ERRCHK(IERR)
+               PRINT *,' FETCHED: ',NUMRET,' NAMES'
+               WRITE(*,140)(NDNMS(K),K=1,NUMRET)
+     140       FORMAT(8X,A)
+               NLEFT = NLEFT - MAXCLD
+               ISTART = ISTART + MAXCLD
+            IF (NLEFT .GT. 0) GO TO 130
+     150 CONTINUE
+         STOP
+         END
+   C
+   C ************* SUBROUTINES ****************
+   C
+         SUBROUTINE ERRCHK(IERR)
+         CHARACTER*80 MESS
+         IF (IERR .GT. 0) THEN
+            CALL ADFERR(IERR,MESS)
+            PRINT *,MESS
+            CALL ABORT('ADF ERROR')
+         ENDIF
+         RETURN
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   PARENT = 1 PARENT NODE NAME = PARENT.1
+       NUMBER OF CHILDREN =  1
+       CHILDREN NAMES:
+        FETCHED            1 NAMES
+          CHILD.1.1
+
+   PARENT = 2 PARENT NODE NAME = PARENT.2
+       NUMBER OF CHILDREN =  4
+       CHILDREN NAMES:
+        FETCHED            4 NAMES
+          CHILD.2.1
+          CHILD.2.2
+          CHILD.2.3
+          CHILD.2.4
+
+   PARENT = 3 PARENT NODE NAME = PARENT.3
+       NUMBER OF CHILDREN =  9
+       CHILDREN NAMES:
+        FETCHED            5 NAMES
+          CHILD.3.1
+          CHILD.3.2
+          CHILD.3.3
+          CHILD.3.4
+          CHILD.3.5
+        FETCHED            4 NAMES
+          CHILD.3.6
+          CHILD.3.7
+          CHILD.3.8
+          CHILD.3.9
+\end{alltt}
+
+\fcthdr{Number\_of\_Children}{Get the Number of Children Nodes}
+\label{sub:Number_of_Children}
+
+\begin{fctbox}
+   {ADF\_Number\_of\_Children}
+   {ADFNCLD}
+   {(PID,num\_children,error\_return)}
+\hline
+Input  & const double PID   & real*8 PID \\
+\hline
+Output & int *num\_children & integer num\_children \\
+       & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{num\_children}}
+\item[\textit{PID}]
+     The ID of the parent node to use.
+\item[\textit{num\_children}]
+     The number of children directly associated with this node.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Number\_of\_Children}, returns the number of
+child names directly associated with a parent node.
+
+\Example
+
+See the \hyperlink{ex:Children\_Names}{example for \fort{ADF\_Children\_Names}}.
+
+\fcthdr{Get\_Node\_ID}{Get the ID of a Child Node}
+\label{sub:Get_Node_ID}
+
+\begin{fctbox}
+   {ADF\_Get\_Node\_ID}
+   {ADFGNID}
+   {(PID,name,ID,error\_return)}
+\hline
+Input  & const double PID   & real*8 PID \\
+       & const char *name   & character*(*) name \\
+\hline
+Output & double *ID         & real*8 ID \\
+       & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{PID}]
+     The ID of the parent node.
+\item[\textit{name}]
+     The name of the node.
+\item[\textit{ID}]
+     The ID of the named node.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Get\_Node\_ID}, returns the ID of a child node,
+given the parent node ID and the name of the child node.
+To return the ID of the root node in an ADF file, use any known ID in
+the ADF file and a name of ``\fort{/}''.
+The syntax for \textit{name} is essentially the same as the ``path
+name'' within the UNIX operating system.
+It might look like \fort{/level.1/level.2/node}.
+The name of the node may be one of two forms.
+If the name begins with a ``\fort{/}'', then the name is relative to the
+root node for the associated database.
+If the name does not begin with a ``\fort{/}'', then the name is
+relative to the parent node associated with the given PID.
+
+To return the ID of the root node an ADF file, use any known ID in the
+ADF file and a name of ``\fort{/}''.
+
+\hypertarget{ex:Get\_Node\_ID}{}
+\Example
+
+This example illustrates the various ways to access a node.
+Note that when a full path is specified (i.e., a leading slash
+``\fort{/}'' is specified), all that is required for the ID is any valid
+ID for the associated database.
+It will probably be clearer to others if the root ID is used in that
+situation.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) NODNAM
+   C
+   C     RID - ROOT ID
+   C     AL1ID - LEVEL 1 ID
+   C     AL2ID - LEVEL 2 ID
+   C     AL3ID - LEVEL 3 ID
+   C     CID - CHILD ID
+   C
+         REAL*8 RID,AL1ID,AL2ID,AL3ID,CID
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('DB.ADF','NEW',' ',RID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** CREATE NODE AT FIRST LEVEL
+   C
+         CALL ADFCRE(RID,'LEVEL.1',AL1ID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** CREATE NODE AT SECOND LEVEL
+   C
+         CALL ADFCRE(AL1ID,'LEVEL.2',AL2ID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** CREATE NODE AT THIRD LEVEL
+   C
+         CALL ADFCRE(AL2ID,'LEVEL.3',AL3ID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** EQUIVALENT WAYS TO GET THE LOWER LEVEL NODE ID
+   C
+   C ****** FULL PATH NAME
+   C
+         CALL ADFGNID(RID,'/LEVEL.1/LEVEL.2/LEVEL.3',CID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFGNAM(CID,NODNAM,IERR)
+         PRINT *,' '
+         PRINT *,' FULL PATH EXAMPLE: ROOT NODE ID: NODE NAME = ',NODNAM
+   C
+   C ****** FULL PATH NAME - GIVEN ANY VALID NODE ID FOR FILE
+   C
+         CALL ADFGNID(AL3ID,'/LEVEL.1/LEVEL.2/LEVEL.3',CID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFGNAM(CID,NODNAM,IERR)
+         PRINT *,' '
+         PRINT *,' FULL PATH EXAMPLE - VALID NODE ID: NODE NAME = ',NODNAM
+   C
+   C ****** PARTIAL PATH NAME
+   C
+         CALL ADFGNID(AL1ID,'LEVEL.2/LEVEL.3',CID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFGNAM(CID,NODNAM,IERR)
+         PRINT *,' '
+         PRINT *,' PARTIAL PATH EXAMPLE: NODE NAME = ',NODNAM
+   C
+   C ****** DIRECT USE OF PARENT ID
+   C
+         CALL ADFGNID(AL2ID,'LEVEL.3',CID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFGNAM(CID,NODNAM,IERR)
+         PRINT *,' '
+         PRINT *,' GIVEN PARENT NAME EXAMPLE: NODE NAME = ',NODNAM
+         STOP
+         END
+   C
+   C ************* SUBROUTINES ****************
+   C
+         SUBROUTINE ERRCHK(IERR)
+         CHARACTER*80 MESS
+         IF (IERR .GT. 0) THEN
+            CALL ADFERR(IERR,MESS)
+            PRINT *,MESS
+            CALL ABORT('ADF ERROR')
+         ENDIF
+         RETURN
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   FULL PATH EXAMPLE: ROOT NODE ID: NODE NAME = LEVEL.3
+
+   FULL PATH EXAMPLE - VALID NODE ID: NODE NAME = LEVEL.3
+
+   PARTIAL PATH EXAMPLE: NODE NAME = LEVEL.3
+
+   GIVEN PARENT NAME EXAMPLE: NODE NAME = LEVEL.3
+\end{alltt}
+
+\fcthdr{Get\_Name}{Get the Name of a Node}
+\label{sub:Get_Name}
+
+\begin{fctbox}
+   {ADF\_Get\_Name}
+   {ADFGNAM}
+   {(ID,name,error\_return)}
+\hline
+Input  & const double ID    & real*8 ID \\
+\hline
+Output & char *name         & character*(*) name \\
+       & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{name}]
+     The simple name of the node.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Get\_Name}, returns the 32-character name of a
+node, given the node's ID.
+In C, the name will be null terminated after the last nonblank
+character; therefore, 33 characters should be used (32 for the name,
+plus 1 for the null).
+In Fortran, the null character is not returned; therefore, the character
+variable declaration for name should be for 32 characters (e.g.,
+\fort{CHARACTER*(32) NAME}).
+
+\Example
+
+See the \hyperlink{ex:Get\_Node\_ID}{example for \fort{ADF\_Get\_Node\_ID}}.
+
+\fcthdr{Put\_Name}{Put a Name on a Node}
+\label{sub:Put_Name}
+
+\begin{fctbox}
+   {ADF\_Put\_Name}
+   {ADFPNAM}
+   {(PID,ID,name,error\_return)}
+\hline
+Input  & const double PID   & real*8 PID \\
+       & const double ID    & real*8 ID \\
+       & const char *name   & character*(*) name \\
+\hline
+Output & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{PID}]
+     The ID of the node's parent.
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{name}]
+     The new name of the node.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Put\_Name}, changes the name of a node.
+
+Note that the parent ID of the node to be deleted is required.
+This is due to the fact that child nodes do not know the ID of their
+parent node.
+Thus, when a node is deleted, in order for the child table of the parent
+to be updated properly, the parent ID must be supplied as an input.
+
+\emph{Warning: If the node is pointed to by a link node, changing the
+node's name will break the link.}
+
+\Example
+
+This example illustrates the creation of a node with an initial name.
+Later, the name of the node is changed.
+The routine \fort{ADFCNAM} is used to get the new name from the
+parent's information table.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) NODNAM,CLDNAM
+   C
+   C     RID - ROOT ID
+   C     CID - CHILD ID
+   C
+         REAL*8 RID,AL1ID,AL2ID,AL3ID,CID
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('db.adf','NEW',' ',RID,IERR)-*9+
+   C
+         CALL ERRCHK(IERR)
+   C
+   C *** CREATE NODE
+   C
+         CALL ADFCRE(RID,'LEVEL.1',CID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** GET NODE NAME AND CHECK PARENTS TABLE
+   C
+         CALL ADFGNAM(CID,NODNAM,IERR)
+         CALL ERRCHK(IERR)
+         PRINT *,' '
+         PRINT *,' NODE NAME = ',NODNAM
+         CALL ADFCNAM(RID,1,1,LEN(CLDNAM),
+        X             NUMRET,CLDNAM,IERR)
+         CALL ERRCHK(IERR)
+         PRINT *,' NODE NAME IN PARENTS TABLE = ',CLDNAM
+   C
+   C *** CHANGE THE NODE NAME
+   C
+         CALL ADFPNAM(RID,CID,'NEW_NAME',IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** GET NEW NODE NAME AND CHECK PARENTS TABLE
+   C
+         CALL ADFGNAM(CID,NODNAM,IERR)
+         CALL ERRCHK(IERR)
+         PRINT *,' '
+         PRINT *,' NEW NODE NAME = ',NODNAM
+         CALL ADFCNAM(RID,1,1,LEN(CLDNAM),
+        X             NUMRET,CLDNAM,IERR)
+         CALL ERRCHK(IERR)
+         PRINT *,' NODE NAME IN PARENTS TABLE = ',CLDNAM
+         STOP
+         END
+   C
+   C ************* SUBROUTINES ****************
+   C
+         SUBROUTINE ERRCHK(IERR)
+         CHARACTER*80 MESS
+         IF (IERR .GT. 0) THEN
+            CALL ADFERR(IERR,MESS)
+            PRINT *,MESS
+            CALL ABORT('ADF ERROR')
+         ENDIF
+         RETURN
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   NODE NAME     = LEVEL.1
+   NODE NAME IN PARENTS TABLE = LEVEL.1
+
+   NEW NODE NAME = NEW_NAME
+   NODE NAME IN PARENTS TABLE = NEW_NAME
+\end{alltt}
+
+\fcthdr{Move\_Child}{Move a Child Node to a Different Parent}
+\label{sub:Move_Child}
+
+\begin{fctbox}
+   {ADF\_Move\_Child}
+   {ADFMOVE}
+   {(PID,ID,NPID,error\_return)}
+\hline
+Input  & const double PID   & real*8 PID \\
+       & const double ID    & real*8 ID \\
+       & double NPID        & real*8 NPID \\
+\hline
+Output & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{PID}]
+     ID of the node's current parent.
+\item[\textit{ID}]
+     ID of the node to use.
+\item[\textit{NPID}]
+     ID of the node's new parent.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Move\_Child}, deletes the given child node from
+the current parent's child table and adds it to the new parent's child
+table.
+\fort{ADF\_Move\_Child} is restricted to moves within the same physical
+file.
+If the node is pointed to by a link-node, moving the node's name will
+break the link.
+
+\Example
+
+This example creates a simple hierarchy.
+It then picks up a node from its original parent and moves it to a new
+parent node.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) NODNAM
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,PID,CID,PID1,PID3
+         INTEGER I,J,IERR
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('db.adf','NEW',' ',RID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** CREATE NODES AT FIRST LEVEL
+   C
+         WRITE(*,100)
+     100 FORMAT(/,' *** ORIGINAL DATABASE SETUP ***')
+         DO 150 I = 1,3
+            WRITE(NODNAM,'(A7,I1)')'PARENT.',I
+            CALL ADFCRE(RID,NODNAM,PID,IERR)
+            CALL ERRCHK(IERR)
+   C
+   C ****** CREATE NODES AT SECOND LEVEL
+   C
+            NUMCLD = I*I
+            DO 110 J = 1,NUMCLD
+               WRITE(NODNAM,'(A6,I1,A1,I1)')'CHILD.',I,'.',J
+               CALL ADFCRE(PID,NODNAM,CID,IERR)
+               CALL ERRCHK(IERR)
+     110    CONTINUE
+   C
+   C ****** GET NUMBER AND NAMES OF CHILDREN JUST CREATED
+   C        AND PRINT THEM OUT
+   C
+            CALL PRTCLD(PID)
+     150 CONTINUE
+   C
+   C *** PICK UP NODE /PARENT.3/CHILD.3.4 AND MOVE IT
+   C     TO /PARENT.1
+   C
+         CALL ADFGNID(RID,'PARENT.3',PID3,IERR)
+         CALL ERRCHK(IERR)
+   C
+         CALL ADFGNID(PID3,'CHILD.3.4',CID,IERR)
+         CALL ERRCHK(IERR)
+   C
+         CALL ADFGNID(RID,'PARENT.1',PID1,IERR)
+         CALL ERRCHK(IERR)
+   C
+         CALL ADFMOVE(PID3,CID,PID1,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** CHECK TO MAKE SURE THE NODE WAS ACTUALLY MOVED
+   C
+         WRITE(*,160)
+     160 FORMAT(/,'*** PARENT.1 AND PARENT.3 AFTER MOVE ***')
+         CALL PRTCLD(PID1)
+         CALL PRTCLD(PID3)
+   C
+         STOP
+         END
+   C
+   C ************* SUBROUTINES ****************
+   C
+         SUBROUTINE ERRCHK(IERR)
+   C
+   C *** CHECK ERROR CONDITION
+   C
+         CHARACTER*80 MESS
+         IF (IERR .GT. 0) THEN
+            CALL ADFERR(IERR,MESS)
+            PRINT *,MESS
+            CALL ABORT('ADF ERROR')
+         ENDIF
+         RETURN
+         END
+
+         SUBROUTINE PRTCLD(PID)
+   C
+   C *** PRINT TABLE OF CHILDREN GIVEN A PARENT NODE-ID
+   C
+         PARAMETER (MAXCLD=10)
+         PARAMETER (MAXCHR=32)
+         REAL*8 PID
+         CHARACTER*(MAXCHR) NODNAM,NDNMS(MAXCLD)
+         CALL ADFGNAM(PID,NODNAM,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFNCLD(PID,NUMC,IERR)
+         CALL ERRCHK(IERR)
+         WRITE(*,120)NODNAM,NUMC
+     120 FORMAT(/,' PARENT NODE NAME = ',A,/,
+        X       '     NUMBER OF CHILDREN = ',I2,/,
+        X       '     CHILDREN NAMES:')
+         NLEFT = NUMC
+         ISTART = 1
+   C     --- TOP OF DO-WHILE LOOP
+     130 CONTINUE
+            CALL ADFCNAM(PID,ISTART,MAXCLD,LEN(NDNMS),
+        X                NUMRET,NDNMS,IERR)
+            CALL ERRCHK(IERR)
+            WRITE(*,140)(NDNMS(K),K=1,NUMRET)
+     140    FORMAT(2(8X,A))
+            NLEFT = NLEFT - MAXCLD
+            ISTART = ISTART + MAXCLD
+         IF (NLEFT .GT. 0) GO TO 130
+         RETURN
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   *** ORIGINAL DATABASE SETUP ***
+
+   PARENT NODE NAME = PARENT.1
+       NUMBER OF CHILDREN =  1
+       CHILDREN NAMES:
+          CHILD.1.1
+
+   PARENT NODE NAME = PARENT.2
+       NUMBER OF CHILDREN =  4
+       CHILDREN NAMES:
+          CHILD.2.1                       CHILD.2.2
+          CHILD.2.3                       CHILD.2.4
+
+   PARENT NODE NAME = PARENT.3
+       NUMBER OF CHILDREN =  9
+       CHILDREN NAMES:
+          CHILD.3.1                       CHILD.3.2
+          CHILD.3.3                       CHILD.3.4
+          CHILD.3.5                       CHILD.3.6
+          CHILD.3.7                       CHILD.3.8
+          CHILD.3.9
+
+   *** PARENT.1 AND PARENT.3 AFTER MOVE ***
+
+   PARENT NODE NAME = PARENT.1
+       NUMBER OF CHILDREN =  2
+       CHILDREN NAMES:
+          CHILD.1.1                       CHILD.3.4
+
+   PARENT NODE NAME = PARENT.3
+       NUMBER OF CHILDREN =  8
+       CHILDREN NAMES:
+          CHILD.3.1                       CHILD.3.2
+          CHILD.3.3                       CHILD.3.5
+          CHILD.3.6                       CHILD.3.7
+          CHILD.3.8                       CHILD.3.9
+\end{alltt}
+
+\fcthdr{Link}{Create a Link to a Node}
+\label{sub:Link}
+
+\begin{fctbox}
+   {ADF\_Link}
+   {ADFLINK}
+   {(PID,name,file,name\_in\_file,ID,error\_return)}
+\hline
+Input  & const double PID           & real*8 PID \\
+       & const char *name           & character*(*) name \\
+       & const char *file           & character*(*) file \\
+       & const char *name\_in\_file & character*(*) name\_in\_file \\
+\hline
+Output & double ID                  & real*8 ID \\
+       & int *error\_return         & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{name\_in\_file}}
+\item[\textit{PID}]
+     The ID of the node's parent.
+\item[\textit{name}]
+     The name of the link node.
+\item[\textit{file}]
+     The file name to use for the link directly usable by a C
+     \fort{open()} routine.
+     If blank (null), the link is assumed to be within the same file
+     as the parent (\textit{PID}).
+\item[\textit{name\_in\_file}]
+     The name of the node that the link will point to.
+     This can be a simple or a compound node.
+\item[\textit{ID}]
+     The ID of the created node.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Link}, will create a link (reference) to a
+node somewhere within the same ADF database file or another ADF database
+file.
+The node that the newly created link node refers to (points to) does not
+have to exist when the link is created.
+The ADF library does not check to make sure that the referenced node
+actually exists at the time \fort{ADF\_Link} is called.
+However, when information from the referenced node is requested by
+routines such as \hyperlink{sub:Get\_Label}{\fort{ADF\_Get\_Label}}
+or \hyperlink{sub:Read\_Data}{\fort{ADF\_Read\_Data}}, the
+referenced node is then accessed.
+If the referenced node is not in existence at that time, an error will
+occur.
+\fort{ADF\_Link} behaves like a ``soft link'' in the UNIX operating system.
+
+\Examplearg{1}
+
+This example creates a link to another node that exists in the same
+physical file.
+Note that the length of \textit{name\_in\_file} is not limited to 32
+characters but can be any length required to fully specify the desired
+node.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) NODNAM,NODLBL,TSTLBL
+         CHARACTER*(72) FN,PATH
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,PID,CID,PID1,PID3
+         INTEGER I,J,IERR
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('db.adf','NEW',' ',RID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** CREATE NODES AT FIRST LEVEL
+   C
+         WRITE(*,100)
+     100 FORMAT(/,' *** ORIGINAL DATABASE SETUP ***')
+         DO 150 I = 1,3
+            WRITE(NODNAM,'(A7,I1)')'PARENT.',I
+            CALL ADFCRE(RID,NODNAM,PID,IERR)
+            CALL ERRCHK(IERR)
+   C
+   C ****** CREATE NODES AT SECOND LEVEL
+   C
+            NUMCLD = I*I
+            DO 110 J = 1,NUMCLD
+               WRITE(NODNAM,'(A6,I1,A1,I1)')'CHILD.',I,'.',J
+               CALL ADFCRE(PID,NODNAM,CID,IERR)
+               CALL ERRCHK(IERR)
+               WRITE(NODLBL,105)I,J
+     105       FORMAT('LABEL STRING IN CHILD.',I1,'.',I1)
+               CALL ADFSLB(CID,NODLBL,IERR)
+               CALL ERRCHK(IERR)
+     110    CONTINUE
+   C
+   C ****** GET NUMBER AND NAMES OF CHILDREN JUST CREATED
+   C        AND PRINT THEM OUT
+   C
+            CALL PRTCLD(PID)
+     150 CONTINUE
+   C
+   C *** LINK NODE /PARENT.3/CHILD.3.4 TO /PARENT.1
+   C
+         CALL ADFGNID(RID,'PARENT.1',PID1,IERR)
+         CALL ERRCHK(IERR)
+   C
+         CALL ADFLINK(PID1,'LINKED_NODE',' ',
+        X             '/PARENT.3/CHILD.3.4',CID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** CHECK TO MAKE SURE THE NODE WAS ACTUALLY LINKED
+   C
+         WRITE(*,160)
+     160 FORMAT(/,'*** PARENT.1 AFTER LINK ***')
+         CALL PRTCLD(PID1)
+   C
+   C *** FOR FINAL CONFIRMATION, GET ORIGINAL LABEL
+   C     GOING THROUGH NEW LINK
+   C
+         CALL ADFGLB(CID,TSTLBL,IERR)
+         CALL ERRCHK(IERR)
+         WRITE(*,170)TSTLBL
+     170 FORMAT(/,'LINKED_NODE LABEL = ',A)
+   C
+         STOP
+         END
+   C
+   C ************* SUBROUTINES ****************
+   C
+         SUBROUTINE ERRCHK(IERR)
+   C
+   C *** CHECK ERROR CONDITION
+   C
+         CHARACTER*80 MESS
+         IF (IERR .GT. 0) THEN
+            CALL ADFERR(IERR,MESS)
+            PRINT *,MESS
+            CALL ABORT('ADF ERROR')
+         ENDIF
+         RETURN
+         END
+
+         SUBROUTINE PRTCLD(PID)
+   C
+   C *** PRINT TABLE OF CHILDREN GIVEN A PARENT NODE-ID
+   C
+         PARAMETER (MAXCLD=10)
+         PARAMETER (MAXCHR=32)
+         REAL*8 PID
+         CHARACTER*(MAXCHR) NODNAM,NDNMS(MAXCLD)
+         CALL ADFGNAM(PID,NODNAM,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFNCLD(PID,NUMC,IERR)
+         CALL ERRCHK(IERR)
+         WRITE(*,120)NODNAM,NUMC
+     120 FORMAT(/,' PARENT NODE NAME = ',A,/,
+        X       '     NUMBER OF CHILDREN = ',I2,/,
+        X       '     CHILDREN NAMES:')
+         NLEFT = NUMC
+         ISTART = 1
+   C     --- TOP OF DO-WHILE LOOP
+     130 CONTINUE
+            CALL ADFCNAM(PID,ISTART,MAXCLD,LEN(NDNMS),
+        X                NUMRET,NDNMS,IERR)
+            CALL ERRCHK(IERR)
+            WRITE(*,140)(NDNMS(K),K=1,NUMRET)
+     140    FORMAT(2(8X,A))
+            NLEFT = NLEFT - MAXCLD
+            ISTART = ISTART + MAXCLD
+         IF (NLEFT .GT. 0) GO TO 130
+         RETURN
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   *** ORIGINAL DATABASE SETUP ***
+
+   PARENT NODE NAME = PARENT.1
+       NUMBER OF CHILDREN =  1
+       CHILDREN NAMES:
+          CHILD.1.1
+
+   PARENT NODE NAME = PARENT.2
+       NUMBER OF CHILDREN =  4
+       CHILDREN NAMES:
+          CHILD.2.1                       CHILD.2.2
+          CHILD.2.3                       CHILD.2.4
+
+   PARENT NODE NAME = PARENT.3
+       NUMBER OF CHILDREN =  9
+       CHILDREN NAMES:
+          CHILD.3.1                       CHILD.3.2
+          CHILD.3.3                       CHILD.3.4
+          CHILD.3.5                       CHILD.3.6
+          CHILD.3.7                       CHILD.3.8
+          CHILD.3.9
+
+   *** PARENT.1 AFTER LINK ***
+
+   PARENT NODE NAME = PARENT.1
+       NUMBER OF CHILDREN =  2
+       CHILDREN NAMES:
+          CHILD.1.1                       LINKED_NODE
+
+   LINKED_NODE LABEL = LABEL STRING IN CHILD.3.4
+\end{alltt}
+
+\Examplearg{2}
+
+This example illustrates the linking of nodes across files.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) TSTLBL
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,PID,CID
+         INTEGER IERR
+   C
+   C *** 1.) OPEN 1ST DATABASE
+   C     2.) CREATE TWO NODES
+   C     3.) PUT LABEL ON 2ND NODE
+   C     4.) CLOSE DATABASE
+   C
+         CALL ADFDOPN('db1.adf','NEW',' ',RID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFCRE(RID,'DB1_NODE1',PID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFCRE(PID,'DB1_NODE2',CID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFSLB(CID,'LABEL IN FILE.1: NODE2',IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFDCLO(RID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** 1.) OPEN 2ND DATABASE
+   C
+         CALL ADFDOPN('db2.adf','NEW',' ',RID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFCRE(RID,'DB2_NODE1',PID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFCRE(PID,'DB2_NODE2',CID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** LINK NODE /DB1_NODE1/DB1_NODE2 TO /DB2_NODE1
+   C
+         CALL ADFLINK(PID,'LINKED_NODE','db1.adf',
+        X             '/DB1_NODE1/DB1_NODE2',CID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** CHECK TO MAKE SURE THE NODE WAS ACTUALLY LINKED
+   C
+         WRITE(*,160)
+     160 FORMAT(/,'*** PARENT AFTER LINK ***')
+         CALL PRTCLD(PID)
+   C
+   C *** FOR FINAL CONFIRMATION, GET ORIGINAL LABEL
+   C     GOING THROUGH NEW LINK
+   C
+         CALL ADFGLB(CID,TSTLBL,IERR)
+         CALL ERRCHK(IERR)
+         WRITE(*,170)TSTLBL
+     170 FORMAT(/,'LINKED_NODE LABEL = ',A)
+   C
+         STOP
+         END
+   C
+   C ************* SUBROUTINES ****************
+   C
+         SUBROUTINE ERRCHK(IERR)
+   C
+   C *** CHECK ERROR CONDITION
+   C
+         CHARACTER*80 MESS
+         IF (IERR .GT. 0) THEN
+            CALL ADFERR(IERR,MESS)
+            PRINT *,MESS
+            CALL ABORT('ADF ERROR')
+         ENDIF
+         RETURN
+         END
+
+         SUBROUTINE PRTCLD(PID)
+   C
+   C *** PRINT TABLE OF CHILDREN GIVEN A PARENT NODE-ID
+   C
+         PARAMETER (MAXCLD=10)
+         PARAMETER (MAXCHR=32)
+         REAL*8 PID
+         CHARACTER*(MAXCHR) NODNAM,NDNMS(MAXCLD)
+         CALL ADFGNAM(PID,NODNAM,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFNCLD(PID,NUMC,IERR)
+         CALL ERRCHK(IERR)
+         WRITE(*,120)NODNAM,NUMC
+     120 FORMAT(/,' PARENT NODE NAME = ',A,/,
+        X       '     NUMBER OF CHILDREN = ',I2,/,
+        X       '     CHILDREN NAMES:')
+         NLEFT = NUMC
+         ISTART = 1
+   C     --- TOP OF DO-WHILE LOOP
+     130 CONTINUE
+            CALL ADFCNAM(PID,ISTART,MAXCLD,LEN(NDNMS),
+        X                NUMRET,NDNMS,IERR)
+            CALL ERRCHK(IERR)
+            WRITE(*,140)(NDNMS(K),K=1,NUMRET)
+     140    FORMAT(2(8X,A))
+            NLEFT = NLEFT - MAXCLD
+            ISTART = ISTART + MAXCLD
+         IF (NLEFT .GT. 0) GO TO 130
+         RETURN
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   *** PARENT AFTER LINK ***
+
+   PARENT NODE NAME = DB2_NODE1
+       NUMBER OF CHILDREN =  2
+       CHILDREN NAMES:
+          DB2_NODE2                       LINKED_NODE
+
+  LINKED_NODE LABEL = LABEL IN FILE.1: NODE2
+\end{alltt}
+
+\fcthdr{Is\_Link}{See If the Node Is a Link}
+\label{sub:Is_Link}
+
+\begin{fctbox}
+   {ADF\_Is\_Link}
+   {ADFISLK}
+   {(ID,link\_path\_length,error\_return)}
+\hline
+Input  & const double ID         & real*8 ID \\
+\hline
+Output & int *link\_path\_length & integer link\_path\_length \\
+       & int *error\_return      & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{link\_path\_length}}
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{link\_path\_length}]
+     This returned value is zero if the node is not a link.
+     If the node referenced by \textit{ID} is a link within the same
+     file, the number of characters in the path is returned.
+     If the node referenced by \textit{ID} is a link in another file,
+     the sum of the number of characters in the referenced file name
+     and the number of characters in the path $+ 1$ is returned.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Is\_Link}, tests to see if the node is a link.
+If the actual data type of the node is \fort{LK} (created with
+\hyperlink{sub:Link}{\fort{ADF\_Link}}), the routine returns the link
+path length; otherwise it returns 0.
+
+\Example
+
+This example creates a link into a second file, and then calls
+\fort{ADF\_Is\_Link} to determine whether the requested node is indeed a
+link or a normal node.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) TSTLBL
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,PID,CID
+         INTEGER IERR
+   C
+   C *** 1.) OPEN 1ST DATABASE
+   C     2.) CREATE TWO NODES
+   C     3.) PUT LABEL ON 2ND NODE
+   C     4.) CLOSE DATABASE
+   C
+         CALL ADFDOPN('db1.adf','NEW',' ',RID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFCRE(RID,'DB1_NODE1',PID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFCRE(PID,'DB1_NODE2',CID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFDCLO(RID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** 1.) OPEN 2ND DATABASE
+   C
+         CALL ADFDOPN('db2.adf','NEW',' ',RID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFCRE(RID,'DB2_NODE1',PID,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFCRE(PID,'DB2_NODE2',CID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** LINK NODE FILE 1:/DB1_NODE1/DB1_NODE2 TO /DB2_NODE1
+   C
+         CALL ADFLINK(PID,'LINKED_NODE','db1.adf',
+        X             '/DB1_NODE1/DB1_NODE2',CID,IERR)
+         CALL ERRCHK(IERR)
+   C
+   C *** CHECK TO MAKE SURE THE NODE WAS ACTUALLY LINKED
+   C
+         CALL ADFISLK(CID,LEN,IERR)
+         CALL ERRCHK(IERR)
+         PRINT *,' PATH LENGTH FROM LINK IS: ',LEN
+   C
+         STOP
+         END
+   C
+   C ************* SUBROUTINES ****************
+   C
+         SUBROUTINE ERRCHK(IERR)
+   C
+   C *** CHECK ERROR CONDITION
+   C
+         CHARACTER*80 MESS
+         IF (IERR .GT. 0) THEN
+            CALL ADFERR(IERR,MESS)
+            PRINT *,MESS
+            CALL ABORT('ADF ERROR')
+         ENDIF
+         RETURN
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   PATH LENGTH FROM LINK IS:           28
+\end{alltt}
+
+\fcthdr{Get\_Link\_Path}{Get the Path Information From a Link}
+\label{sub:Get_Link_Path}
+
+\begin{fctbox}
+   {ADF\_Get\_Link\_Path}
+   {ADFGLKP}
+   {(ID,file,name\_in\_file,error\_return)}
+\hline
+Input  & const double ID      & real*8 ID \\
+\hline
+Output & char *file           & character*(*) file \\
+       & char *name\_in\_file & character*(*) name\_in\_file \\
+       & int *error\_return   & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{name\_in\_file}}
+\item[\textit{ID}]
+     The ID of the node to use.
+\item[\textit{file}]
+     The file name to use for the link.
+     It is directly usable by the C \fort{open()} routine.
+     If blank (null), the link is within the same file.
+\item[\textit{name\_in\_file}]
+     The name of the node that the link points to.
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Get\_Link\_Path}, gets the path information from
+a link.
+If the node is a link node, the routine returns the path information;
+otherwise it returns an error.
+
+\Example
+
+This example opens two ADF files.
+A link is created in the second file (\textit{db2.adf}) that references a
+node in the first file (\textit{db1.adf}).
+\fort{ADFGLKP} is used to extract the file name and path that the link
+actually points to.
+It is not anticipated that this information will be useful to the normal
+user.
+For most applications, it is best to allow ADF to resolve the link
+internally, transparent to the user.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) TSTLBL
+         CHARACTER*(40) FILENM,PATH
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,PID,CID
+         INTEGER IERR
+   C
+   C *** 1.) OPEN 1ST DATABASE
+   C     2.) CREATE TWO NODES
+   C     3.) PUT LABEL ON 2ND NODE
+   C     4.) CLOSE DATABASE
+   C
+         CALL ADFDOPN('db1.adf','NEW',' ',RID,IERR)
+         CALL ADFCRE(RID,'DB1_NODE1',PID,IERR)
+         CALL ADFCRE(PID,'DB1_NODE2',CID,IERR)
+         CALL ADFDCLO(RID,IERR)
+   C
+   C *** 1.) OPEN 2ND DATABASE
+   C
+         CALL ADFDOPN('db2.adf','NEW',' ',RID,IERR)
+         CALL ADFCRE(RID,'DB2_NODE1',PID,IERR)
+         CALL ADFCRE(PID,'DB2_NODE2',CID,IERR)
+   C
+   C *** LINK NODE FILE 1:/DB1_NODE1/DB1_NODE2 TO /DB2_NODE1
+   C
+         CALL ADFLINK(PID,'LINKED_NODE','db1.adf',
+        X             '/DB1_NODE1/DB1_NODE2',CID,IERR)
+   C
+   C *** CHECK TO MAKE SURE THE NODE WAS ACTUALLY LINKED
+   C
+         CALL ADFGLKP(CID,FILENM,PATH,IERR)
+         PRINT *,' INFORMATION FROM LINK:'
+         PRINT *,' FILE: ',FILENM
+         PRINT *,' PATH: ',PATH
+   C
+         STOP
+         END
+   C
+   C ************* SUBROUTINES ****************
+   C
+         SUBROUTINE ERRCHK(IERR)
+   C
+   C *** CHECK ERROR CONDITION
+   C
+         CHARACTER*80 MESS
+         IF (IERR .GT. 0) THEN
+            CALL ADFERR(IERR,MESS)
+            PRINT *,MESS
+            CALL ABORT('ADF ERROR')
+         ENDIF
+         RETURN
+         END
+
+         SUBROUTINE PRTCLD(PID)
+   C
+   C *** PRINT TABLE OF CHILDREN GIVEN A PARENT NODE-ID
+   C
+         PARAMETER (MAXCLD=10)
+         PARAMETER (MAXCHR=32)
+         REAL*8 PID
+         CHARACTER*(MAXCHR) NODNAM,NDNMS(MAXCLD)
+         CALL ADFGNAM(PID,NODNAM,IERR)
+         CALL ERRCHK(IERR)
+         CALL ADFNCLD(PID,NUMC,IERR)
+         CALL ERRCHK(IERR)
+         WRITE(*,120)NODNAM,NUMC
+     120 FORMAT(/,' PARENT NODE NAME = ',A,/,
+        X       '     NUMBER OF CHILDREN = ',I2,/,
+        X       '     CHILDREN NAMES:')
+         NLEFT = NUMC
+         ISTART = 1
+   C     --- TOP OF DO-WHILE LOOP
+     130 CONTINUE
+            CALL ADFCNAM(PID,ISTART,MAXCLD,LEN(NDNMS),
+        X                NUMRET,NDNMS,IERR)
+            CALL ERRCHK(IERR)
+            WRITE(*,140)(NDNMS(K),K=1,NUMRET)
+     140    FORMAT(2(8X,A))
+            NLEFT = NLEFT - MAXCLD
+            ISTART = ISTART + MAXCLD
+         IF (NLEFT .GT. 0) GO TO 130
+         RETURN
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+   INFORMATION FROM LINK:
+   FILE: db1.adf
+   PATH: /DB1_NODE1/DB1_NODE2
+\end{alltt}
+
+\fcthdr{Get\_Root\_ID}{Get the Root ID for the ADF System}
+\label{sub:Get_Root_ID}
+
+\begin{fctbox}
+   {ADF\_Get\_Root\_ID}
+   {ADFGRID}
+   {(ID,root\_ID,error\_return)}
+\hline
+Input  & const double ID    & real*8 ID \\
+\hline
+Output & double root\_ID    & real*8 root\_ID \\
+       & int *error\_return & integer error\_return \\
+\hline
+\end{fctbox}
+
+\begin{Ventryi}{\textit{error\_return}}
+\item[\textit{ID}]
+     Any valid node ID for the given ADF database.
+\item[\textit{root\_ID}]
+     The ID of the root node
+\item[\textit{error\_return}]
+     Error return code.
+     (See \hyperref[s:errors]{Appendix~\ref*{s:errors}}.)
+\end{Ventryi}
+
+This routine, \fort{ADF\_Get\_Root\_ID}, returns the root ID for an ADF
+file when given any valid node ID for that file.
+
+\Example
+
+This example illustrates that the root node ID can be obtained at any
+time by using a currently valid node ID for that file.
+
+\begin{alltt}
+   PROGRAM TEST
+   C
+         PARAMETER (MAXCHR=32)
+   C
+         CHARACTER*(MAXCHR) NODNAM,ROOTNM
+   C
+   C *** NODE IDS
+   C
+         REAL*8 RID,PID,CID,TESTID
+         INTEGER I,J,IERR,NUMCLD
+   C
+   C *** OPEN DATABASE
+   C
+         CALL ADFDOPN('db.adf','NEW',' ',RID,IERR)
+         CALL ADFGNAM(RID,ROOTNM,IERR)
+         PRINT *,' AFTER OPENING FILE, ROOT NAME = ',ROOTNM
+   C
+   C *** CREATE NODES AT FIRST LEVEL
+   C
+         DO 150 I = 1,2
+            WRITE(NODNAM,'(A7,I1)')'PARENT.',I
+            CALL ADFCRE(RID,NODNAM,PID,IERR)
+            TESTID = 0.0
+            ROOTNM =''
+            CALL ADFGRID(PID,TESTID,IERR)
+            CALL ADFGNAM(TESTID,ROOTNM,IERR)
+            WRITE(*,100)NODNAM,ROOTNM
+     100    FORMAT('USING NODE ID FROM: ',A,
+        X          ' ROOT NAME = ',A)
+   C
+   C ****** CREATE NODES AT SECOND LEVEL
+   C
+            NUMCLD = 2*I
+            DO 110 J = 1,NUMCLD
+               WRITE(NODNAM,'(A6,I1,A1,I1)')'CHILD.',I,'.',J
+               CALL ADFCRE(PID,NODNAM,CID,IERR)
+               TESTID = 0.0
+               ROOTNM =''
+               CALL ADFGRID(PID,TESTID,IERR)
+               CALL ADFGNAM(TESTID,ROOTNM,IERR)
+               WRITE(*,100)NODNAM,ROOTNM
+     110    CONTINUE
+     150 CONTINUE
+   C
+         STOP
+         END
+\end{alltt}
+
+\noindent
+The resulting output is:
+
+\begin{alltt}
+    AFTER OPENING FILE, ROOT NAME = ADF MotherNode
+   USING NODE ID FROM: PARENT.1          ROOT NAME = ADF MotherNode
+   USING NODE ID FROM: CHILD.1.1         ROOT NAME = ADF MotherNode
+   USING NODE ID FROM: CHILD.1.2         ROOT NAME = ADF MotherNode
+   USING NODE ID FROM: PARENT.2          ROOT NAME = ADF MotherNode
+   USING NODE ID FROM: CHILD.2.1         ROOT NAME = ADF MotherNode
+   USING NODE ID FROM: CHILD.2.2         ROOT NAME = ADF MotherNode
+   USING NODE ID FROM: CHILD.2.3         ROOT NAME = ADF MotherNode
+   USING NODE ID FROM: CHILD.2.4         ROOT NAME = ADF MotherNode
+\end{alltt}
