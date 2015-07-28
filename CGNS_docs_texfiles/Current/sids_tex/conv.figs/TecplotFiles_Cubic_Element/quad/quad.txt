@@ -1,8 +1,0 @@
-TITLE = "Quad Element"
-VARIABLES = "x","y","z"
-ZONE T="Quad" N=4 E=1 DATAPACKING=POINT ZONETYPE=FEQUADRILATERAL
--1 -1 0
- 1 -1 0
- 1  1 0
--1  1 0
-1 2 3 4
